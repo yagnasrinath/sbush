@@ -41,7 +41,6 @@ int main(int argc, char* argv[], char* envp[])
     if (argc == 1)
     {
         line = get_line();
-        set_prompt("")
     }
     else
     {
