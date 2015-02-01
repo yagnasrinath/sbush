@@ -1,7 +1,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include"sbush.h"
-#include "lib/bushutils.h"
+#include"bushutils.h"
 char* get_line()
 {
     int fd = 0; // 0 is stdin
@@ -43,6 +43,7 @@ int make_job(struct job* cmd_list,char * cmdline)
     {
         return 0;
     }
+    trim(cmdline); 
     struct command* cm = (struct command*) malloc(sizeof(struct command));
     cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
     cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
