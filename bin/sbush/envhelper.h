@@ -10,6 +10,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+#include"sbushutils.h"
 typedef struct env {
 	char* key;
 	char* value;

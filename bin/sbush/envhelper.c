@@ -91,11 +91,12 @@ void setvalue(char* key, char *val) {
 
 char * buildenv(envList *head) {
 	int len = strlen(head->key) + strlen(head->value) + 2;
-	char * envVar = (char *)malloc(sizeof(len));
-	strcpy(envVar,head->key);
-	strcpy(envVar,"=");
-	strcpy(envVar,head->value);
-	return envVar;
+	char * envVar = (char *)malloc(len);
+	memset(envVar, '\0',len);
+    strcpy(envVar,head->key);
+	strcat(envVar,"=");
+	strcat(envVar,head->value);
+    return envVar;
 }
 char ** getenv() {
 	envList *head =  environment;
@@ -104,10 +105,11 @@ char ** getenv() {
 	while(head !=0) {
 		env [i] = buildenv(head);
 		head = head->next;
-		i++;
+            i++;
 	}
-	env [i]= 0;
-	return env;
+    printf("%d,%d\n",envSize,i);
+    env [i]= 0;
+    return env;
 }
 
 void freeenv(char **envlist){

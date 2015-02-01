@@ -140,7 +140,7 @@ void delete_job(struct job* cmd_list)
             free(cmd->argv[i]);
             i++;
         }
-        free(cmd->argv);
+        //free(cmd->argv);
         cmd = cmd->next;
     }
 }
@@ -174,9 +174,11 @@ void execute_job(struct job* j,char**envp)
                 }
                 close(new[0]);
                 dup2(1,new[1]);
-                execve(c->executable,c->argv,envp);
+                char* args[] = {"/bin/ls",0};
+                printf("%s",c->executable);
+                execve("/bin/ls",args,envp);
                 msg="execve failed";
-                write(2,msg,strlen(msg));
+                printf("%s,%d\n",msg,errno);
                 exit(EXIT_FAILURE);
                 break;
             default:
@@ -207,6 +209,6 @@ int main(int argc, char* argv[], char* envp[])
     struct job cmd_list;
     make_job(&cmd_list,line);
     print_job(&cmd_list);
-    delete_job(&cmd_list);
+    //delete_job(&cmd_list);
     execute_job(&cmd_list,new_envp);
 }

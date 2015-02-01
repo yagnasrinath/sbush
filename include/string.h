@@ -10,6 +10,9 @@ extern int strcmp (const char *__s1, const char *__s2);
 
 extern int strncmp (const char *__s1, const char *__s2, size_t __n);
 
+extern char *strcat (char *__restrict __dest, const char *__restrict __src);
+extern char *strncat (char *__restrict __dest, const char *__restrict __src,
+                      size_t __n);
 extern size_t strlen (const char *__s);
 #endif /* string.h  */
 
