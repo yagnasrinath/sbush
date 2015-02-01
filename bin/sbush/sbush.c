@@ -5,6 +5,60 @@
 #include"sbconstants.h"
 #include"envhelper.h"
 
+void getabsolutepath(struct job *newcommand, char *path){
+    struct job *tempjob = (struct job*)malloc(sizeof(struct job));
+
+
+}
+
+int getCountOfChar(char* string, char character) {
+    if(string ==0 )
+        return 0;
+    int len = strlen(string);
+    int count =0;
+    for(int i=0;i <len; i++) {
+        count++;
+    }
+    return count;
+}
+int getfirstindex(char* string,char character) {
+    if(string ==0) {
+        return 0;
+    }
+    int i=0;
+    while(string[i]) {
+        if(string[i]==character) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+
+char** strtokenize(char* string, char character) {
+    int numofstrings = getcountofchar(string,character) +1;
+    char **output = (char**)malloc(sizeof(char*)*numofstrings);
+    int index=0;
+    int i=0,j=0;
+    while(string) {
+        j = getfirstindex(string,character);
+        if(j==-1){
+            char* currstring = (char*)(malloc(strlen(string)+1));
+            strcpy(currstring,string);
+            output[index] = currstring;
+            return output;
+        }
+        char* currstring = (char*)(malloc(j)+1);
+        strncpy(currstring,string,j);
+        currstring[j] ='\0';
+        string+=j;
+        output[index] =currstring;
+        index++;
+    }
+    return 0;
+}
+
+
 char* get_line()
 {
     int fd = 0; // 0 is stdin
