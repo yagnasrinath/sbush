@@ -1,7 +1,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include"sbush.h"
-#include"bushutils.h"
+#include"bushUtils.h"
 char* get_line()
 {
     int fd = 0; // 0 is stdin
@@ -35,15 +35,13 @@ char* get_args_line(int argc,char*argv[])
     return buf;
 }
 
-//does not handle initial spaces
-
 int make_job(struct job* cmd_list,char * cmdline)
 {
     if(cmdline == 0)
     {
         return 0;
     }
-    trim(cmdline); 
+        trim(cmdline); 
     struct command* cm = (struct command*) malloc(sizeof(struct command));
     cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
     cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
@@ -56,6 +54,7 @@ int make_job(struct job* cmd_list,char * cmdline)
     {
         if(*cmdline=='|')
         {
+            arg_index ++;
             temp->argv[arg_index] = 0;
             cm = (struct command*) malloc(sizeof(struct command));
             cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
@@ -77,6 +76,7 @@ int make_job(struct job* cmd_list,char * cmdline)
                 cmd_index = 0;
                 arg_val_index=0;
                 arg_index++;
+//                printf("%d\n",arg_index);
                 cm->argv[arg_index] = (char*)malloc(ARG_MAX_LENGTH);
             }
             else if(is_cmd)
@@ -86,12 +86,16 @@ int make_job(struct job* cmd_list,char * cmdline)
             }
             else if(is_arg)
             {
+//                printf("\n%c\t%d\n",*cmdline,arg_val_index,arg_index);
                 cm->argv[arg_index][arg_val_index] = *cmdline;
                 arg_val_index++;
             }
         }
         cmdline++;
     }
+
+    arg_index ++;
+    temp->argv[arg_index] = 0;
     return 0;
 }
 
