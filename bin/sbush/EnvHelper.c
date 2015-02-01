@@ -32,10 +32,10 @@ void parseCurrEnv(envList* currentEnv, char* inputEnv) {
 }
 
 
-envList* initializeEnv(char **inputEnv) {
+void initializeEnv(char **inputEnv) {
 
 	if(inputEnv == 0) {
-		return 0;
+		return ;
 	}
 	int i =0;
 	envList* head = 0;

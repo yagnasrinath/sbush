@@ -15,7 +15,7 @@ typedef struct env {
 	char* value;
 	struct env* next;
 }envList;
-envList* initializeEnv(char **inputEnv);
+void initializeEnv(char **inputEnv);
 void getValue(char* key, char *val);
 void setValue(char* key, char *val);
 char * buildEnv(envList *head);
