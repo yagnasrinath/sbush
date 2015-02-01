@@ -7,15 +7,14 @@
 
 void getabsolutepath(struct job *newcommand, char *path){
     int pathlen = strlen(path);
-//    int execlen = strlen(newcommand->executable);
-//    int newexeclength = pathlen + execlen + 2;
-//    char newexec[newexeclength];
- //   strncpy(newexec,path, pathlen);
-  //  strcat(newexec+pathlen,"/");
- //   strncpy(newexec+pathlen+1, newcommand->executable, execlen+1);
-    
-
-
+    int execlen = strlen(newcommand->start->executable);
+    int newexeclength = pathlen + execlen + 2;
+    char newexec[newexeclength];
+    strncpy(newexec,path, pathlen);
+    strcat(newexec,"/");
+    strcat(newexec, newcommand->start->executable);
+    strncpy(newcommand->start->executable,newexec, newexeclength);
+    strncpy(newcommand->start->argv[0], newcommand->start->executable, newexeclength); //copying executable to argv[0]
 }
 
 
