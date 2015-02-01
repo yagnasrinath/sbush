@@ -42,7 +42,7 @@ void initializeenv(char **inputEnv) {
 	envList* head = 0;
 	envList* tail = 0;
 	while(inputEnv[i]) {
-		envList* currentEnv = (envList*)malloc(sizeof(envList));
+        envList* currentEnv = (envList*)malloc(sizeof(envList));
 		if(head == 0) {
 			head= currentEnv ;
 		}
@@ -53,6 +53,7 @@ void initializeenv(char **inputEnv) {
 		currentEnv->next = 0;
 		parsecurrenv(currentEnv,inputEnv[i]);
 		envSize++;
+        i++;
 	}
 	environment = head;
 }
