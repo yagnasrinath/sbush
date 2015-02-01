@@ -5,13 +5,13 @@
  *      Author: ravichandrasadineni
  */
 
-#ifndef SBUSH_BIN_SBUSH_LIB_BUSHUTILS_H_
-#define SBUSH_BIN_SBUSH_LIB_BUSHUTILS_H_
+#ifndef SBUSHUTILS_H
+#define SBUSHUTILS_H
 
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 
-void trim(char* input);
+void ltrim(char* input);
 
 #endif /* SBUSH_BIN_SBUSH_LIB_BUSHUTILS_H_ */
