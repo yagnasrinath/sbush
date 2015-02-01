@@ -53,26 +53,30 @@ int make_job(struct job* cmd_list,char * cmdline)
     cmd_list->start = cm;
     struct command* temp=cmd_list->start;
     int is_cmd=1,is_arg=0;//0 - False, 1 - True
-    int cmd_index = 0, arg_val_index=0, arg_index = -1;
+    int cmd_index = 0, arg_val_index=0, arg_index = 0;
     while(*cmdline)
     {
         if(*cmdline=='|')
         {
+            temp->executable[cmd_index]='\0';
+            rtrim(temp->executable);
             arg_index ++;
             temp->argv[arg_index] = 0;
+            temp->argv[0] = (char*)malloc(COMMAND_MAX_LENGTH);
+            memset(temp->argv[0],'\0',COMMAND_MAX_LENGTH);
+            strcpy(temp->argv[0],temp->executable);
             cm = (struct command*) malloc(sizeof(struct command));
             cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
             memset(cm->executable,'\0',COMMAND_MAX_LENGTH);
             cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
             cm->next=0;
             temp->next = cm;
+            cmd_index=0;
             temp = cm;
             is_cmd = 1;
             is_arg = 0;
             arg_val_index = 0;
-            arg_index = -1;
-            temp->executable[cmd_index]='\0';
-            cmd_index=0;
+            arg_index = 0;
         }
         else
         {
@@ -100,10 +104,16 @@ int make_job(struct job* cmd_list,char * cmdline)
         }
         cmdline++;
     }
-
     arg_index ++;
     temp->argv[arg_index] = 0;
     temp->executable[cmd_index]='\0';
+    rtrim(temp->executable);
+    if(!temp->argv[0])
+    {
+        temp->argv[0] = (char*)malloc(COMMAND_MAX_LENGTH);
+        memset(temp->argv[0],'\0',COMMAND_MAX_LENGTH);
+        strcpy(temp->argv[0],temp->executable);
+    }
     return 0;
 }
 
@@ -175,7 +185,7 @@ void execute_job(struct job* j,char**envp)
                 close(new[0]);
                 dup2(1,new[1]);
                 char* args[] = {"/bin/ls",0};
-                printf("%s",c->executable);
+                printf("%s\t%s\n",c->executable,c->argv[0]);
                 execve("/bin/ls",args,envp);
                 msg="execve failed";
                 printf("%s,%d\n",msg,errno);
