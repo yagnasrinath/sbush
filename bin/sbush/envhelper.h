@@ -5,8 +5,8 @@
  *      Author: ravichandrasadineni
  */
 
-#ifndef SBUSH_BIN_SBUSH_ENVHELPER_H_
-#define SBUSH_BIN_SBUSH_ENVHELPER_H_
+#ifndef ENVHELPER_H
+#define ENVHELPER_H
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>

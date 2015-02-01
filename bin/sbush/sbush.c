@@ -2,6 +2,10 @@
 #include<stdio.h>
 #include"sbush.h"
 #include"sbushutils.h"
+#include"sbconstants.h"
+
+
+
 char* get_line()
 {
     int fd = 0; // 0 is stdin
@@ -137,8 +141,54 @@ void delete_job(struct job* cmd_list)
     }
 }
 
+void execute_job(struct job* j,char**envp)
+{
+    int old[2] = {-1,-1},new[2]={-1,-1};
+    struct command c = j->start;
+    int pid = -1;
+    while(c)
+    {
+        if(pipe(new)==-1)
+        {
+            char * msg="pipe creation failed";
+            write(2,msg,strlen(msg));
+            exit(EXIT_FAILURE);
+        }
+        switch(pid = fork())
+        {
+            case -1:
+                char * msg="fork failed";
+                write(2,msg,strlen(msg));
+                exit(EXIT_FAILURE);
+                break;
+            case 0:
+                if(old[1]!=-1)
+                {
+                    close(old[1]);
+                    dup2(0,old[0]);
+                }
+                close(new[0]);
+                dup2(1,new[1]);
+                execve(c->executable,c->args,envp);
+                char * msg="execve failed";
+                write(2,msg,strlen(msg));
+                exit(EXIT_FAILURE);
+                break;
+            default:
+                close(old[0]);
+                close(old[1]);
+                old[0]=new[0];
+                old[1]=new[1];
+                break;
+        }
+        c=c->next;
+    }
+}
+
 int main(int argc, char* argv[], char* envp[])
 {
+    initializeenv(envp);
+    char** new_envp = getenv();
     char * line;
     if (argc == 1)
     {

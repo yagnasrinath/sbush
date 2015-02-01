@@ -10,6 +10,7 @@ struct command
 struct job
 {
     struct command* start;
+    struct job* next;
 };
 
 int make_job(struct job* cmd_list,char * cmdline);
