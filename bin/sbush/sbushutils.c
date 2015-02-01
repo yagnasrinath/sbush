@@ -5,7 +5,7 @@
  *      Author: ravichandrasadineni
  */
 
-#include "bushUtils.h"
+#include "sbushutils.h"
 
 static int isspace(int c) {
 	switch(c) {
@@ -18,7 +18,7 @@ static int isspace(int c) {
 	default   : return 0;
 	}
 }
-void trim(char *s) {
+void ltrim(char *s) {
   if(s == 0) {
 	  return;
   }
