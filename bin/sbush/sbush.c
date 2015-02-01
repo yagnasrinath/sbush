@@ -3,8 +3,7 @@
 #include"sbush.h"
 #include"sbushutils.h"
 #include"sbconstants.h"
-
-
+#include"envhelper.h"
 
 char* get_line()
 {
@@ -12,7 +11,7 @@ char* get_line()
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
     write(1,"prompt$",7);
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
-                                            // last char reserved for '\0'
+    // last char reserved for '\0'
     buf[bytes_read] = '\0';
     return buf;
 }
@@ -80,7 +79,7 @@ int make_job(struct job* cmd_list,char * cmdline)
                 cmd_index = 0;
                 arg_val_index=0;
                 arg_index++;
-//                printf("%d\n",arg_index);
+                //                printf("%d\n",arg_index);
                 cm->argv[arg_index] = (char*)malloc(ARG_MAX_LENGTH);
             }
             else if(is_cmd)
@@ -90,7 +89,7 @@ int make_job(struct job* cmd_list,char * cmdline)
             }
             else if(is_arg)
             {
-//                printf("\n%c\t%d\n",*cmdline,arg_val_index,arg_index);
+                //                printf("\n%c\t%d\n",*cmdline,arg_val_index,arg_index);
                 cm->argv[arg_index][arg_val_index] = *cmdline;
                 arg_val_index++;
             }
@@ -144,7 +143,7 @@ void delete_job(struct job* cmd_list)
 void execute_job(struct job* j,char**envp)
 {
     int old[2] = {-1,-1},new[2]={-1,-1};
-    struct command c = j->start;
+    struct command* c = j->start;
     int pid = -1;
     while(c)
     {
@@ -156,7 +155,8 @@ void execute_job(struct job* j,char**envp)
         }
         switch(pid = fork())
         {
-            case -1:
+            case (-1):
+                ;
                 char * msg="fork failed";
                 write(2,msg,strlen(msg));
                 exit(EXIT_FAILURE);
@@ -169,8 +169,8 @@ void execute_job(struct job* j,char**envp)
                 }
                 close(new[0]);
                 dup2(1,new[1]);
-                execve(c->executable,c->args,envp);
-                char * msg="execve failed";
+                execve(c->executable,c->argv,envp);
+                msg="execve failed";
                 write(2,msg,strlen(msg));
                 exit(EXIT_FAILURE);
                 break;
@@ -203,4 +203,5 @@ int main(int argc, char* argv[], char* envp[])
     make_job(&cmd_list,line);
     print_job(&cmd_list);
     delete_job(&cmd_list);
+    //execute_job(&cmd_list,new_envp);
 }

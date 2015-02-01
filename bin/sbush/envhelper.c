@@ -100,7 +100,7 @@ char ** getenv() {
 	char ** env = (char **)malloc(sizeof(char *)*(envSize+1));
 	int i=0;
 	while(head !=0) {
-		env [i] = buildEnv(head);
+		env [i] = buildenv(head);
 		head = head->next;
 		i++;
 	}
