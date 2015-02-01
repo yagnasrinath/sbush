@@ -1,7 +1,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include"sbush.h"
-
+#include "lib/bushutils.h"
 char* get_line()
 {
     int fd = 0; // 0 is stdin
