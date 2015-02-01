@@ -5,7 +5,7 @@
  *      Author: ravichandrasadineni
  */
 
-#include "EnvHelper.h"
+#include "envhelper.h"
 static envList * environment;
 static int envSize=0;
 
