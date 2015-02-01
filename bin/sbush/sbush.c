@@ -192,8 +192,8 @@ void execute_job(struct job* j,char**envp)
 
 int main(int argc, char* argv[], char* envp[])
 {
-//    initializeenv(envp);
-//    char** new_envp = getenv();
+    initializeenv(envp);
+    char** new_envp = getenv();
     char * line;
     if (argc == 1)
     {
@@ -208,5 +208,5 @@ int main(int argc, char* argv[], char* envp[])
     make_job(&cmd_list,line);
     print_job(&cmd_list);
     delete_job(&cmd_list);
-    //execute_job(&cmd_list,new_envp);
+    execute_job(&cmd_list,new_envp);
 }

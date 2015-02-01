@@ -9,9 +9,9 @@
 static envList * environment;
 static int envSize=0;
 
-void parseCurrEnv(envList* currentEnv, char* inputEnv) {
+void parsecurrenv(envList* currentEnv, char* inputEnv) {
 	if(inputEnv ==0) {
-		printf("ENV HELPER.c: parseCurrEnv: FATAL : ENVIRONMENT contains null values\n");
+		printf("ENV HELPER.c: parsecurrenv: FATAL : ENVIRONMENT contains null values\n");
 		exit(1);
 	}
 	int i;
@@ -25,9 +25,10 @@ void parseCurrEnv(envList* currentEnv, char* inputEnv) {
 	int len = strlen(inputEnv);
 	char *key = (char*)malloc(i+1);
 	strncpy(key,inputEnv,i);
+    key[i] = '\0';
 	currentEnv->key = key;
-	char *value =(char*)malloc(len-(i));
-	strcpy(value,(inputEnv+i+1));
+	char *value =(char*)malloc(len-i);
+	strncpy(value,(inputEnv+i+1),(len-i));
 	currentEnv->value = value;
 }
 
@@ -50,7 +51,7 @@ void initializeenv(char **inputEnv) {
 		}
 		tail = currentEnv;
 		currentEnv->next = 0;
-		parseCurrEnv(currentEnv,inputEnv[i]);
+		parsecurrenv(currentEnv,inputEnv[i]);
 		envSize++;
 	}
 	environment = head;
