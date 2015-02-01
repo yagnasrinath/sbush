@@ -6,6 +6,7 @@ char* get_line()
 {
     int fd = 0; // 0 is stdin
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
+    write(1,"prompt$",7);
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
                                             // last char reserved for '\0'
     buf[bytes_read] = '\0';
