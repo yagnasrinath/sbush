@@ -15,13 +15,13 @@ typedef struct env {
 	char* value;
 	struct env* next;
 }envList;
-void initializeEnv(char **inputEnv);
-void getValue(char* key, char *val);
-void setValue(char* key, char *val);
-char * buildEnv(envList *head);
-char** getEnv();
-void freeEnv(char **envlist);
-char* appendPATH(char* PATH,char* appendPATH);
-char* prependPATH(char PATH[],char prependPATH[]);
+void initializeenv(char **inputEnv);
+void getvalue(char* key, char *val);
+void setvalue(char* key, char *val);
+char * buildenv(envList *head);
+char** getenv();
+void freeenv(char **envlist);
+char* appendpath(char* PATH,char* appendPATH);
+char* prependpath(char PATH[],char prependPATH[]);
 
 #endif /* SBUSH_BIN_SBUSH_ENVHELPER_H_ */

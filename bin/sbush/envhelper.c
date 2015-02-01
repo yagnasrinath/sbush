@@ -32,7 +32,7 @@ void parseCurrEnv(envList* currentEnv, char* inputEnv) {
 }
 
 
-void initializeEnv(char **inputEnv) {
+void initializeenv(char **inputEnv) {
 
 	if(inputEnv == 0) {
 		return ;
@@ -56,7 +56,7 @@ void initializeEnv(char **inputEnv) {
 	environment = head;
 }
 
-void getValue(char* key, char *val) {
+void getvalue(char* key, char *val) {
 	if(key == 0) {
 		printf("PATH HELPER.c:getValue : FATAL : Key passed is null\n");
 	}
@@ -69,7 +69,7 @@ void getValue(char* key, char *val) {
 	}
 }
 
-void setValue(char* key, char *val) {
+void setvalue(char* key, char *val) {
 	if(key == 0) {
 		printf("ENV HELPER.c: setValue: FATAL : Key passed is null\n");
 	}
@@ -87,7 +87,7 @@ void setValue(char* key, char *val) {
 	}
 }
 
-char * buildEnv(envList *head) {
+char * buildenv(envList *head) {
 	int len = strlen(head->key) + strlen(head->value) + 2;
 	char * envVar = (char *)malloc(sizeof(len));
 	strcpy(envVar,head->key);
@@ -95,7 +95,7 @@ char * buildEnv(envList *head) {
 	strcpy(envVar,head->value);
 	return envVar;
 }
-char ** getEnv() {
+char ** getenv() {
 	envList *head =  environment;
 	char ** env = (char **)malloc(sizeof(char *)*(envSize+1));
 	int i=0;
@@ -108,7 +108,7 @@ char ** getEnv() {
 	return env;
 }
 
-void freeEnv(char **envlist){
+void freeenv(char **envlist){
 	int i = 0;
 	while(envlist[i]!= 0){
 		free(envlist[i]);
@@ -117,7 +117,7 @@ void freeEnv(char **envlist){
 	free(envlist);
 }
 
-char* appendPATH(char* PATH,char* appendPATH){
+char* appendpath(char* PATH,char* appendPATH){
 	int newLength = strlen(PATH) + strlen(appendPATH) + 1;
 	char *newPATH = (char *)malloc(sizeof(newLength)) ;
 	strcpy(newPATH, PATH);
@@ -125,7 +125,7 @@ char* appendPATH(char* PATH,char* appendPATH){
 	return newPATH;
 }
 
-char* prependPATH(char PATH[],char prependPATH[]){
+char* prependpath(char PATH[],char prependPATH[]){
 	int newLength = strlen(PATH) + strlen(prependPATH) + 1;
 	char *newPATH;
 	newPATH = (char *)malloc(newLength);
