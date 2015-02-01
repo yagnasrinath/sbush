@@ -47,6 +47,7 @@ int make_job(struct job* cmd_list,char * cmdline)
     ltrim(cmdline); 
     struct command* cm = (struct command*) malloc(sizeof(struct command));
     cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
+    memset(cm->executable,'\0',COMMAND_MAX_LENGTH);
     cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
     cm->next=0;
     cmd_list->start = cm;
@@ -61,6 +62,7 @@ int make_job(struct job* cmd_list,char * cmdline)
             temp->argv[arg_index] = 0;
             cm = (struct command*) malloc(sizeof(struct command));
             cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
+            memset(cm->executable,'\0',COMMAND_MAX_LENGTH);
             cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
             cm->next=0;
             temp->next = cm;
@@ -69,6 +71,8 @@ int make_job(struct job* cmd_list,char * cmdline)
             is_arg = 0;
             arg_val_index = 0;
             arg_index = -1;
+            temp->executable[cmd_index]='\0';
+            cmd_index=0;
         }
         else
         {
@@ -76,11 +80,11 @@ int make_job(struct job* cmd_list,char * cmdline)
             {
                 is_cmd = 0;
                 is_arg = 1;
-                cmd_index = 0;
                 arg_val_index=0;
                 arg_index++;
                 //                printf("%d\n",arg_index);
                 cm->argv[arg_index] = (char*)malloc(ARG_MAX_LENGTH);
+                memset(cm->argv[arg_index],'\0',ARG_MAX_LENGTH);
             }
             else if(is_cmd)
             {
@@ -99,6 +103,7 @@ int make_job(struct job* cmd_list,char * cmdline)
 
     arg_index ++;
     temp->argv[arg_index] = 0;
+    temp->executable[cmd_index]='\0';
     return 0;
 }
 
@@ -187,8 +192,8 @@ void execute_job(struct job* j,char**envp)
 
 int main(int argc, char* argv[], char* envp[])
 {
-    initializeenv(envp);
-    char** new_envp = getenv();
+//    initializeenv(envp);
+//    char** new_envp = getenv();
     char * line;
     if (argc == 1)
     {

@@ -33,3 +33,14 @@ void ltrim(char *s) {
   }
   s[k] = '\0';
 }
+
+void memset(void* input,int c, int size)
+{
+    int i=0;
+    unsigned char* p = input;
+    for(i=0;i<size;i++)
+    {
+        *p = (unsigned char)c;
+        p++;
+    }
+}

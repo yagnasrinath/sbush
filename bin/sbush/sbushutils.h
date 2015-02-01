@@ -13,5 +13,6 @@
 #include<string.h>
 
 void ltrim(char* input);
+void memset(void* input,int c,int size);
 
 #endif /* SBUSH_BIN_SBUSH_LIB_BUSHUTILS_H_ */
