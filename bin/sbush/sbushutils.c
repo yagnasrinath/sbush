@@ -34,6 +34,16 @@ void ltrim(char *s) {
   s[k] = '\0';
 }
 
+void rtrim(char *s){
+    if(s == 0)
+        return;
+    int i=strlen(s)-1;
+    while(isspace(s[i]))
+        i--;
+    s[i+1] = '\0';
+}    
+
+
 void memset(void* input,int c, int size)
 {
     int i=0;
