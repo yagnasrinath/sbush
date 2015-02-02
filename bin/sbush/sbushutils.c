@@ -43,6 +43,11 @@ void rtrim(char *s){
     s[i+1] = '\0';
 }    
 
+void trim(char *s){
+    ltrim(s);
+    rtrim(s);
+}    
+
 
 void memset(void* input,int c, int size)
 {
