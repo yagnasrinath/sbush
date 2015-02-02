@@ -41,7 +41,7 @@ void changedir(char *dirpath){
 int isKnowncommand(char *command) {
 	int  i;
 	for(i=0; i<knowncommandslength; i++) {
-		if(!strcmp(command,knowncommands)){
+		if(!strcmp(command,knowncommands[i])){
 			return TRUE;
 		}
 	}
@@ -49,7 +49,7 @@ int isKnowncommand(char *command) {
 }
 
 void executecommand(char *command, char** args) {
-	int i;
+
 	if(!strcmp(command,"cd")) {
 		changedir(args[1]);
 	}
