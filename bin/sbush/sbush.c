@@ -6,6 +6,7 @@
 #include"envhelper.h"
 #include"sberror.h"
 
+static char prompt[128];
 
 void setabsolutepath(char*newexec,struct command *newcommand, char *path){
     strcpy(newexec,path);
@@ -17,8 +18,13 @@ char* get_line()
 {
     int fd = 0; // 0 is stdin
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
-    write(1,"prompt$",7);
+    write(1,prompt,strlen(prompt));
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
+    if(bytes_read == 0)
+    {
+        printf("exit\n");
+        exit(0);
+    }
     trim(buf);
     // last char reserved for '\0'
     buf[bytes_read] = '\0';
@@ -121,6 +127,10 @@ int make_job(struct job* cmd_list,char * cmdline)
         cmdline++;
     }
     arg_index ++;
+    if((arg_index-1)>=0)
+    {
+        trim(temp->argv[arg_index-1]);
+    }
     temp->argv[arg_index] = 0;
     temp->executable[cmd_index]='\0';
     rtrim(temp->executable);
@@ -159,13 +169,16 @@ void delete_job(struct job* cmd_list)
     int i=0;
     while(cmd!=0)
     {
+        if(cmd->executable)
         free(cmd->executable);
         i=0;
         while(cmd->argv[i]!=0)
         {
+            if(cmd->argv[i])
             free(cmd->argv[i]);
             i++;
         }
+        if(cmd->argv)
         free(cmd->argv);
         cmd = cmd->next;
     }
@@ -189,7 +202,8 @@ void execute_command(struct command*c, char**envp)
         char** paths = strtokenize(path,':');
         while(*paths)
         {
-            char cmdpath[MAX_PATH_LENGTH];
+            free(c->argv[0]);
+            char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
             setabsolutepath(cmdpath,c,*paths);
             c->argv[0]=cmdpath;
             execve(cmdpath,c->argv,envp);
@@ -264,21 +278,27 @@ void execute_job(struct job* j,char**envp)
 
 int main(int argc, char* argv[], char* envp[])
 {
+    strncpy(prompt,"sbush$",128);
     initializeenv(envp);
     char** new_envp = getenv();
     char * line;
-    if (argc == 1)
-    {
-        line = get_line();
-    }
-    else
+    struct job cmd_list;
+    if (argc != 1)
     {
         line = get_args_line(argc,argv);
+        make_job(&cmd_list,line);
+        execute_job(&cmd_list,new_envp);
+        delete_job(&cmd_list);
+        return 0;
+    }
+    while(1)
+    {
+        line = get_line(); 
+        make_job(&cmd_list,line);
+        execute_job(&cmd_list,new_envp);
+        delete_job(&cmd_list);
     }
     //printf("%s\n",line);
-    struct job cmd_list;
-    make_job(&cmd_list,line);
     //print_job(&cmd_list);
-    execute_job(&cmd_list,new_envp);
     //delete_job(&cmd_list);
 }
