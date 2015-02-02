@@ -25,7 +25,7 @@ void parsecurrenv(envList* currentEnv, char* inputEnv) {
 	int len = strlen(inputEnv);
 	char *key = (char*)malloc(i+1);
 	strncpy(key,inputEnv,i);
-    key[i] = '\0';
+	key[i] = '\0';
 	currentEnv->key = key;
 	char *value =(char*)malloc(len-i);
 	strncpy(value,(inputEnv+i+1),(len-i));
@@ -42,7 +42,7 @@ void initializeenv(char **inputEnv) {
 	envList* head = 0;
 	envList* tail = 0;
 	while(inputEnv[i]) {
-        envList* currentEnv = (envList*)malloc(sizeof(envList));
+		envList* currentEnv = (envList*)malloc(sizeof(envList));
 		if(head == 0) {
 			head= currentEnv ;
 		}
@@ -53,9 +53,10 @@ void initializeenv(char **inputEnv) {
 		currentEnv->next = 0;
 		parsecurrenv(currentEnv,inputEnv[i]);
 		envSize++;
-        i++;
+		i++;
 	}
 	environment = head;
+	buildenv();
 }
 
 void getvalue(char* key, char *val) {
@@ -87,32 +88,31 @@ void setvalue(char* key, char *val) {
 		}
 		head = head->next;
 	}
+	buildenv();
 }
 
-char * buildenv(envList *head) {
-	int len = strlen(head->key) + strlen(head->value) + 2;
-	char * envVar = (char *)malloc(len);
-	memset(envVar, '\0',len);
-    strcpy(envVar,head->key);
-	strcat(envVar,"=");
-	strcat(envVar,head->value);
-    return envVar;
-}
-char ** getenv() {
+void buildenv() {
 	envList *head =  environment;
 	if(env != 0) {
-        freeenv(env);
-    }
-    env = (char **)malloc(sizeof(char *)*(envSize+1));
+		freeenv(env);
+	}
+	env = (char **)malloc(sizeof(char *)*(envSize+1));
 	int i=0;
 	while(head !=0) {
-		env [i] = buildenv(head);
+		int len = strlen(head->key) + strlen(head->value) + 2;
+		char * envVar = (char *)malloc(len);
+		memset(envVar, '\0',len);
+		strcpy(envVar,head->key);
+		strcat(envVar,"=");
+		strcat(envVar,head->value);
+		env [i] = envVar;
 		head = head->next;
-            i++;
+		i++;
 	}
-    //printf("%d,%d\n",envSize,i);
-    env [i]= 0;
-    return env;
+	env [i]= 0;
+}
+char *** getenv() {
+	return &(env);
 }
 
 void freeenv(char **envlist){
