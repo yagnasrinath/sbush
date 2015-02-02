@@ -31,29 +31,7 @@ char* get_line()
     return buf;
 }
 
-int changeDir(char *newDirName){
-    char *Exists;
-    if((Exists = opendir(newDirName)) != 0)
-        return TRUE;
-    else{
-        write(2,strerror(errno),sizeof(strerror(errno)));
-    }
-    return FALSE;
-}
 
-
-void changedir(char *dirpath){
-    char path[4096] ;
-    strncpy(path, dirpath, strlen(dirpath)+1);
-    free(dirpath);
-    trim(path);
-    if(strlen(path) == 0)
-        getvalue("HOME", path);
-    if(changeDir(path) == TRUE){
-        printf("Change DIR Successful \n");
-        setvalue("PWD",path);
-    }
-}
 
 char* get_args_line(int argc,char*argv[])
 {
