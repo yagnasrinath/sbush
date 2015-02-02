@@ -86,11 +86,12 @@ int getfirstindex(char* string,char character) {
 char** strtokenize(char* string, char character) {
     int numofstrings = getcountofchar(string,character) +1;
     char **output = (char**)malloc(sizeof(char*)*numofstrings+1);
+    //printf("%d\n",numofstrings);
     output[numofstrings] = 0;
     int index=0;
     int j=0;
     while(string) {
-        printf("%c\n",*string);
+        //printf("%s\n",string);
         j = getfirstindex(string,character);
         if(j==-1){
             char* currstring = (char*)(malloc(strlen(string)+1));
@@ -101,7 +102,8 @@ char** strtokenize(char* string, char character) {
         char* currstring = (char*)(malloc(j)+1);
         strncpy(currstring,string,j);
         currstring[j] ='\0';
-        string+=j;
+        //printf("%s\n",currstring);
+        string+=(j+1);
         output[index] =currstring;
         index++;
     }

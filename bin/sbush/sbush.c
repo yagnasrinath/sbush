@@ -7,17 +7,10 @@
 #include"sberror.h"
 
 
-void setabsolutepath(struct command *newcommand, char *path){
-    int pathlen = strlen(path);
-    int execlen = strlen(newcommand->executable);
-    int newexeclength = pathlen + execlen + 2;
-    char newexec[newexeclength];
-    strncpy(newexec,path, pathlen);
+void setabsolutepath(char*newexec,struct command *newcommand, char *path){
+    strcpy(newexec,path);
     strcat(newexec,"/");
     strcat(newexec, newcommand->executable);
-    printf("%s\n",newexec);
-    strncpy(newcommand->executable,newexec, newexeclength);
-    strncpy(newcommand->argv[0], newcommand->executable, newexeclength); //copying executable to argv[0]
 }
 
 char* get_line()
@@ -184,19 +177,20 @@ void execute_command(struct command*c, char**envp)
     {
         char path[MAX_PATH_LENGTH];
         getvalue("PATH",path);
-        printf("path:%s\n",path);
+        //printf("path:%s\n",path);
         char** paths = strtokenize(path,':');
         while(*paths)
         {
-            setabsolutepath(c,*paths);
-            execve(c->executable,c->argv,envp);
+            char cmdpath[MAX_PATH_LENGTH];
+            setabsolutepath(cmdpath,c,*paths);
+            c->argv[0]=cmdpath;
+            execve(cmdpath,c->argv,envp);
             if (errno != ENOENT )
             {
                 write(2,strerror(errno),strlen(strerror(errno)));
                 write(2,"\n",strlen("\n"));
                 return;
             }
-
             paths++;
         }
 
@@ -276,7 +270,7 @@ int main(int argc, char* argv[], char* envp[])
     //printf("%s\n",line);
     struct job cmd_list;
     make_job(&cmd_list,line);
-    //print_job(&cmd_list);
+    print_job(&cmd_list);
     execute_job(&cmd_list,new_envp);
     //delete_job(&cmd_list);
 }

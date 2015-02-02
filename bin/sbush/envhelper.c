@@ -110,7 +110,7 @@ char ** getenv() {
 		head = head->next;
             i++;
 	}
-    printf("%d,%d\n",envSize,i);
+    //printf("%d,%d\n",envSize,i);
     env [i]= 0;
     return env;
 }
