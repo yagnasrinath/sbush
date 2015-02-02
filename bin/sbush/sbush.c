@@ -5,6 +5,7 @@
 #include"sbconstants.h"
 #include"envhelper.h"
 
+
 void getabsolutepath(struct job *newcommand, char *path){
     int pathlen = strlen(path);
     int execlen = strlen(newcommand->start->executable);
@@ -16,6 +17,8 @@ void getabsolutepath(struct job *newcommand, char *path){
     strncpy(newcommand->start->executable,newexec, newexeclength);
     strncpy(newcommand->start->argv[0], newcommand->start->executable, newexeclength); //copying executable to argv[0]
 }
+
+
 
 
 char* get_line()
@@ -163,7 +166,7 @@ void delete_job(struct job* cmd_list)
             free(cmd->argv[i]);
             i++;
         }
-        //free(cmd->argv);
+        free(cmd->argv);
         cmd = cmd->next;
     }
 }
@@ -173,6 +176,7 @@ void execute_job(struct job* j,char**envp)
     int old[2] = {-1,-1},new[2]={-1,-1};
     struct command* c = j->start;
     int pid = -1;
+    int childs=0;
     while(c)
     {
         if(pipe(new)==-1)
@@ -193,25 +197,34 @@ void execute_job(struct job* j,char**envp)
                 if(old[1]!=-1)
                 {
                     close(old[1]);
-                    dup2(0,old[0]);
+                    dup2(old[0],0);
                 }
                 close(new[0]);
-                dup2(1,new[1]);
-                char* args[] = {"/bin/ls",0};
-                printf("%s\t%s\n",c->executable,c->argv[0]);
-                execve("/bin/ls",args,envp);
-                msg="execve failed";
-                printf("%s,%d\n",msg,errno);
+                if(c->next!=0)
+                {
+                    dup2(new[1],1);
+                }
+                execve(c->executable,c->argv,envp);
                 exit(EXIT_FAILURE);
                 break;
             default:
-                close(old[0]);
-                close(old[1]);
+                childs++;
+                if(old[0]!=-1)
+                {
+                    close(old[0]);
+                    close(old[1]);
+                }
                 old[0]=new[0];
                 old[1]=new[1];
                 break;
         }
         c=c->next;
+    }
+    close(old[0]);
+    close(old[1]);
+    while(childs--)
+    {
+        waitpid(-1,0,0);
     }
 }
 
@@ -228,10 +241,10 @@ int main(int argc, char* argv[], char* envp[])
     {
         line = get_args_line(argc,argv);
     }
-    printf("%s\n",line);
+    //printf("%s\n",line);
     struct job cmd_list;
     make_job(&cmd_list,line);
-    print_job(&cmd_list);
-    //delete_job(&cmd_list);
+    //print_job(&cmd_list);
     execute_job(&cmd_list,new_envp);
+    //delete_job(&cmd_list);
 }
