@@ -7,6 +7,9 @@
 #include"knowncommandexecutor.h"
 
 
+envList * environment;
+int envSize=0;
+char** env=0;
 
 void setabsolutepath(char*newexec,struct command *newcommand, char *path){
     strcpy(newexec,path);
@@ -19,6 +22,7 @@ char* get_line()
     int fd = 0; // 0 is stdin
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
     write(1,getprompt(),strlen(getprompt()));
+    write(1," ",strlen(" "));
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
     if(bytes_read == 0)
     {
@@ -156,11 +160,6 @@ void delete_job(struct job* cmd_list)
 
 void execute_command(struct command*c, char***envp_ptr)
 {
-    if(isknowncommand(c->executable))
-    {
-        executeknowncommand(c->executable,c->argv);
-        return;
-    }
     int indexofslash =  getfirstindex(c->executable,'/');
     if(indexofslash != -1)
     {
@@ -185,7 +184,6 @@ void execute_command(struct command*c, char***envp_ptr)
             execve(cmdpath,c->argv,*envp_ptr);
             if (errno != ENOENT && errno != EACCES)
             {
-                printf("%s\n",cmdpath);
                 write(2,strerror(errno),strlen(strerror(errno)));
                 write(2,"\n",strlen("\n"));
                 return;
@@ -206,44 +204,51 @@ void execute_job(struct job* j,char***envp_ptr)
     int childs=0;
     while(c)
     {
-        if(pipe(new)==-1)
+        if(isknowncommand(c->executable))
         {
-            char * msg="pipe creation failed";
-            write(2,msg,strlen(msg));
-            exit(EXIT_FAILURE);
+            executeknowncommand(c->executable,c->argv);
+            
         }
-        switch(pid = fork())
-        {
-            case (-1):
-                ;
-                char * msg="fork failed";
+        else {
+            if(pipe(new)==-1)
+            {
+                char * msg="pipe creation failed";
                 write(2,msg,strlen(msg));
                 exit(EXIT_FAILURE);
-                break;
-            case 0:
-                if(old[1]!=-1)
-                {
-                    close(old[1]);
-                    dup2(old[0],0);
-                }
-                close(new[0]);
-                if(c->next!=0)
-                {
-                    dup2(new[1],1);
-                }
-                execute_command(c,envp_ptr);
-                exit(EXIT_FAILURE);
-                break;
-            default:
-                childs++;
-                if(old[0]!=-1)
-                {
-                    close(old[0]);
-                    close(old[1]);
-                }
-                old[0]=new[0];
-                old[1]=new[1];
-                break;
+            }
+            switch(pid = fork())
+            {
+                case (-1):
+                    ;
+                    char * msg="fork failed";
+                    write(2,msg,strlen(msg));
+                    exit(EXIT_FAILURE);
+                    break;
+                case 0:
+                    if(old[1]!=-1)
+                    {
+                        close(old[1]);
+                        dup2(old[0],0);
+                    }
+                    close(new[0]);
+                    if(c->next!=0)
+                    {
+                        dup2(new[1],1);
+                    }
+                    execute_command(c,envp_ptr);
+                    exit(EXIT_FAILURE);
+                    break;
+                default:
+                    childs++;
+                    if(old[0]!=-1)
+                    {
+                        close(old[0]);
+                        close(old[1]);
+                    }
+                    old[0]=new[0];
+                    old[1]=new[1];
+                    break;
+            }
         }
         c=c->next;
     }
@@ -283,6 +288,7 @@ int main(int argc, char* argv[], char* envp[])
         free(line);
         //print_job(&cmd_list);
         execute_job(&cmd_list,new_envp_ptr);
+        //print_job(&cmd_list);
         delete_job(&cmd_list);
     }
     //printf("%s\n",line);

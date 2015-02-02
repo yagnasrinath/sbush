@@ -6,9 +6,9 @@
  */
 
 #include "envhelper.h"
-static envList * environment;
-static int envSize=0;
-static char** env=0;
+extern envList * environment;
+extern int envSize;
+extern char** env;
 void parsecurrenv(envList* currentEnv, char* inputEnv) {
 	if(inputEnv ==0) {
 		printf("ENV HELPER.c: parsecurrenv: FATAL : ENVIRONMENT contains null values\n");
@@ -67,6 +67,7 @@ void getvalue(char* key, char *val) {
 	while(head != 0) {
 		if(strcmp(head->key,key) == 0) {
 			strcpy(val,head->value);
+            return;
 		}
 		head = head->next;
 	}
@@ -83,8 +84,11 @@ void setvalue(char* key, char *val) {
 	while(head != 0) {
 		if(strcmp(head->key,key) == 0) {
 			free(head->value);
-			head->value = (char *)malloc(strlen(val)+1);
-			strcpy(head->value,val);
+			
+            head->value = (char *)malloc(strlen(val)+1);
+            strcpy(head->value,val);
+            break;
+			//printf("%s\n",head->value);
 		}
 		head = head->next;
 	}

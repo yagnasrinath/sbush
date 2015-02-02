@@ -14,7 +14,8 @@ int isdirexist(char *newDirName){
 	if((Exists = opendir(newDirName)) != 0)
         return TRUE;
 	else{
-		write(2,strerror(errno),sizeof(strerror(errno)));
+		write(2,strerror(errno),strlen(strerror(errno)));
+        write(2, "\n",strlen("\n"));
 	}
 	return FALSE;
 }
@@ -32,23 +33,23 @@ char* getprompt() {
 void changedir(char *dirpath){
 	char path[4096] ;
 	trim(dirpath);
-	if((dirpath == 0)||(strlen(dirpath) == 0)) {
+    if((dirpath == 0)||(strlen(dirpath) == 0)) {
 		getvalue("HOME", path);
-		if(strlen(dirpath) == 0) {
-			free(dirpath);
-		}
 	}
 	else {
 		strncpy(path, dirpath, strlen(dirpath)+1);
-		free(dirpath);
 	}
 	if(isdirexist(path) == TRUE){
-		if(!chdir(path))
-            printf("Change DIR Successful \n");
-		setvalue("PWD",path);
-        memset(path,'\0',strlen(path));
-        getvalue("PWD",path);
-        printf("%s\n",path);
+		if(!chdir(path)){
+            //printf("Change DIR Successful \n");
+        }
+        else {
+            printf("%s\n",strerror(errno));
+            //write(2,strerror(errno),strlen(strerror(errno)));
+            //write(2,"\n",strlen("\n"));
+        }
+        getcwd(path,4096);
+        setvalue("PWD",path);
 	}
 }
 
@@ -71,7 +72,6 @@ void executeknowncommand(char *command, char** args) {
 	if(!strcmp(command,"set")) {
 		if(!strcmp(args[1],"prompt")) {
 			if(args[2] != 0) {
-				printf("Setting prompt\n");
                 strncpy(prompt,args[2],128);
 				return;
 			}
