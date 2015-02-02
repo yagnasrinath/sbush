@@ -19,8 +19,8 @@ typedef struct env {
 void initializeenv(char **inputEnv);
 void getvalue(char* key, char *val);
 void setvalue(char* key, char *val);
-char * buildenv(envList *head);
-char** getenv();
+void buildenv();
+char*** getenv();
 void freeenv(char **envlist);
 char* appendpath(char* PATH,char* appendPATH);
 char* prependpath(char PATH[],char prependPATH[]);
