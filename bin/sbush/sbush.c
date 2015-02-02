@@ -25,9 +25,9 @@ char* get_line()
         printf("exit\n");
         exit(0);
     }
-    trim(buf);
     // last char reserved for '\0'
     buf[bytes_read] = '\0';
+    trim(buf);
     return buf;
 }
 
@@ -61,89 +61,57 @@ int make_job(struct job* cmd_list,char * cmdline)
     {
         return 0;
     }
-    ltrim(cmdline); 
-    struct command* cm = (struct command*) malloc(sizeof(struct command));
-    cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
-    memset(cm->executable,'\0',COMMAND_MAX_LENGTH);
-    cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
-    cm->next=0;
-    cmd_list->start = cm;
-    struct command* temp=cmd_list->start;
-    int is_cmd=1,is_arg=0;//0 - False, 1 - True
-    int cmd_index = 0, arg_val_index=0, arg_index = 0;
-    while(*cmdline)
+    trim(cmdline); 
+    char **list =strtokenize(cmdline,'|');
+    int firstcommand = TRUE;
+    struct command* temp=0;
+    while(*list)
     {
-        if(*cmdline=='|')
+        trim(*list);
+        if(strlen(*list))
         {
-            temp->executable[cmd_index]='\0';
-            rtrim(temp->executable);
-            arg_index ++;
-            trim(temp->argv[arg_index-1]);
-     //       printf("$%s$\n",temp->argv[arg_index-1]);
-            temp->argv[arg_index] = 0;
-            temp->argv[0] = (char*)malloc(COMMAND_MAX_LENGTH);
-            memset(temp->argv[0],'\0',COMMAND_MAX_LENGTH);
-            strcpy(temp->argv[0],temp->executable);
-            cm = (struct command*) malloc(sizeof(struct command));
+            struct command* cm = (struct command*) malloc(sizeof(struct command));
+            if(firstcommand)
+            {
+                cmd_list->start = cm;
+                temp = cm;
+                firstcommand = FALSE;
+            }
+            else
+            {
+                temp->next = cm;
+                temp = cm;
+            }
             cm->executable = (char*)malloc(COMMAND_MAX_LENGTH);
             memset(cm->executable,'\0',COMMAND_MAX_LENGTH);
             cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
             cm->next=0;
-            temp->next = cm;
-            cmd_index=0;
-            temp = cm;
-            is_cmd = 1;
-            is_arg = 0;
-            arg_val_index = 0;
-            arg_index = 0;
-        }
-        else
-        {
-            if(*cmdline==' ')
+            char **cmd_args = strtokenize(*list,' ');
+            strcpy(cm->executable,*cmd_args);
+            cm->argv[0] = (char*)malloc(ARG_MAX_LENGTH);
+            memset(cm->argv[0],'\0',ARG_MAX_LENGTH);
+            strcpy(cm->argv[0],*cmd_args);
+            cmd_args++;
+            int index = 1;
+            while(*cmd_args)
             {
-                is_cmd = 0;
-                is_arg = 1;
-                arg_val_index=0;
-                arg_index++;
-                //                printf("%d\n",arg_index);
-                if(arg_index!=0)
+                trim(*cmd_args);
+                if(strlen(*cmd_args))
                 {
-                    trim(cm->argv[arg_index-1]);
-    //                printf("$%s$\n",cm->argv[arg_index-1]);
+                    cm->argv[index] = (char*)malloc(ARG_MAX_LENGTH);
+                    memset(cm->argv[index],'\0',ARG_MAX_LENGTH);
+                    strcpy(cm->argv[index],*cmd_args);
+                    index++;
                 }
-                cm->argv[arg_index] = (char*)malloc(ARG_MAX_LENGTH);
-                memset(cm->argv[arg_index],'\0',ARG_MAX_LENGTH);
+                cmd_args++;
             }
-            else if(is_cmd)
-            {
-                cm->executable[cmd_index] = *cmdline;
-                cmd_index++;
-            }
-            else if(is_arg)
-            {
-                //                printf("\n%c\t%d\n",*cmdline,arg_val_index,arg_index);
-                cm->argv[arg_index][arg_val_index] = *cmdline;
-                arg_val_index++;
-            }
+            cm->argv[index]=0;
         }
-        cmdline++;
-    }
-    arg_index ++;
-    if((arg_index-1)>=0)
-    {
-        trim(temp->argv[arg_index-1]);
-    }
-    temp->argv[arg_index] = 0;
-    temp->executable[cmd_index]='\0';
-    rtrim(temp->executable);
-    if(!temp->argv[0])
-    {
-        temp->argv[0] = (char*)malloc(COMMAND_MAX_LENGTH);
-        memset(temp->argv[0],'\0',COMMAND_MAX_LENGTH);
-        strcpy(temp->argv[0],temp->executable);
+        list++;
     }
     return 0;
 }
+
 
 void print_job(struct job*cmd_list)
 {
@@ -152,11 +120,11 @@ void print_job(struct job*cmd_list)
     int i=0;
     while(cmd!=0)
     {
-        printf("command:$%s$\n args:",cmd->executable);
+        printf("command:%s\n args:",cmd->executable);
         i=0;
         while(cmd->argv[i]!=0)
         {
-            printf("$%s$\t",cmd->argv[i]);
+            printf("%s\t",cmd->argv[i]);
             i++;
         }
         printf("\n");
@@ -186,12 +154,17 @@ void delete_job(struct job* cmd_list)
     }
 }
 
-void execute_command(struct command*c, char**envp)
+void execute_command(struct command*c, char***envp_ptr)
 {
+    if(isknowncommand(c->executable))
+    {
+        executeknowncommand(c->executable,c->argv);
+        return;
+    }
     int indexofslash =  getfirstindex(c->executable,'/');
     if(indexofslash != -1)
     {
-        execve(c->executable,c->argv,envp);
+        execve(c->executable,c->argv,*envp_ptr);
         write(2,strerror(errno),strlen(strerror(errno)));
         write(2,"\n",strlen("\n"));
         return;
@@ -209,20 +182,23 @@ void execute_command(struct command*c, char**envp)
             char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
             setabsolutepath(cmdpath,c,*paths);
             c->argv[0]=cmdpath;
-            execve(cmdpath,c->argv,envp);
-            if (errno != ENOENT )
+            execve(cmdpath,c->argv,*envp_ptr);
+            if (errno != ENOENT && errno != EACCES)
             {
+                printf("%s\n",cmdpath);
                 write(2,strerror(errno),strlen(strerror(errno)));
                 write(2,"\n",strlen("\n"));
                 return;
             }
             paths++;
         }
-
+        char * msg="command not found";
+        write(2,msg,strlen(msg));
+        write(2,"\n",strlen("\n"));
     }
 }
 
-void execute_job(struct job* j,char**envp)
+void execute_job(struct job* j,char***envp_ptr)
 {
     int old[2] = {-1,-1},new[2]={-1,-1};
     struct command* c = j->start;
@@ -255,7 +231,7 @@ void execute_job(struct job* j,char**envp)
                 {
                     dup2(new[1],1);
                 }
-                execute_command(c,envp);
+                execute_command(c,envp_ptr);
                 exit(EXIT_FAILURE);
                 break;
             default:
@@ -283,22 +259,30 @@ int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
     initializeenv(envp);
-    char** new_envp = getenv();
+    char*** new_envp_ptr = getenv();
     char * line;
     struct job cmd_list;
     if (argc != 1)
     {
         line = get_args_line(argc,argv);
         make_job(&cmd_list,line);
-        execute_job(&cmd_list,new_envp);
+        free(line);
+        execute_job(&cmd_list,new_envp_ptr);
         delete_job(&cmd_list);
         return 0;
     }
     while(1)
     {
         line = get_line(); 
+        if(!strlen(line))
+        {
+            free(line);
+            continue;
+        }
         make_job(&cmd_list,line);
-        execute_job(&cmd_list,new_envp);
+        free(line);
+        //print_job(&cmd_list);
+        execute_job(&cmd_list,new_envp_ptr);
         delete_job(&cmd_list);
     }
     //printf("%s\n",line);
