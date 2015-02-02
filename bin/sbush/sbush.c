@@ -202,6 +202,7 @@ void execute_command(struct command*c, char**envp)
         char** paths = strtokenize(path,':');
         while(*paths)
         {
+            if(c->argv[0])
             free(c->argv[0]);
             char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
             setabsolutepath(cmdpath,c,*paths);
