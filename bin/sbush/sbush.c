@@ -4,29 +4,28 @@
 #include"sbushutils.h"
 #include"sbconstants.h"
 #include"envhelper.h"
+#include"sberror.h"
 
+static char prompt[128];
 
-void getabsolutepath(struct job *newcommand, char *path){
-    int pathlen = strlen(path);
-    int execlen = strlen(newcommand->start->executable);
-    int newexeclength = pathlen + execlen + 2;
-    char newexec[newexeclength];
-    strncpy(newexec,path, pathlen);
+void setabsolutepath(char*newexec,struct command *newcommand, char *path){
+    strcpy(newexec,path);
     strcat(newexec,"/");
-    strcat(newexec, newcommand->start->executable);
-    strncpy(newcommand->start->executable,newexec, newexeclength);
-    strncpy(newcommand->start->argv[0], newcommand->start->executable, newexeclength); //copying executable to argv[0]
+    strcat(newexec, newcommand->executable);
 }
-
-
-
 
 char* get_line()
 {
     int fd = 0; // 0 is stdin
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
-    write(1,"prompt$",7);
+    write(1,prompt,strlen(prompt));
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
+    if(bytes_read == 0)
+    {
+        printf("exit\n");
+        exit(0);
+    }
+    trim(buf);
     // last char reserved for '\0'
     buf[bytes_read] = '\0';
     return buf;
@@ -77,6 +76,8 @@ int make_job(struct job* cmd_list,char * cmdline)
             temp->executable[cmd_index]='\0';
             rtrim(temp->executable);
             arg_index ++;
+            trim(temp->argv[arg_index-1]);
+     //       printf("$%s$\n",temp->argv[arg_index-1]);
             temp->argv[arg_index] = 0;
             temp->argv[0] = (char*)malloc(COMMAND_MAX_LENGTH);
             memset(temp->argv[0],'\0',COMMAND_MAX_LENGTH);
@@ -103,6 +104,11 @@ int make_job(struct job* cmd_list,char * cmdline)
                 arg_val_index=0;
                 arg_index++;
                 //                printf("%d\n",arg_index);
+                if(arg_index!=0)
+                {
+                    trim(cm->argv[arg_index-1]);
+    //                printf("$%s$\n",cm->argv[arg_index-1]);
+                }
                 cm->argv[arg_index] = (char*)malloc(ARG_MAX_LENGTH);
                 memset(cm->argv[arg_index],'\0',ARG_MAX_LENGTH);
             }
@@ -121,6 +127,10 @@ int make_job(struct job* cmd_list,char * cmdline)
         cmdline++;
     }
     arg_index ++;
+    if((arg_index-1)>=0)
+    {
+        trim(temp->argv[arg_index-1]);
+    }
     temp->argv[arg_index] = 0;
     temp->executable[cmd_index]='\0';
     rtrim(temp->executable);
@@ -140,11 +150,11 @@ void print_job(struct job*cmd_list)
     int i=0;
     while(cmd!=0)
     {
-        printf("command:%s\n args:",cmd->executable);
+        printf("command:$%s$\n args:",cmd->executable);
         i=0;
         while(cmd->argv[i]!=0)
         {
-            printf("%s\t",cmd->argv[i]);
+            printf("$%s$\t",cmd->argv[i]);
             i++;
         }
         printf("\n");
@@ -159,15 +169,54 @@ void delete_job(struct job* cmd_list)
     int i=0;
     while(cmd!=0)
     {
+        if(cmd->executable)
         free(cmd->executable);
         i=0;
         while(cmd->argv[i]!=0)
         {
+            if(cmd->argv[i])
             free(cmd->argv[i]);
             i++;
         }
+        if(cmd->argv)
         free(cmd->argv);
         cmd = cmd->next;
+    }
+}
+
+void execute_command(struct command*c, char**envp)
+{
+    int indexofslash =  getfirstindex(c->executable,'/');
+    if(indexofslash != -1)
+    {
+        execve(c->executable,c->argv,envp);
+        write(2,strerror(errno),strlen(strerror(errno)));
+        write(2,"\n",strlen("\n"));
+        return;
+    }
+    else
+    {
+        char path[MAX_PATH_LENGTH];
+        getvalue("PATH",path);
+        //printf("path:%s\n",path);
+        char** paths = strtokenize(path,':');
+        while(*paths)
+        {
+            if(c->argv[0])
+            free(c->argv[0]);
+            char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
+            setabsolutepath(cmdpath,c,*paths);
+            c->argv[0]=cmdpath;
+            execve(cmdpath,c->argv,envp);
+            if (errno != ENOENT )
+            {
+                write(2,strerror(errno),strlen(strerror(errno)));
+                write(2,"\n",strlen("\n"));
+                return;
+            }
+            paths++;
+        }
+
     }
 }
 
@@ -204,7 +253,7 @@ void execute_job(struct job* j,char**envp)
                 {
                     dup2(new[1],1);
                 }
-                execve(c->executable,c->argv,envp);
+                execute_command(c,envp);
                 exit(EXIT_FAILURE);
                 break;
             default:
@@ -230,21 +279,27 @@ void execute_job(struct job* j,char**envp)
 
 int main(int argc, char* argv[], char* envp[])
 {
+    strncpy(prompt,"sbush$",128);
     initializeenv(envp);
     char** new_envp = getenv();
     char * line;
-    if (argc == 1)
-    {
-        line = get_line();
-    }
-    else
+    struct job cmd_list;
+    if (argc != 1)
     {
         line = get_args_line(argc,argv);
+        make_job(&cmd_list,line);
+        execute_job(&cmd_list,new_envp);
+        delete_job(&cmd_list);
+        return 0;
+    }
+    while(1)
+    {
+        line = get_line(); 
+        make_job(&cmd_list,line);
+        execute_job(&cmd_list,new_envp);
+        delete_job(&cmd_list);
     }
     //printf("%s\n",line);
-    struct job cmd_list;
-    make_job(&cmd_list,line);
     //print_job(&cmd_list);
-    execute_job(&cmd_list,new_envp);
     //delete_job(&cmd_list);
 }

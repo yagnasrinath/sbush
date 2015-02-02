@@ -44,9 +44,11 @@ void rtrim(char *s){
 }    
 
 void trim(char *s){
+    if(s == 0)
+        return;
     ltrim(s);
     rtrim(s);
-}    
+}
 
 
 void memset(void* input,int c, int size)
@@ -66,7 +68,11 @@ int getcountofchar(char* string, char character) {
     int len = strlen(string);
     int count =0;
     for(int i=0;i <len; i++) {
-        count++;
+        if(*string == character)
+        {
+            count++;
+        }
+        string++;
     }
     return count;
 }
@@ -86,10 +92,13 @@ int getfirstindex(char* string,char character) {
 
 char** strtokenize(char* string, char character) {
     int numofstrings = getcountofchar(string,character) +1;
-    char **output = (char**)malloc(sizeof(char*)*numofstrings);
+    char **output = (char**)malloc(sizeof(char*)*numofstrings+1);
+    //printf("%d\n",numofstrings);
+    output[numofstrings] = 0;
     int index=0;
     int j=0;
     while(string) {
+        //printf("%s\n",string);
         j = getfirstindex(string,character);
         if(j==-1){
             char* currstring = (char*)(malloc(strlen(string)+1));
@@ -100,7 +109,8 @@ char** strtokenize(char* string, char character) {
         char* currstring = (char*)(malloc(j)+1);
         strncpy(currstring,string,j);
         currstring[j] ='\0';
-        string+=j;
+        //printf("%s\n",currstring);
+        string+=(j+1);
         output[index] =currstring;
         index++;
     }

@@ -11,9 +11,10 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-void trim(char *s);
+
 void rtrim(char *s);
 void ltrim(char* input);
+void trim(char* input);
 void memset(void* input,int c,int size);
 int getCountOfChar(char* string, char character);
 int getfirstindex(char* string,char character);
