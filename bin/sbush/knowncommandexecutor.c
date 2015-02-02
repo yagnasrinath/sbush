@@ -49,7 +49,7 @@ int isKnowncommand(char *command) {
 }
 
 void executecommand(char *command, char** args) {
-	int i;
+
 	if(!strcmp(command,"cd")) {
 		changedir(args[1]);
 	}
