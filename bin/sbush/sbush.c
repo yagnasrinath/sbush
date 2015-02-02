@@ -4,22 +4,21 @@
 #include"sbushutils.h"
 #include"sbconstants.h"
 #include"envhelper.h"
+#include"sberror.h"
 
 
-void getabsolutepath(struct job *newcommand, char *path){
+void setabsolutepath(struct command *newcommand, char *path){
     int pathlen = strlen(path);
-    int execlen = strlen(newcommand->start->executable);
+    int execlen = strlen(newcommand->executable);
     int newexeclength = pathlen + execlen + 2;
     char newexec[newexeclength];
     strncpy(newexec,path, pathlen);
     strcat(newexec,"/");
-    strcat(newexec, newcommand->start->executable);
-    strncpy(newcommand->start->executable,newexec, newexeclength);
-    strncpy(newcommand->start->argv[0], newcommand->start->executable, newexeclength); //copying executable to argv[0]
+    strcat(newexec, newcommand->executable);
+    printf("%s\n",newexec);
+    strncpy(newcommand->executable,newexec, newexeclength);
+    strncpy(newcommand->argv[0], newcommand->executable, newexeclength); //copying executable to argv[0]
 }
-
-
-
 
 char* get_line()
 {
@@ -171,6 +170,39 @@ void delete_job(struct job* cmd_list)
     }
 }
 
+void execute_command(struct command*c, char**envp)
+{
+    int indexofslash =  getfirstindex(c->executable,'/');
+    if(indexofslash != -1)
+    {
+        execve(c->executable,c->argv,envp);
+        write(2,strerror(errno),strlen(strerror(errno)));
+        write(2,"\n",strlen("\n"));
+        return;
+    }
+    else
+    {
+        char path[MAX_PATH_LENGTH];
+        getvalue("PATH",path);
+        printf("path:%s\n",path);
+        char** paths = strtokenize(path,':');
+        while(*paths)
+        {
+            setabsolutepath(c,*paths);
+            execve(c->executable,c->argv,envp);
+            if (errno != ENOENT )
+            {
+                write(2,strerror(errno),strlen(strerror(errno)));
+                write(2,"\n",strlen("\n"));
+                return;
+            }
+
+            paths++;
+        }
+
+    }
+}
+
 void execute_job(struct job* j,char**envp)
 {
     int old[2] = {-1,-1},new[2]={-1,-1};
@@ -204,7 +236,7 @@ void execute_job(struct job* j,char**envp)
                 {
                     dup2(new[1],1);
                 }
-                execve(c->executable,c->argv,envp);
+                execute_command(c,envp);
                 exit(EXIT_FAILURE);
                 break;
             default:
