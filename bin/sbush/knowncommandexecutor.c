@@ -12,7 +12,7 @@ static char prompt[128];
 int isdirexist(char *newDirName){
 	char *Exists;
 	if((Exists = opendir(newDirName)) != 0)
-		return TRUE;
+        return TRUE;
 	else{
 		write(2,strerror(errno),sizeof(strerror(errno)));
 	}
@@ -43,7 +43,8 @@ void changedir(char *dirpath){
 		free(dirpath);
 	}
 	if(isdirexist(path) == TRUE){
-		printf("Change DIR Successful \n");
+		if(!chdir(path))
+            printf("Change DIR Successful \n");
 		setvalue("PWD",path);
 	}
 }
@@ -67,7 +68,8 @@ void executeknowncommand(char *command, char** args) {
 	if(!strcmp(command,"set")) {
 		if(!strcmp(args[1],"prompt")) {
 			if(args[2] != 0) {
-				strncpy(prompt,args[2],128);
+				printf("Setting prompt\n");
+                strncpy(prompt,args[2],128);
 				return;
 			}
 			return;
