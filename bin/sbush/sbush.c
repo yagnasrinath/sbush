@@ -19,6 +19,7 @@ char* get_line()
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
     write(1,"prompt$",7);
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
+    trim(buf);
     // last char reserved for '\0'
     buf[bytes_read] = '\0';
     return buf;
@@ -69,6 +70,8 @@ int make_job(struct job* cmd_list,char * cmdline)
             temp->executable[cmd_index]='\0';
             rtrim(temp->executable);
             arg_index ++;
+            trim(temp->argv[arg_index-1]);
+     //       printf("$%s$\n",temp->argv[arg_index-1]);
             temp->argv[arg_index] = 0;
             temp->argv[0] = (char*)malloc(COMMAND_MAX_LENGTH);
             memset(temp->argv[0],'\0',COMMAND_MAX_LENGTH);
@@ -95,6 +98,11 @@ int make_job(struct job* cmd_list,char * cmdline)
                 arg_val_index=0;
                 arg_index++;
                 //                printf("%d\n",arg_index);
+                if(arg_index!=0)
+                {
+                    trim(cm->argv[arg_index-1]);
+    //                printf("$%s$\n",cm->argv[arg_index-1]);
+                }
                 cm->argv[arg_index] = (char*)malloc(ARG_MAX_LENGTH);
                 memset(cm->argv[arg_index],'\0',ARG_MAX_LENGTH);
             }
@@ -132,11 +140,11 @@ void print_job(struct job*cmd_list)
     int i=0;
     while(cmd!=0)
     {
-        printf("command:%s\n args:",cmd->executable);
+        printf("command:$%s$\n args:",cmd->executable);
         i=0;
         while(cmd->argv[i]!=0)
         {
-            printf("%s\t",cmd->argv[i]);
+            printf("$%s$\t",cmd->argv[i]);
             i++;
         }
         printf("\n");
@@ -270,7 +278,7 @@ int main(int argc, char* argv[], char* envp[])
     //printf("%s\n",line);
     struct job cmd_list;
     make_job(&cmd_list,line);
-    print_job(&cmd_list);
+    //print_job(&cmd_list);
     execute_job(&cmd_list,new_envp);
     //delete_job(&cmd_list);
 }
