@@ -4,9 +4,9 @@
 #include"sbushutils.h"
 #include"sbconstants.h"
 #include"envhelper.h"
-#include"sberror.h"
+#include"knowncommandexecutor.h"
 
-static char prompt[128];
+
 
 void setabsolutepath(char*newexec,struct command *newcommand, char *path){
     strcpy(newexec,path);
@@ -18,7 +18,7 @@ char* get_line()
 {
     int fd = 0; // 0 is stdin
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
-    write(1,prompt,strlen(prompt));
+    write(1,getprompt(),strlen(getprompt()));
     size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
     if(bytes_read == 0)
     {
@@ -281,7 +281,7 @@ void execute_job(struct job* j,char**envp)
 
 int main(int argc, char* argv[], char* envp[])
 {
-    strncpy(prompt,"sbush$",128);
+	initprompt();
     initializeenv(envp);
     char** new_envp = getenv();
     char * line;

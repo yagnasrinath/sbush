@@ -13,5 +13,9 @@
 #include"sbconstants.h"
 #include"envhelper.h"
 #include"sberror.h"
-
+void setprompt(char* currpromt);
+char* getprompt();
+void initprompt();
+int isknowncommand(char *command) ;
+void executeknowncommand(char *command, char** args);
 #endif /* SBUSH_BIN_SBUSH_KNOWNCOMMANDEXECUTOR_H_ */
