@@ -50,6 +50,7 @@ void trim(char *s){
     rtrim(s);
 }
 
+
 void memset(void* input,int c, int size)
 {
     int i=0;
