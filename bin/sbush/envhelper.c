@@ -8,7 +8,7 @@
 #include "envhelper.h"
 static envList * environment;
 static int envSize=0;
-
+static char** env=0;
 void parsecurrenv(envList* currentEnv, char* inputEnv) {
 	if(inputEnv ==0) {
 		printf("ENV HELPER.c: parsecurrenv: FATAL : ENVIRONMENT contains null values\n");
@@ -100,7 +100,10 @@ char * buildenv(envList *head) {
 }
 char ** getenv() {
 	envList *head =  environment;
-	char ** env = (char **)malloc(sizeof(char *)*(envSize+1));
+	if(env != 0) {
+        free(env);
+    }
+    env = (char **)malloc(sizeof(char *)*(envSize+1));
 	int i=0;
 	while(head !=0) {
 		env [i] = buildenv(head);
