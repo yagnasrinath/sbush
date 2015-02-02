@@ -101,7 +101,7 @@ char * buildenv(envList *head) {
 char ** getenv() {
 	envList *head =  environment;
 	if(env != 0) {
-        free(env);
+        freeenv(env);
     }
     env = (char **)malloc(sizeof(char *)*(envSize+1));
 	int i=0;
