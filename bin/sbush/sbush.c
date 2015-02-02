@@ -156,6 +156,11 @@ void delete_job(struct job* cmd_list)
 
 void execute_command(struct command*c, char**envp)
 {
+    if(isknowncommand(c->executable))
+    {
+        executeknowncommand(c->executable,c->argv);
+        return;
+    }
     int indexofslash =  getfirstindex(c->executable,'/');
     if(indexofslash != -1)
     {
