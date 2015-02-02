@@ -154,7 +154,7 @@ void delete_job(struct job* cmd_list)
     }
 }
 
-void execute_command(struct command*c, char**envp)
+void execute_command(struct command*c, char***envp_ptr)
 {
     if(isknowncommand(c->executable))
     {
@@ -164,7 +164,7 @@ void execute_command(struct command*c, char**envp)
     int indexofslash =  getfirstindex(c->executable,'/');
     if(indexofslash != -1)
     {
-        execve(c->executable,c->argv,envp);
+        execve(c->executable,c->argv,*envp_ptr);
         write(2,strerror(errno),strlen(strerror(errno)));
         write(2,"\n",strlen("\n"));
         return;
@@ -182,7 +182,7 @@ void execute_command(struct command*c, char**envp)
             char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
             setabsolutepath(cmdpath,c,*paths);
             c->argv[0]=cmdpath;
-            execve(cmdpath,c->argv,envp);
+            execve(cmdpath,c->argv,*envp_ptr);
             if (errno != ENOENT && errno != EACCES)
             {
                 printf("%s\n",cmdpath);
@@ -198,7 +198,7 @@ void execute_command(struct command*c, char**envp)
     }
 }
 
-void execute_job(struct job* j,char**envp)
+void execute_job(struct job* j,char***envp_ptr)
 {
     int old[2] = {-1,-1},new[2]={-1,-1};
     struct command* c = j->start;
@@ -231,7 +231,7 @@ void execute_job(struct job* j,char**envp)
                 {
                     dup2(new[1],1);
                 }
-                execute_command(c,envp);
+                execute_command(c,envp_ptr);
                 exit(EXIT_FAILURE);
                 break;
             default:
@@ -259,7 +259,7 @@ int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
     initializeenv(envp);
-    char** new_envp = getenv();
+    char*** new_envp_ptr = getenv();
     char * line;
     struct job cmd_list;
     if (argc != 1)
@@ -267,7 +267,7 @@ int main(int argc, char* argv[], char* envp[])
         line = get_args_line(argc,argv);
         make_job(&cmd_list,line);
         free(line);
-        execute_job(&cmd_list,new_envp);
+        execute_job(&cmd_list,new_envp_ptr);
         delete_job(&cmd_list);
         return 0;
     }
@@ -282,7 +282,7 @@ int main(int argc, char* argv[], char* envp[])
         make_job(&cmd_list,line);
         free(line);
         //print_job(&cmd_list);
-        execute_job(&cmd_list,new_envp);
+        execute_job(&cmd_list,new_envp_ptr);
         delete_job(&cmd_list);
     }
     //printf("%s\n",line);

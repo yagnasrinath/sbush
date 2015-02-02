@@ -45,6 +45,9 @@ void changedir(char *dirpath){
 	if(isdirexist(path) == TRUE){
 		printf("Change DIR Successful \n");
 		setvalue("PWD",path);
+        memset(path,'\0',strlen(path));
+        getvalue("PWD",path);
+        printf("%s\n",path);
 	}
 }
 
