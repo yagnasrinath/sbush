@@ -102,11 +102,13 @@ char** strtokenize(char* string, char character) {
         j = getfirstindex(string,character);
         if(j==-1){
             char* currstring = (char*)(malloc(strlen(string)+1));
+            memset(currstring,'\0',strlen(string)+1);
             strcpy(currstring,string);
             output[index] = currstring;
             return output;
         }
-        char* currstring = (char*)(malloc(j)+1);
+        char* currstring = (char*)(malloc(j+1));
+        memset(currstring,'\0',j+1);
         strncpy(currstring,string,j);
         currstring[j] ='\0';
         //printf("%s\n",currstring);

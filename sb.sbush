@@ -1,0 +1,3 @@
+#!/home/stufs1/ybattula/sbush/rootfs/bin/sbush
+#this is comment
+ls -a

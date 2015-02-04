@@ -23,14 +23,28 @@ char* get_line()
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
     write(1,getprompt(),strlen(getprompt()));
     write(1," ",strlen(" "));
-    size_t bytes_read = read(fd,buf,JOB_MAX_LENGTH-1); // can read only 31999 bytes
-    if(bytes_read == 0)
+    char c[1]={'\0'};
+    int index = 0;
+    while(read(fd,c,1))
+    {
+        if(c[0]=='\n')
+        {
+            buf[index]='\0';
+            //printf("%s\n",buf);
+            break;
+        }
+        else
+        {
+            buf[index]=c[0];
+        }
+        index++;
+    }
+    if(index == 0)
     {
         printf("exit\n");
         exit(0);
     }
     // last char reserved for '\0'
-    buf[bytes_read] = '\0';
     trim(buf);
     return buf;
 }
@@ -66,6 +80,10 @@ int make_job(struct job* cmd_list,char * cmdline)
         return 0;
     }
     trim(cmdline); 
+    if(cmdline[0]=='#')
+    {
+        return 0;
+    }
     char **list =strtokenize(cmdline,'|');
     int firstcommand = TRUE;
     struct command* temp=0;
@@ -110,9 +128,14 @@ int make_job(struct job* cmd_list,char * cmdline)
                 cmd_args++;
             }
             cm->argv[index]=0;
+            //printf("%s\n",cm->executable);
+            index=0;
+            //while(cm->argv[index])
+            //printf("%s\n",cm->argv[index++]);
         }
         list++;
     }
+    print_job(cmd_list);
     return 0;
 }
 
@@ -267,7 +290,8 @@ int main(int argc, char* argv[], char* envp[])
     char*** new_envp_ptr = getenv();
     char * line;
     struct job cmd_list;
-    if (argc != 1)
+/*
+   if (argc != 1)
     {
         line = get_args_line(argc,argv);
         make_job(&cmd_list,line);
@@ -275,6 +299,12 @@ int main(int argc, char* argv[], char* envp[])
         execute_job(&cmd_list,new_envp_ptr);
         delete_job(&cmd_list);
         return 0;
+    }
+    */
+    if(argc == 2)
+    {
+        int fd = open(argv[1],O_RDONLY);
+        dup2(fd,0);
     }
     while(1)
     {
@@ -286,10 +316,10 @@ int main(int argc, char* argv[], char* envp[])
         }
         make_job(&cmd_list,line);
         free(line);
+        print_job(&cmd_list);
+//        execute_job(&cmd_list,new_envp_ptr);
         //print_job(&cmd_list);
-        execute_job(&cmd_list,new_envp_ptr);
-        //print_job(&cmd_list);
-        delete_job(&cmd_list);
+//        delete_job(&cmd_list);
     }
     //printf("%s\n",line);
     //print_job(&cmd_list);
