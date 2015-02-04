@@ -81,10 +81,12 @@ void setvalue(char* key, char *val) {
 		printf("ENV HELPER.c: setValue: FATAL : val passed is null\n");
 	}
 	envList *head =  environment;
-	while(head != 0) {
+    int found = FALSE;
+	while(head != 0) 
+    {
 		if(strcmp(head->key,key) == 0) {
 			free(head->value);
-			
+		    found = TRUE;	
             head->value = (char *)malloc(strlen(val)+1);
             strcpy(head->value,val);
             break;
@@ -92,6 +94,30 @@ void setvalue(char* key, char *val) {
 		}
 		head = head->next;
 	}
+	head = environment;
+    if(!found)
+    {
+        while(head!=0 && head->next!=0) head++;
+        if(head==0)
+        {
+            head = (envList*)malloc(sizeof(envList));
+            head->key = (char*)malloc(sizeof(key)+1);
+            strcpy(head->key,key);
+            head->value = (char*)malloc(sizeof(val)+1);
+            strcpy(head->value,val);
+            head->next=0;
+        }
+        else
+        {
+            head->next = (envList*)malloc(sizeof(envList));
+            head++;
+            head->key = (char*)malloc(sizeof(key)+1);
+            strcpy(head->key,key);
+            head->value = (char*)malloc(sizeof(val)+1);
+            strcpy(head->value,val);
+            head->next=0;
+        }
+    }
 	buildenv();
 }
 

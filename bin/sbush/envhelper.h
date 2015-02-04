@@ -11,6 +11,7 @@
 #include<stdio.h>
 #include<string.h>
 #include"sbushutils.h"
+#include"sbconstants.h"
 typedef struct env {
 	char* key;
 	char* value;

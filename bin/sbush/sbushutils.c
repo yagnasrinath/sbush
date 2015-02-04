@@ -116,3 +116,39 @@ char** strtokenize(char* string, char character) {
     }
     return 0;
 }
+
+char *StrStr(char *haystack, char *needle)
+{
+    char *needle_temp = needle;
+    if(!*needle_temp)
+    {
+        return haystack;
+    }
+    int size_needle = 0;
+    while(*(needle_temp++)) size_needle++;
+    int index = 0;
+    needle_temp = needle;
+    char *haystack_temp = haystack;
+    while(*haystack_temp)
+    {
+        while(*needle_temp)
+        {
+            if(*needle_temp != haystack_temp[index])
+            {
+                break;
+            }
+            index++;
+            needle_temp++;
+        }
+        if(index == size_needle)
+        {
+            return haystack_temp;
+        }
+        index = 0;
+        needle_temp = needle;
+        haystack_temp++;
+    }
+    return 0;
+}
+
+

@@ -13,6 +13,7 @@
 #include"sbconstants.h"
 #include"envhelper.h"
 #include"sberror.h"
+#include"sblimits.h"
 void setprompt(char* currpromt);
 char* getprompt();
 void initprompt();

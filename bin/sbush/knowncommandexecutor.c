@@ -6,8 +6,8 @@
  */
 
 #include "knowncommandexecutor.h"
-static char* knowncommands[] = {"cd", "set"};
-int knowncommandslength = 2;
+static char* knowncommands[] = {"cd", "set" ,"setenv","echo"};
+int knowncommandslength = 4;
 static char prompt[128];
 int isdirexist(char *newDirName){
 	char *Exists;
@@ -65,17 +65,102 @@ int isknowncommand(char *command) {
 
 void executeknowncommand(char *command, char** args) {
 
-	if(!strcmp(command,"cd")) {
-		changedir(args[1]);
-		return;
-	}
-	if(!strcmp(command,"set")) {
-		if(!strcmp(args[1],"prompt")) {
-			if(args[2] != 0) {
-                strncpy(prompt,args[2],128);
-				return;
-			}
-			return;
-		}
-	}
+    if(!strcmp(command,"cd")) 
+    {
+        changedir(args[1]);
+        return;
+    }
+    
+    if(!strcmp(command,"setenv"))
+    {
+        char** arg2tokens = strtokenize(args[2],':');
+        int index=0;
+        char *temp = 0;
+        int size =0;
+        for(index=0;arg2tokens[index]!=0;index++)
+        {
+            temp = StrStr(arg2tokens[index],"${");
+            if(temp!=0)
+            {
+                temp=temp+2;
+                int pos=-1;
+                if((pos=getfirstindex(temp,'}'))!=-1)
+                {
+                    char* key = (char*)malloc(pos+1);
+                    strncpy(key,temp,pos);
+                    key[pos]='\0';
+                    char* value = (char*)malloc(MAX_PATH_LENGTH);
+                    memset(value,'\0',MAX_PATH_LENGTH);
+                    getvalue(key,value);
+                    if(strlen(value)!=0)
+                    {
+                        free(arg2tokens[index]);
+                        free(key);
+                        arg2tokens[index] = value;
+                    }
+                    else
+                    {
+                        char * msg=":undefined variable.\n";
+                        write(2,key,strlen(key));
+                        write(2,msg,strlen(msg));
+                        free(key);
+                        free(value);
+                        return;
+                    }
+
+                }
+                else
+                {
+                    char * msg="Missing }.\n";
+                    write(2,msg,strlen(msg));
+                    return;
+                }
+            }
+            size = size + strlen(arg2tokens[index])+1;
+        }
+        size += 2;
+        char * value = (char*)malloc(size);
+        temp = value;
+        for(index =0;arg2tokens[index]!=0;index++)
+        {
+            strncpy(temp,arg2tokens[index],strlen(arg2tokens[index]));
+            temp+=strlen(arg2tokens[index])+1;
+            *temp=':';
+        }
+        *temp='\0';
+        setvalue(args[1],value);
+    }
+    else if(!strcmp(command,"set")) 
+    {
+        char* temp = StrStr(args[1],"prompt=");
+        if(temp!=0) 
+        {
+            temp =temp+7;
+            trim(temp);
+            int pos = getfirstindex(temp,'\'');
+            if(pos==0)
+            {
+                temp++;
+                pos = getfirstindex(temp,'\'');
+                if(pos!=-1)
+                {
+                    strncpy(prompt,temp,pos);
+                    prompt[pos]='\0';
+                    return;
+                }
+            }
+        }
+        char * msg="invalid usage\n";
+        write(2,msg,strlen(msg));
+        return;
+    }
+    else if(!strcmp(command,"echo")) 
+    {
+        trim(args[1]);
+        char* value = (char*)malloc(MAX_PATH_LENGTH);
+        memset(value,'\0',MAX_PATH_LENGTH);
+        getvalue(args[1]+1,value);
+        printf("%s\n",value);
+        free(value);
+    }
 }

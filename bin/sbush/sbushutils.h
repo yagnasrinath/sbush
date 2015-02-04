@@ -19,5 +19,6 @@ void memset(void* input,int c,int size);
 int getCountOfChar(char* string, char character);
 int getfirstindex(char* string,char character);
 char** strtokenize(char* string, char character);
+char *StrStr(char *haystack, char *needle);
 
 #endif /* SBUSH_BIN_SBUSH_LIB_BUSHUTILS_H_ */
