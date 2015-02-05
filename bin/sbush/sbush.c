@@ -11,6 +11,7 @@ envList * environment;
 int envSize=0;
 char** env=0;
 
+void print_job(struct job*cmd_list);
 void setabsolutepath(char*newexec,struct command *newcommand, char *path){
     strcpy(newexec,path);
     strcat(newexec,"/");
@@ -77,11 +78,13 @@ int make_job(struct job* cmd_list,char * cmdline)
 {
     if(cmdline == 0)
     {
+        cmd_list->start =0;
         return 0;
     }
     trim(cmdline); 
     if(cmdline[0]=='#')
     {
+        cmd_list->start=0;
         return 0;
     }
     char **list =strtokenize(cmdline,'|');
@@ -287,7 +290,7 @@ int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
     initializeenv(envp);
-    char*** new_envp_ptr = getenv();
+    //char*** new_envp_ptr = getenv();
     char * line;
     struct job cmd_list;
 /*
@@ -315,7 +318,7 @@ int main(int argc, char* argv[], char* envp[])
             continue;
         }
         make_job(&cmd_list,line);
-        free(line);
+        //free(line);
         print_job(&cmd_list);
 //        execute_job(&cmd_list,new_envp_ptr);
         //print_job(&cmd_list);
