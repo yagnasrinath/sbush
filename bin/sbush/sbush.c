@@ -290,7 +290,7 @@ int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
     initializeenv(envp);
-    //char*** new_envp_ptr = getenv();
+    char*** new_envp_ptr = getenv();
     char * line;
     struct job cmd_list;
 /*
@@ -318,9 +318,9 @@ int main(int argc, char* argv[], char* envp[])
             continue;
         }
         make_job(&cmd_list,line);
-        //free(line);
-        print_job(&cmd_list);
-//        execute_job(&cmd_list,new_envp_ptr);
+        free(line);
+        //print_job(&cmd_list);
+        execute_job(&cmd_list,new_envp_ptr);
         //print_job(&cmd_list);
 //        delete_job(&cmd_list);
     }
