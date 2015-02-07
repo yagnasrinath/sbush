@@ -4,7 +4,6 @@
 #include <sys/defs.h>
 
 extern __thread int errno;
-
 int main(int argc, char* argv[], char* envp[]);
 void exit(int status);
 
