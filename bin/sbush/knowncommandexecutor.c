@@ -75,11 +75,11 @@ void executeknowncommand(char *command, char** args) {
     {
         char** arg2tokens = strtokenize(args[2],':');
         int index=0;
-        char *temp = 0;
+         char *temp = 0;
         int size =0;
         for(index=0;arg2tokens[index]!=0;index++)
         {
-            temp = StrStr(arg2tokens[index],"${");
+            temp = strstr(arg2tokens[index],"${");
             if(temp!=0)
             {
                 temp=temp+2;
@@ -132,7 +132,7 @@ void executeknowncommand(char *command, char** args) {
     }
     else if(!strcmp(command,"set")) 
     {
-        char* temp = StrStr(args[1],"prompt=");
+       char* temp = strstr(args[1],"prompt=");
         if(temp!=0) 
         {
             temp =temp+7;

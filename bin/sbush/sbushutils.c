@@ -51,16 +51,6 @@ void trim(char *s){
 }
 
 
-void memset(void* input,int c, int size)
-{
-    int i=0;
-    unsigned char* p = input;
-    for(i=0;i<size;i++)
-    {
-        *p = (unsigned char)c;
-        p++;
-    }
-}
 
 int getcountofchar(char* string, char character) {
     if(string ==0 )
@@ -119,38 +109,5 @@ char** strtokenize(char* string, char character) {
     return 0;
 }
 
-char *StrStr(char *haystack, char *needle)
-{
-    char *needle_temp = needle;
-    if(!*needle_temp)
-    {
-        return haystack;
-    }
-    int size_needle = 0;
-    while(*(needle_temp++)) size_needle++;
-    int index = 0;
-    needle_temp = needle;
-    char *haystack_temp = haystack;
-    while(*haystack_temp)
-    {
-        while(*needle_temp)
-        {
-            if(*needle_temp != haystack_temp[index])
-            {
-                break;
-            }
-            index++;
-            needle_temp++;
-        }
-        if(index == size_needle)
-        {
-            return haystack_temp;
-        }
-        index = 0;
-        needle_temp = needle;
-        haystack_temp++;
-    }
-    return 0;
-}
 
 
