@@ -113,14 +113,14 @@ char** strtokenize(char* string, char character) {
 void free_str_tokens(char**originallist)
 {
     char ** _tmp = originallist;
-    if(temp==0)
+    if(_tmp==0)
     {
         return;
     }
-    while(*temp)
+    while(*_tmp)
     {
-        free(*temp);
-        temp++;
+        free(*_tmp);
+        _tmp++;
     }
     if(originallist)
     {
