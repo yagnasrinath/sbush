@@ -11,11 +11,50 @@ envList * environment;
 int envSize=0;
 char** env=0;
 
-void print_job(struct job*cmd_list);
 void setabsolutepath(char*newexec,struct command *newcommand, char *path){
     strcpy(newexec,path);
     strcat(newexec,"/");
     strcat(newexec, newcommand->executable);
+}
+
+void print_job(struct job*cmd_list)
+{
+    struct command *cmd;
+    cmd = cmd_list->start;
+    int i=0;
+    while(cmd!=0)
+    {
+        printf("command:%s\n args:",cmd->executable);
+        i=0;
+        while(cmd->argv[i]!=0)
+        {
+            printf("%s\t",cmd->argv[i]);
+            i++;
+        }
+        printf("\n");
+        cmd = cmd->next;
+    }
+}
+
+void free_job(struct job*cmd_list) {
+    struct command *cmd;
+    cmd = cmd_list->start;
+    int i=0;
+    while(cmd!=0)
+    {
+        free(cmd->executable);
+        i=0;
+        while(cmd->argv[i]!=0)
+        {
+            free(cmd->argv[i]);
+            i++;
+        }
+        free(cmd->argv);
+        struct command *prev_cmd;
+        prev_cmd = cmd;
+        cmd = cmd->next;
+        free(prev_cmd);
+    }
 }
 
 char* get_line()
@@ -74,20 +113,21 @@ char* get_args_line(int argc,char*argv[])
     return buf;
 }
 
-int make_job(struct job* cmd_list,char * cmdline)
+void make_job(struct job* cmd_list,char * cmdline)
 {
     if(cmdline == 0)
     {
         cmd_list->start =0;
-        return 0;
+        return;
     }
     trim(cmdline); 
     if(cmdline[0]=='#')
     {
         cmd_list->start=0;
-        return 0;
+        return;
     }
     char **list =strtokenize(cmdline,'|');
+    char **_list = list;
     int firstcommand = TRUE;
     struct command* temp=0;
     while(*list)
@@ -112,6 +152,7 @@ int make_job(struct job* cmd_list,char * cmdline)
             cm->argv = (char**)malloc(sizeof(char*)*MAX_COMMAND_ARGS);
             cm->next=0;
             char **cmd_args = strtokenize(*list,' ');
+            char **_cmd_args = cmd_args;
             strcpy(cm->executable,*cmd_args);
             cm->argv[0] = (char*)malloc(ARG_MAX_LENGTH);
             memset(cm->argv[0],'\0',ARG_MAX_LENGTH);
@@ -131,6 +172,7 @@ int make_job(struct job* cmd_list,char * cmdline)
                 cmd_args++;
             }
             cm->argv[index]=0;
+            free(_cmd_args);
             //printf("%s\n",cm->executable);
             index=0;
             //while(cm->argv[index])
@@ -138,51 +180,12 @@ int make_job(struct job* cmd_list,char * cmdline)
         }
         list++;
     }
-    print_job(cmd_list);
-    return 0;
+    free(_list);
+    return;
 }
 
 
-void print_job(struct job*cmd_list)
-{
-    struct command *cmd;
-    cmd = cmd_list->start;
-    int i=0;
-    while(cmd!=0)
-    {
-        printf("command:%s\n args:",cmd->executable);
-        i=0;
-        while(cmd->argv[i]!=0)
-        {
-            printf("%s\t",cmd->argv[i]);
-            i++;
-        }
-        printf("\n");
-        cmd = cmd->next;
-    }
-}
 
-void delete_job(struct job* cmd_list)
-{
-    struct command *cmd;
-    cmd = cmd_list->start;
-    int i=0;
-    while(cmd!=0)
-    {
-        if(cmd->executable)
-        free(cmd->executable);
-        i=0;
-        while(cmd->argv[i]!=0)
-        {
-            if(cmd->argv[i])
-            free(cmd->argv[i]);
-            i++;
-        }
-        if(cmd->argv)
-        free(cmd->argv);
-        cmd = cmd->next;
-    }
-}
 
 void execute_command(struct command*c, char***envp_ptr)
 {
@@ -203,7 +206,7 @@ void execute_command(struct command*c, char***envp_ptr)
         while(*paths)
         {
             if(c->argv[0])
-            free(c->argv[0]);
+                free(c->argv[0]);
             char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
             setabsolutepath(cmdpath,c,*paths);
             c->argv[0]=cmdpath;
@@ -233,7 +236,7 @@ void execute_job(struct job* j,char***envp_ptr)
         if(isknowncommand(c->executable))
         {
             executeknowncommand(c->executable,c->argv);
-            
+
         }
         else {
             if(pipe(new)==-1)
@@ -278,8 +281,11 @@ void execute_job(struct job* j,char***envp_ptr)
         }
         c=c->next;
     }
-    close(old[0]);
-    close(old[1]);
+    if(old[0]!=-1)
+    {
+        close(old[0]);
+        close(old[1]);
+    }
     while(childs--)
     {
         waitpid(-1,0,0);
@@ -288,22 +294,22 @@ void execute_job(struct job* j,char***envp_ptr)
 
 int main(int argc, char* argv[], char* envp[])
 {
-	initprompt();
+    initprompt();
     initializeenv(envp);
     char*** new_envp_ptr = getenv();
     char * line;
     struct job cmd_list;
-/*
-   if (argc != 1)
-    {
-        line = get_args_line(argc,argv);
-        make_job(&cmd_list,line);
-        free(line);
-        execute_job(&cmd_list,new_envp_ptr);
-        delete_job(&cmd_list);
-        return 0;
-    }
-    */
+    /*
+       if (argc != 1)
+       {
+       line = get_args_line(argc,argv);
+       make_job(&cmd_list,line);
+       free(line);
+       execute_job(&cmd_list,new_envp_ptr);
+       delete_job(&cmd_list);
+       return 0;
+       }
+       */
     if(argc == 2)
     {
         int fd = open(argv[1],O_RDONLY);
@@ -319,12 +325,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         make_job(&cmd_list,line);
         free(line);
-        //print_job(&cmd_list);
         execute_job(&cmd_list,new_envp_ptr);
-        //print_job(&cmd_list);
-//        delete_job(&cmd_list);
+        free_job(&cmd_list);
     }
-    //printf("%s\n",line);
-    //print_job(&cmd_list);
-    //delete_job(&cmd_list);
 }

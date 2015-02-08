@@ -12,3 +12,6 @@ opendir
 pipe
 read
 waitpid
+
+free in make_job line, two alloactions from strtokenize
+

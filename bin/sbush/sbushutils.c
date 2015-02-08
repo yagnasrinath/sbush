@@ -110,4 +110,20 @@ char** strtokenize(char* string, char character) {
 }
 
 
-
+void free_str_tokens(char**originallist)
+{
+    char ** _tmp = originallist;
+    if(temp==0)
+    {
+        return;
+    }
+    while(*temp)
+    {
+        free(*temp);
+        temp++;
+    }
+    if(originallist)
+    {
+        free(originallist);
+    }
+}
