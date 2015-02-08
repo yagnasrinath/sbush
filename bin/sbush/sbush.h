@@ -13,4 +13,3 @@ struct job
     struct job* next;
 };
 
-int make_job(struct job* cmd_list,char * cmdline);
