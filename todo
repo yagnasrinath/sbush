@@ -11,10 +11,4 @@ open
 opendir
 pipe
 read
-strcat
-strcmp
-strcpy
-strlen
-strncpy
 waitpid
-

@@ -38,6 +38,5 @@
 
 
 
-const char * strerror(int errno);
-
+extern int errno;
 #endif

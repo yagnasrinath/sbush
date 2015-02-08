@@ -1,10 +1,4 @@
-/*
- * sberror.c
- *
- *  Created on: Feb 2, 2015
- *      Author: ravichandrasadineni
- */
-#include"sberror.h"
+#include"errno.h"
 const char *sys_errlist[] =
 {
   "Error 0",
@@ -106,8 +100,4 @@ const char *sys_errlist[] =
   "RISC OS error",                              /* EOPSYS */
   "Signal Received"                             /* as flagged by SIG_ERR */
 };
-const char * strerror(int errno)
-{
-    return  sys_errlist[errno];
-}
-
+int errno=0;

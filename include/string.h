@@ -16,5 +16,6 @@ extern char *strncat (char *__restrict __dest, const char *__restrict __src,
 extern size_t strlen (const char *__s);
 void *memset(void* input,int c,size_t size);
 char *strstr(char *haystack, char *needle);
+const char *strerror(int errnum);
 #endif /* string.h  */
 

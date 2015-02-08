@@ -12,7 +12,7 @@
 #include"sbushutils.h"
 #include"sbconstants.h"
 #include"envhelper.h"
-#include"sberror.h"
+#include"errno.h"
 #include"sblimits.h"
 void setprompt(char* currpromt);
 char* getprompt();

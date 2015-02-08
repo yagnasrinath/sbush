@@ -2,8 +2,9 @@
 #define _STDLIB_H
 
 #include <sys/defs.h>
+//#include <errno.h>
 
-extern __thread int errno;
+//extern __thread int errno;
 int main(int argc, char* argv[], char* envp[]);
 void exit(int status);
 

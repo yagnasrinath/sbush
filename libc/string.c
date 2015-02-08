@@ -1,4 +1,5 @@
 #include<string.h>
+#include<errno.h>
 char *strcpy ( char *__restrict dest, const char *__restrict src) {
     char* orgdest = dest;
     while((*dest = *src)){
@@ -169,4 +170,9 @@ char *strstr(char *haystack, char *needle)
         haystack_temp++;
     }
     return 0;
+}
+extern const char *sys_errlist[]; 
+const char *strerror(int errnum)
+{
+    return  sys_errlist[errno];
 }
