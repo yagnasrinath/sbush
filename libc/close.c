@@ -3,5 +3,5 @@
 #include<syscall.h>
 int close(int fd)
 {
-    return syscall_1(SYS_close,(uint64_t)fd);
+	return syscall_1((uint64_t)SYS_close,(uint64_t)fd);
 }
