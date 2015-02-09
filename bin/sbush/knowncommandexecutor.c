@@ -10,7 +10,7 @@ static char* knowncommands[] = {"cd", "set" ,"setenv","echo"};
 int knowncommandslength = 4;
 static char prompt[128];
 int isdirexist(char *newDirName){
-	char *Exists;
+	void *Exists;
 	if((Exists = opendir(newDirName)) != 0)
         return TRUE;
 	else{
