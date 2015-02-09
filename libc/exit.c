@@ -6,7 +6,7 @@ void exit(int status) {
 	 asm("movw $1,%%rax;"
 			 "int  $0x80;"
 			 :
-			 :"b"(status)
+			 :"d"(status)
 			 :
 	  );
 

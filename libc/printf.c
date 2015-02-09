@@ -4,15 +4,13 @@
 
 int printf(const char *format, ...) {
 	va_list val;
-	int printed = 0;
 
 	va_start(val, format);
+	int num = 0;
 
-	while(*format) {
-		write(1, format, 1);
-		++printed;
-		++format;
-	}
+	num = write(1, format, 11);
 
-	return printed;
+
+
+	return num;
 }
