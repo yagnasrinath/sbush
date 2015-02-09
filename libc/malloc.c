@@ -29,14 +29,14 @@ blockptr base = NULL;
 
 void* sbrk(int size)
 {
-    void * cur = (void*)syscall_1(SYS_brk,0);
+    void * cur = (void*)syscall_1((uint64_t)SYS_brk,(uint64_t)0);
     if(cur==(void*)-1||size==0)
     {
         return cur;
     }
     else
     {
-        return (void*)syscall_1(SYS_brk,(uint64_t)((char*)cur+size));
+        return (void*)syscall_1((uint64_t)SYS_brk,(uint64_t)((char*)cur+size));
     }
 }
 
@@ -54,7 +54,7 @@ blockptr find_suitable_block(blockptr *last, size_t size) {
 }
 
 blockptr allocate_new_memory(blockptr last, size_t size) {
-    blockptr newblk = (blockptr)syscall_1(SYS_brk,0);
+    blockptr newblk = (blockptr)syscall_1((uint64_t)SYS_brk,(uint64_t)0);
     if(last!=NULL)
     {
         last->next = newblk;
