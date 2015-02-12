@@ -7,6 +7,6 @@ int main(int argc, char* argv[], char* envp[]) {
 		//char *tmp = tmp1;
 		char arg ;
 		scanf("%c%x",&arg, &i);
-		printf("%c,%d",arg,i);
+		printf("%c,%x \n",arg,i);
 		return 0;
 }
