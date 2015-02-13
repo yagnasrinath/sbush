@@ -77,6 +77,6 @@ int printf(const char *format, ...) {
 		}
 		firstargument++;
 	}
-
+	va_end( val );
 	return printed;
 }
