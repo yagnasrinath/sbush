@@ -6,7 +6,7 @@
 
 static __inline uint64_t syscall_0(uint64_t n) {
 	uint64_t ret;
-	asm volatile
+	__asm volatile
 		(
 				"syscall"
 				:"=a"(ret)
@@ -18,7 +18,7 @@ static __inline uint64_t syscall_0(uint64_t n) {
 
 static __inline uint64_t syscall_1(uint64_t n, uint64_t a1) {
 	uint64_t ret;
-		asm volatile
+		__asm volatile
 				(
 						"syscall"
 						: "=a" (ret)
@@ -33,7 +33,7 @@ static __inline uint64_t syscall_1(uint64_t n, uint64_t a1) {
 
 static __inline uint64_t syscall_2(uint64_t n, uint64_t a1, uint64_t a2) {
 	uint64_t ret;
-		asm volatile
+		__asm volatile
 				(
 						"syscall"
 						: "=a" (ret)
@@ -48,7 +48,7 @@ static __inline uint64_t syscall_2(uint64_t n, uint64_t a1, uint64_t a2) {
 
 static __inline uint64_t syscall_3(uint64_t n, uint64_t a1, uint64_t a2, uint64_t a3) {
 	uint64_t ret;
-	asm volatile
+	__asm volatile
 			(
 					"syscall"
 					: "=a" (ret)
@@ -62,8 +62,8 @@ static __inline uint64_t syscall_3(uint64_t n, uint64_t a1, uint64_t a2, uint64_
 
 static __inline uint64_t syscall_4(uint64_t n, uint64_t a1, uint64_t a2, uint64_t a3,uint64_t a4) {
 	uint64_t ret;
-	register uint64_t a4r10 asm("r10") = a4;
-	asm volatile
+	register uint64_t a4r10 __asm("r10") = a4;
+	__asm volatile
 			(
 					"syscall"
 					: "=a" (ret)

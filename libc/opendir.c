@@ -6,7 +6,7 @@
 typedef struct
 {
 	int              fd;
-	size_t           numOfItems;
+	size_t           totalrecordlength;
 	struct dirent*   next;
 	struct dirent    buffer[15];
 }DIR;
@@ -25,7 +25,7 @@ void *opendir(const char *path)
 	}
 	else
 	{
-		dir->numOfItems = 0;
+		dir->totalrecordlength = 0;
 		dir->next = NULL;
 	}
 	return NULL;
@@ -36,7 +36,7 @@ struct dirent* readdir(void* dir) {
 	DIR* dirStruct  = (DIR *)dir;
 	struct dirent * retDirEntry;
 
-	if(dirStruct->numOfItems == 0) {
+	if(dirStruct->totalrecordlength == 0) {
 		int returnCount;
 		while(1) {
 			returnCount = getdirentries(dirStruct->fd,dirStruct->buffer,sizeof(dirStruct->buffer));
@@ -46,13 +46,13 @@ struct dirent* readdir(void* dir) {
 		if(returnCount < 0) {
 			return NULL;
 		}
-		dirStruct->numOfItems  = returnCount;
+		dirStruct->totalrecordlength  = returnCount;
 		dirStruct->next = dirStruct->buffer;
 	}
 
 	retDirEntry= dirStruct->next ;
 	dirStruct->next=(struct dirent*)((char*)retDirEntry +retDirEntry->d_reclen);
-	dirStruct->numOfItems -= retDirEntry->d_reclen;
+	dirStruct->totalrecordlength -= retDirEntry->d_reclen;
 
 	return retDirEntry;
 }
