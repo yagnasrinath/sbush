@@ -32,7 +32,7 @@ void *opendir(const char *path)
 }
 
 
-struct dirent* readDir(void* dir) {
+struct dirent* readdir(void* dir) {
 	DIR* dirStruct  = (DIR *)dir;
 	struct dirent * retDirEntry;
 
