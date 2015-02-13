@@ -58,3 +58,10 @@ struct dirent* readDir(void* dir) {
 }
 
 
+int closedir(void *dir) {
+	DIR* dirStruct  = (DIR *)dir;
+	int returncode;
+	returncode = close(dirStruct->fd);
+	free(dirStruct);
+	return returncode ;
+}
