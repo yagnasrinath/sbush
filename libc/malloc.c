@@ -5,8 +5,6 @@
 #define ALIGN_SIZE(X) ((((X-1)>>3)<<3)+8)
 #define BLOCK_SIZE 40
 
-
-
 struct mem_block 
 {
 	//packing structure to multiple of 8 as the machine is 64 bit
