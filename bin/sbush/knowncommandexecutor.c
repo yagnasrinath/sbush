@@ -132,11 +132,12 @@ void executeknowncommand(char *command, char** args) {
     }
     else if(!strcmp(command,"set")) 
     {
-       char* temp = strstr(args[1],"prompt=");
-        if(temp!=0) 
+        printf("%s\n",args[1]);
+        char* temp = strstr(args[1],"prompt=");
+        if(temp!=0)
+            trim(temp=temp+7);
+        if(temp!=0 ) 
         {
-            temp =temp+7;
-            trim(temp);
             int pos = getfirstindex(temp,'\'');
             if(pos==0)
             {
