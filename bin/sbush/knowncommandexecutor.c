@@ -33,6 +33,7 @@ char* getprompt() {
 void changedir(char *dirpath){
 	char path[4096] ;
 	trim(dirpath);
+
     if((dirpath == 0)||(strlen(dirpath) == 0)) {
 		getvalue("HOME", path);
 	}

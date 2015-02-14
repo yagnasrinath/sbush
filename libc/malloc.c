@@ -109,9 +109,9 @@ void *malloc(size_t size)
 			if(new->size>size+2*BLOCK_SIZE+8)
 			{
 				split_blk(new,size);
-				new->free =0;
 			}
 			mem = new->data;
+			new->free =0;
 		}
 	}
 	else
