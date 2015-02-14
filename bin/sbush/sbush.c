@@ -189,6 +189,7 @@ void make_job(struct job* cmd_list,char * cmdline)
 
 void execute_command(struct command*c, char***envp_ptr)
 {
+
     int indexofslash =  getfirstindex(c->executable,'/');
     if(indexofslash != -1)
     {
@@ -213,7 +214,9 @@ void execute_command(struct command*c, char***envp_ptr)
             execve(cmdpath,c->argv,*envp_ptr);
             if (errno != ENOENT && errno != EACCES)
             {
+            	printf("Enter the process 1 \n");
                 write(2,strerror(errno),strlen(strerror(errno)));
+                printf("Enter the process 1 \n");
                 write(2,"\n",strlen("\n"));
                 return;
             }

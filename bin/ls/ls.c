@@ -3,7 +3,7 @@
 #include<errno.h>
 
 int main(int argc, char* argv[], char* envp[]) {
-    char buf[255];        
+	char buf[255];
     void* dir; 
     if(argc == 1){
         getcwd(buf,255);

@@ -5,7 +5,7 @@
 int chdir(const char *path)
 {
 	uint64_t returnvalue =  syscall_1((uint64_t)SYS_chdir,(uint64_t)path);
-    if(returnvalue < 0){
+	  if(((int)returnvalue) < 0){
         errno = -(returnvalue);
         return -1;
     }
