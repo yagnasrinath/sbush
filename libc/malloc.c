@@ -213,3 +213,17 @@ void free(void* mem)
 		}
 	}
 }
+
+void printmalloc(){
+    blockptr temp = base;
+    if(temp == 0){
+        printf("Malloc has not been called\n");
+        return ;
+    }
+    while(temp->next != 0){
+            printf("free %d\tsize %d location of mem block is %d\n",temp->free,temp->size,temp->ptr);
+        temp = temp->next;
+    }
+    if(!temp)
+        printf("free %d\tsize %d location of mem block is %d\n",temp->free,temp->size,temp->ptr);
+}
