@@ -79,12 +79,6 @@ char* get_line()
         }
         index++;
     }
-    if(index == 0)
-    {
-        printf("exit\n");
-        exit(0);
-    }
-    // last char reserved for '\0'
     trim(buf);
     return buf;
 }
