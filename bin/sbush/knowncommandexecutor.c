@@ -74,6 +74,12 @@ void executeknowncommand(char *command, char** args) {
     
     if(!strcmp(command,"setenv"))
     {
+       if((args[1] == 0)||(args[2]==0)) {
+           printf("Usage: setenv VARIABLE ${VAR}:appendpath\n");
+           printf("Usage: setenv VARIABLE prependpath:${VAR}\n");
+           printf("Usage: setenv VARIABLE newpath\n");
+            return;
+        } 
         char** arg2tokens = strtokenize(args[2],':');
         int index=0;
          char *temp = 0;
@@ -125,15 +131,26 @@ void executeknowncommand(char *command, char** args) {
         for(index =0;arg2tokens[index]!=0;index++)
         {
             strncpy(temp,arg2tokens[index],strlen(arg2tokens[index]));
-            temp+=strlen(arg2tokens[index])+1;
+            temp+=strlen(arg2tokens[index]);
             *temp=':';
+            temp++;
         }
-        *temp='\0';
+        *(--temp)='\0';
         setvalue(args[1],value);
+        int i=0;
+        for(i=0;arg2tokens[i]!=0;i++){
+            free(arg2tokens[i]);
+        }
+        free(arg2tokens);
+        free(value);
     }
     else if(!strcmp(command,"set")) 
     {
-        printf("%s\n",args[1]);
+
+        if((args[1] == 0)) {
+            printf("Usage : set prompt='YOURPROMPT'\n");
+            return;
+        }
         char* temp = strstr(args[1],"prompt=");
         if(temp!=0)
             trim(temp=temp+7);
@@ -158,6 +175,10 @@ void executeknowncommand(char *command, char** args) {
     }
     else if(!strcmp(command,"echo")) 
     {
+        if((args[1] == 0)) {
+            printf("Usage : echo $VARIABLE \n");
+            return;
+        }
         trim(args[1]);
         char* value = (char*)malloc(MAX_PATH_LENGTH);
         memset(value,'\0',MAX_PATH_LENGTH);

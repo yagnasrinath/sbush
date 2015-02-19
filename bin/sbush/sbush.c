@@ -10,6 +10,7 @@
 envList * environment;
 int envSize=0;
 char** env=0;
+int isfileinput = 0;
 
 void setabsolutepath(char*newexec,struct command *newcommand, char *path){
     strcpy(newexec,path);
@@ -61,8 +62,10 @@ char* get_line()
 {
     int fd = 0; // 0 is stdin
     char *buf = (char*)malloc(JOB_MAX_LENGTH);
-    write(1,getprompt(),strlen(getprompt()));
-    write(1," ",strlen(" "));
+    if(!isfileinput){
+        write(1,getprompt(),strlen(getprompt()));
+        write(1," ",strlen(" "));
+    }
     char c[1]={'\0'};
     int index = 0;
     while(read(fd,c,1))
@@ -78,6 +81,10 @@ char* get_line()
             buf[index]=c[0];
         }
         index++;
+    }
+    if((index == 0)&&(isfileinput))
+    {
+        exit(0);
     }
     trim(buf);
     return buf;
@@ -115,7 +122,7 @@ void make_job(struct job* cmd_list,char * cmdline)
         return;
     }
     trim(cmdline); 
-    if(cmdline[0]=='#')
+    if((cmdline[0]=='#')&&(isfileinput))
     {
         cmd_list->start=0;
         return;
@@ -310,6 +317,7 @@ int main(int argc, char* argv[], char* envp[])
     if(argc == 2)
     {
         int fd = open(argv[1],O_RDONLY);
+        isfileinput =1;
         dup2(fd,0);
     }
     while(1)
@@ -318,6 +326,7 @@ int main(int argc, char* argv[], char* envp[])
         if(!strlen(line))
         {
             free(line);
+            
             continue;
         }
         make_job(&cmd_list,line);

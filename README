@@ -1,0 +1,19 @@
+# sbush
+Warm-up Project #1 (Part 1 of 2): The Shell
+------------------------------------------
+Yagna Srinath Reddy, Battula(110010304)
+Ravi Chandra, Sadineni(109754581)
+Harshavardhan Chowdary, Ellanti(109596321)
+
+Our project will work as basic shell. Our project will work
+
+1) We have implemented support to change directory(cd)
+    a) Implemented basic cd /path/to/new/directory  
+    b) Implemented cd (Which will take to $HOME directory)
+2) We have implemented shell to execute binaries interactively
+3) We have implemented shell which will run scripts
+4) We have implemented shell to execute pipelines of binaries (/bin/ls | /bin/grep test )
+5) We have implemented shell to set PATH variable(setenv VARIABLE ${VARIABLE}:newpath (or) setenv VARIABLE newpath (or) setenv VARIABLE prepath:${VARIABLE1}:postpath:${VARIABLE2}....)
+6) We have implemented shell to set PS1 variable(set prompt='YOURPROMPT')
+7) We have implemented shell to echo any environment variable (echo $VARIABLE)
+
