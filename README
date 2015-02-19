@@ -1,19 +1,24 @@
-# sbush
-Warm-up Project #1 (Part 1 of 2): The Shell
-------------------------------------------
-Yagna Srinath Reddy, Battula(110010304)
-Ravi Chandra, Sadineni(109754581)
-Harshavardhan Chowdary, Ellanti(109596321)
+The provided Makefile:
+  1) builds a kernel
+  2) copies it into rootfs/boot/kernel/kernel
+  3) creates an ISO CD image with the rootfs/ contents
 
-Our project will work as basic shell. Our project will work
+To boot the system in QEMU, run:
+  qemu-system-x86_64 -curses -cdrom $USER.iso -drive id=disk,file=$USER.img,if=none -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0 -net nic -net user,hostfwd=tcp::10080-:80 -net user,hostfwd=tcp::10023-:23 --no-reboot -gdb tcp::9998
 
-1) We have implemented support to change directory(cd)
-    a) Implemented basic cd /path/to/new/directory  
-    b) Implemented cd (Which will take to $HOME directory)
-2) We have implemented shell to execute binaries interactively
-3) We have implemented shell which will run scripts
-4) We have implemented shell to execute pipelines of binaries (/bin/ls | /bin/grep test )
-5) We have implemented shell to set PATH variable(setenv VARIABLE ${VARIABLE}:newpath (or) setenv VARIABLE newpath (or) setenv VARIABLE prepath:${VARIABLE1}:postpath:${VARIABLE2}....)
-6) We have implemented shell to set PS1 variable(set prompt='YOURPROMPT')
-7) We have implemented shell to echo any environment variable (echo $VARIABLE)
+  Explanation of parameters:
+  -curses         use a text console (omit this to use default SDL/VNC console)
+  -cdrom x.iso    connect a CD-ROM and insert CD with x.iso disk
+  --no-reboot     exit when guest reboots
+  -gdb tcp::9998  listen for "remote" debugging connections on port 9998
 
+  connect a hard drive with x.img disk:
+  -drive id=disk,file=$USER.img,if=none -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0
+  connect a NIC and forward local port 10080 into port 80 and local port 10023 to port 23
+  -net nic -net user,hostfwd=tcp::10080-:80 -net user,hostfwd=tcp::10023-:23
+
+When using the -curses mode, switch to the qemu> console with ESC-2.
+
+To connect a remote debugger to the running qemu VM:
+  gdb ./kernel
+  target remote localhost:9998

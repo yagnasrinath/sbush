@@ -4,6 +4,9 @@ int res;
 int argc;
 char**argv;
 char **envp;
+
+int main(int argc, char* argv[], char* envp[]);
+
 void _start(void) {
 	 uint64_t stack_breaker[0];
 	 argc = *(uint64_t*)(((uint64_t)stack_breaker)+sizeof(uint64_t));
