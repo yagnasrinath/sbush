@@ -28,7 +28,7 @@ void *opendir(const char *path)
 		dir->totalrecordlength = 0;
 		dir->next = NULL;
 	}
-	return NULL;
+	return dir;
 }
 
 
@@ -40,10 +40,10 @@ struct dirent* readdir(void* dir) {
 		int returnCount;
 		while(1) {
 			returnCount = getdirentries(dirStruct->fd,dirStruct->buffer,sizeof(dirStruct->buffer));
-			if(returnCount > 0 || errno != EINTR)
+			if(returnCount >= 0 || errno != EINTR)
 				break;
 		}
-		if(returnCount < 0) {
+		if(returnCount <= 0) {
 			return NULL;
 		}
 		dirStruct->totalrecordlength  = returnCount;

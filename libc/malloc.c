@@ -109,9 +109,9 @@ void *malloc(size_t size)
 			if(new->size>size+2*BLOCK_SIZE+8)
 			{
 				split_blk(new,size);
-				new->free =0;
 			}
 			mem = new->data;
+			new->free =0;
 		}
 	}
 	else
@@ -212,4 +212,18 @@ void free(void* mem)
 			brk(cur);
 		}
 	}
+}
+
+void printmalloc(){
+    blockptr temp = base;
+    if(temp == 0){
+        printf("Malloc has not been called\n");
+        return ;
+    }
+    while(temp->next != 0){
+            printf("free %d\tsize %d location of mem block is %d\n",temp->free,temp->size,temp->ptr);
+        temp = temp->next;
+    }
+    if(!temp)
+        printf("free %d\tsize %d location of mem block is %d\n",temp->free,temp->size,temp->ptr);
 }

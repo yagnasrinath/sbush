@@ -7,7 +7,7 @@
 //extern __thread int errno;
 int main(int argc, char* argv[], char* envp[]);
 void exit(int status);
-
+void printmalloc();
 // memory
 typedef uint64_t size_t;
 void *malloc(size_t size);

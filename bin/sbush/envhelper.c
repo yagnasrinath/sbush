@@ -130,7 +130,7 @@ void buildenv() {
 	int i=0;
 	while(head !=0) {
 		int len = strlen(head->key) + strlen(head->value) + 2;
-		char * envVar = (char *)malloc(len);
+		char* envVar = (char *)malloc(len);
 		memset(envVar, '\0',len);
 		strcpy(envVar,head->key);
 		strcat(envVar,"=");
@@ -140,7 +140,9 @@ void buildenv() {
 		i++;
 	}
 	env [i]= 0;
+
 }
+
 char *** getenv() {
 	return &(env);
 }
