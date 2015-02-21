@@ -28,10 +28,6 @@ void putchar(int i) {
     kernelwrite(output);
 }
 
-/*int puts(char *i) {
-  return write(1, i, strlen(i));
-  }*/
-
 void printIntinStringFormat(int value, int base) {
     int isnegative =0;
     if(value < 0) {
@@ -74,6 +70,7 @@ void printf(const char *format, ...) {
     va_list val;
     int numOut;
     char *strOut;
+    uint64_t voidprint;
     const char *firstargument;
     va_start(val, format);
     firstargument=format;
@@ -101,6 +98,9 @@ void printf(const char *format, ...) {
                       break;
             case 'x': numOut=va_arg(val,int);
                       printIntinStringFormat(numOut,16);
+                      break;
+            case 'p': voidprint = va_arg(val, uint64_t);
+                      printIntinStringFormat(voidprint,16);
                       break;
             case '%': putchar('%');
                       break;
