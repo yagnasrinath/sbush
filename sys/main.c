@@ -1,6 +1,7 @@
 #include <sys/sbunix.h>
 #include <sys/gdt.h>
 #include <sys/tarfs.h>
+#include<sys/system.h>
 
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
@@ -24,23 +25,40 @@ uint32_t* loader_stack;
 extern char kernmem, physbase;
 struct tss_t tss;
 
+
+
+int main()
+{
+	init_video();
+	char s[10];
+	s[0]= 'h';
+	s[1]= 'h';
+	s[2]=0x08;
+	s[3]='\0';
+	printf("%s",s);
+	cls();
+	while(1);
+}
+
+
 void boot(void)
 {
 	// note: function changes rsp, local stack variables can't be practically used
 	register char *s, *v;
 	__asm__(
-		"movq %%rsp, %0;"
-		"movq %1, %%rsp;"
-		:"=g"(loader_stack)
-		:"r"(&stack[INITIAL_STACK_SIZE])
+			"movq %%rsp, %0;"
+			"movq %1, %%rsp;"
+			:"=g"(loader_stack)
+			 :"r"(&stack[INITIAL_STACK_SIZE])
 	);
 	reload_gdt();
 	setup_tss();
 	start(
-		(uint32_t*)((char*)(uint64_t)loader_stack[3] + (uint64_t)&kernmem - (uint64_t)&physbase),
-		&physbase,
-		(void*)(uint64_t)loader_stack[4]
+			(uint32_t*)((char*)(uint64_t)loader_stack[3] + (uint64_t)&kernmem - (uint64_t)&physbase),
+			&physbase,
+			(void*)(uint64_t)loader_stack[4]
 	);
+	main();
 	s = "!!!!! start() returned !!!!!";
 	for(v = (char*)0xb8000; *s; ++s, v += 2) *v = *s;
 	while(1);
