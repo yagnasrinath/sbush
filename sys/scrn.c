@@ -6,7 +6,7 @@
  */
 #include <sys/system.h>
 #include<sys/utils/string.h>
-#define MAX_ROW 25
+#define MAX_ROW 24
 #define MAX_COLUMN 80
 static unsigned short *basememptr;
 static int colorattr = 0X0F;
@@ -32,6 +32,27 @@ static void scroll() {
 		csr_row=MAX_ROW-1;
 		csr_column=0;
 	}
+}
+
+void putchat(int put_row , int put_column,unsigned char c ) {
+	 if(put_row > 25 || put_row < 1 || put_column <1 ||put_column > 80 ) {
+		 	 return;
+	 }
+	 unsigned short * current_pos = basememptr+put_row*80+put_column-1;
+	 *current_pos = c|colorattr<<8;
+}
+
+void putsat(int put_row , int put_column, char* s ) {
+	 if(put_row > 25 || put_row < 1 || put_column <1 ||put_column > 80 ) {
+		 	 return;
+	 }
+	 while(*s) {
+		 putchat(put_row,put_column++,*s++);
+		 if(put_column > 80) {
+			 put_row++;
+			 put_column =0;
+		 }
+	 }
 }
 
 void cls() {

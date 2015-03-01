@@ -7,12 +7,8 @@
 
 #ifndef SBUSH_INCLUDE_SYS_SYSTEM_H_
 #define SBUSH_INCLUDE_SYS_SYSTEM_H_
-#include<sys/types.h>
-void cls();
-void putch(unsigned char c);
-void puts(char *str);
-void settextcolor(unsigned char forecolor, unsigned char backcolor);
-void init_video();
+#include<sys/defs.h>
+void timer_install();
 
 
 inline unsigned char inportb (unsigned short _port) {

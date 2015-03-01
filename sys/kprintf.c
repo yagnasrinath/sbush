@@ -1,6 +1,7 @@
 #include <sys/sbunix.h>
 #include <stdarg.h>
 #include<sys/system.h>
+#include<sys/scrn.h>
 int lines = 0;
 int columns = 0;
 int color = 7;

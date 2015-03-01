@@ -2,7 +2,8 @@
 #include <sys/gdt.h>
 #include <sys/tarfs.h>
 #include<sys/system.h>
-
+#include<sys/idt.h>
+#include<sys/scrn.h>
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
 	struct smap_t {
@@ -15,6 +16,7 @@ void start(uint32_t* modulep, void* physbase, void* physfree)
 			printf("Available Physical Memory [%x-%x]\n", smap->base, smap->base + smap->length);
 		}
 	}
+
 	printf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
 	// kernel starts here
 }
@@ -30,14 +32,12 @@ struct tss_t tss;
 int main()
 {
 	init_video();
-	char s[10];
-	s[0]= 'h';
-	s[1]= 'h';
-	s[2]=0x08;
-	s[3]='\0';
-	printf("%s",s);
-	cls();
+	idt_install();
+	timer_install();
+	__asm__ __volatile__ ("sti");
+	//cls();
 	while(1);
+
 }
 
 
