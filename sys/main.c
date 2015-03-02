@@ -4,6 +4,7 @@
 #include<sys/system.h>
 #include<sys/idt.h>
 #include<sys/scrn.h>
+#include<sys/kb_intrpt_handler.h>
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
 	struct smap_t {
@@ -34,6 +35,7 @@ int main()
 	init_video();
 	idt_install();
 	timer_install();
+	kb_install();
 	__asm__ __volatile__ ("sti");
 	//cls();
 	while(1);

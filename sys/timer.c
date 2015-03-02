@@ -29,7 +29,7 @@ void printtimeatrightconer(int value) {
 		value = value/10;
 	}while(value!=0);
 	ptr++;
-	putsat(24,  80-sec_length, ptr);
+	putsat(24,  78-sec_length, ptr);
 	return ;
 
 }

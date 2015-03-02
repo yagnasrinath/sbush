@@ -42,6 +42,7 @@
 
 INTERRUPT(0);
 INTERRUPT(32);
+INTERRUPT(33);
 // hardware interrupts
 void *irq_routines[16] =
 {
@@ -70,6 +71,14 @@ void x86_64_handle_isr_vector0(struct isr_nrm_regs *stack) {
 void x86_64_handle_isr_vector32(struct isr_nrm_regs *stack) {
 	void (*handler)(struct isr_nrm_regs *stack);
 	handler =irq_routines[0];
+	handler(stack);
+	// send the EOI to the master controller.
+	outportb(0x20, 0x20);
+}
+
+void x86_64_handle_isr_vector33(struct isr_nrm_regs *stack) {
+	void (*handler)(struct isr_nrm_regs *stack);
+	handler =irq_routines[1];
 	handler(stack);
 	// send the EOI to the master controller.
 	outportb(0x20, 0x20);
