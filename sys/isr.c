@@ -4,16 +4,16 @@
  *  Created on: Mar 1, 2015
  *      Author: ravichandrasadineni
  */
-/* adapted from Chris Stones, shovelos */
+
 #include <sys/sbunix.h>
 #include <sys/stdlib.h>
 #include <sys/isr.h>
 #include<sys/system.h>
 
-
+/* adapted from Chris Stones, shovelos */
 #define INTERRUPT(vector) \
-	__asm__(".global x86_64_isr_vector" #vector "\n"\
-			"x86_64_isr_vector" #vector ":\n" \
+	__asm__(".global x86_64_isr" #vector "\n"\
+			"x86_64_isr" #vector ":\n" \
 			"    pushq %rax;" \
 			"    pushq %rcx;" \
 			"    pushq %rdx;" \
@@ -25,7 +25,7 @@
 			"    pushq %r11;" \
 			"    movq  %rsp,%rdi;" \
 			"    addq  $72, %rdi;"  \
-			"    call x86_64_handle_isr_vector" #vector ";" \
+			"    call x86_64_handle_isr" #vector ";" \
 			"    popq %r11;" \
 			"    popq %r10;" \
 			"    popq %r9;" \
@@ -61,14 +61,14 @@ void irq_uninstall_handler(int irq)
     irq_routines[irq] = 0;
 }
 
-void x86_64_handle_isr_vector0(struct isr_nrm_regs *stack) {
+void x86_64_handle_isr0(struct isr_nrm_regs *stack) {
 	printf("devided by zero exception\n");
 	printf("CS:0x%x\n",stack->cs);
 	printf("RIP:0x%x\n",stack->rip);
 	HALT("");
 }
 
-void x86_64_handle_isr_vector32(struct isr_nrm_regs *stack) {
+void x86_64_handle_isr32(struct isr_nrm_regs *stack) {
 	void (*handler)(struct isr_nrm_regs *stack);
 	handler =irq_routines[0];
 	handler(stack);
@@ -76,7 +76,7 @@ void x86_64_handle_isr_vector32(struct isr_nrm_regs *stack) {
 	outportb(0x20, 0x20);
 }
 
-void x86_64_handle_isr_vector33(struct isr_nrm_regs *stack) {
+void x86_64_handle_isr33(struct isr_nrm_regs *stack) {
 	void (*handler)(struct isr_nrm_regs *stack);
 	handler =irq_routines[1];
 	handler(stack);

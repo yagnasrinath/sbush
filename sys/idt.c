@@ -55,9 +55,9 @@ static void inline load_idt(void* idt_ptr) {
 }
 
 
-extern void x86_64_isr_vector0();
-extern void x86_64_isr_vector32();
-extern void x86_64_isr_vector33();
+extern void x86_64_isr0();
+extern void x86_64_isr32();
+extern void x86_64_isr33();
 
 void idt_set_gate(uint16_t idtNum, uint64_t handler ) {
 	idt_arr[idtNum].offset_low = handler & 0XFFFF;
@@ -80,12 +80,12 @@ void idt_install ()  {
 	idt_ptr.base = (uint64_t)&idt_arr;
 	memset(&idt_arr, 0, (sizeof (struct idt_t) * 256));
 	// Load the ISR here
-	idt_set_gate(0,(uint64_t)&x86_64_isr_vector0);
+	idt_set_gate(0,(uint64_t)&x86_64_isr0);
 
 
 	//Load the hardware Interrupts here
-	idt_set_gate(32,(uint64_t)&x86_64_isr_vector32);
-	idt_set_gate(33,(uint64_t)&x86_64_isr_vector33);
+	idt_set_gate(32,(uint64_t)&x86_64_isr32);
+	idt_set_gate(33,(uint64_t)&x86_64_isr33);
 	load_idt((void *)&idt_ptr);
 }
 
