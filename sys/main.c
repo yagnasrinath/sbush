@@ -5,19 +5,18 @@
 #include<sys/idt.h>
 #include<sys/scrn.h>
 #include<sys/kb_intrpt_handler.h>
+#include<sys/MemoryManagement/phy_alloc.h>
+int mymain(uint32_t* modulep, void* physbase, void* physfree);
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
-	struct smap_t {
-		uint64_t base, length;
-		uint32_t type;
-	}__attribute__((packed)) *smap;
-	while(modulep[0] != 0x9001) modulep += modulep[1]+2;
-	for(smap = (struct smap_t*)(modulep+2); smap < (struct smap_t*)((char*)modulep+modulep[1]+2*4); ++smap) {
-		if (smap->type == 1 /* memory */ && smap->length != 0) {
-			printf("Available Physical Memory [%x-%x]\n", smap->base, smap->base + smap->length);
-		}
-	}
 
+	while(modulep[0] != 0x9001) modulep += modulep[1]+2;
+	/*for(smap = (struct smap_t*)(modulep+2); smap < (struct smap_t*)((char*)modulep+modulep[1]+2*4); ++smap) {
+		if (smap->type == 1  memory  && smap->length != 0) {
+			printf("Available Physical Memory [%d-%d]\n", smap->base, smap->base + smap->length);
+		}
+	}*/
+	mymain(  modulep,  physbase,  physfree);
 	printf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
 	// kernel starts here
 }
@@ -30,14 +29,22 @@ struct tss_t tss;
 
 
 
-int main()
+int mymain(uint32_t* modulep, void* physbase, void* physfree)
 {
-	init_video();
-	idt_install();
-	timer_install();
-	kb_install();
-	__asm__ __volatile__ ("sti");
-	//cls();
+	init_video();// video buffer
+	idt_install(); // interrupt descriptor table
+	timer_install(); // timer
+	kb_install(); // keyboard
+	__asm__ __volatile__ ("sti"); // activating interrupts
+	while(modulep[0] != 0x9001) modulep += modulep[1]+2;
+	int num_smaps=0;
+
+	struct smap_t* smapbase = (struct smap_t*)(modulep+2);
+	for(smap = (struct smap_t*)(modulep+2); smap < (struct smap_t*)((char*)modulep+modulep[1]+2	*4); ++smap) {
+		num_smaps++;
+	}
+	init_phy_memory( smapbase, num_smaps,  physbase,  physfree );
+	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	while(1);
 
 }
@@ -60,7 +67,7 @@ void boot(void)
 			&physbase,
 			(void*)(uint64_t)loader_stack[4]
 	);
-	main();
+
 	s = "!!!!! start() returned !!!!!";
 	for(v = (char*)0xb8000; *s; ++s, v += 2) *v = *s;
 	while(1);

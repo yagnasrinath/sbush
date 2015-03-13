@@ -1,0 +1,30 @@
+/*
+ * phy_alloc.h
+ *
+ *  Created on: Mar 12, 2015
+ *      Author: ravichandrasadineni
+ */
+
+#ifndef SBUSH_SYS_MEMOYMANAGEMENT_PHY_ALLOC_H_
+#define SBUSH_SYS_MEMOYMANAGEMENT_PHY_ALLOC_H_
+#include<sys/defs.h>
+struct smap_t {
+	uint64_t base, length;
+	uint32_t type;
+}__attribute__((packed)) *smap;
+#define NUM_PAGES 4096
+#define PAGE_SIZE 4096
+#define PAGES_PER_GROUP 8
+
+void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* phy_free );
+
+void free_phy_page(uint64_t page_num);
+
+uint64_t allocate_phy_page() ;
+
+static inline uint64_t mm_phy_to_page(uint64_t phy) {
+
+	return phy / PAGE_SIZE;
+}
+
+#endif /* SBUSH_SYS_MEMOYMANAGEMENT_PHY_ALLOC_H_ */
