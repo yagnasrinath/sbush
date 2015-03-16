@@ -72,7 +72,7 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 		if(is_allocatable_memory(smap,phy_base,phy_free)) {
 			uint64_t addr = smap->base;
 			uint64_t length = smap->length;
-			for(;length>0; length-=PAGE_SIZE, addr+=PAGE_SIZE) {
+			for(;length>=PAGE_SIZE; length-=PAGE_SIZE, addr+=PAGE_SIZE) {
 				mark_page_free(mm_phy_to_page(addr));
 			}
 		}
