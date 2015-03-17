@@ -1,32 +1,12 @@
 #include <sys/sbunix.h>
 #include <stdarg.h>
+#include<sys/system.h>
+#include<sys/scrn.h>
 int lines = 0;
 int columns = 0;
 int color = 7;
 int isunsignedint = 0;
-static char* monitor = (char *)0xB8000;
 
-
-void kernelwrite(char *output){
-    while(*output != '\0'){
-        columns++;
-        if(columns == 80||*output == '\n'){
-            lines++;
-            monitor = monitor +((80 - columns) * 2);  
-            columns = 0;
-        }
-        *monitor++ = *output++;
-        *monitor++ = color;
-
-    }
-}
-
-void putchar(int i) {
-    char output[2];
-    output[0] = i;
-    output[1] = '\0';
-    kernelwrite(output);
-}
 
 void printIntinStringFormat(int value, int base) {
     int isnegative =0;
@@ -34,7 +14,6 @@ void printIntinStringFormat(int value, int base) {
         isnegative =1;
         value *=-1;
     }
-
     char output[33];
     char *ptr;
     ptr = &output[32];
@@ -63,7 +42,7 @@ void printIntinStringFormat(int value, int base) {
             ptr--;
         }
     }
-    kernelwrite(++ptr);
+    puts(++ptr);
 }
 
 void printf(const char *format, ...) {
@@ -76,20 +55,20 @@ void printf(const char *format, ...) {
     firstargument=format;
     while(*firstargument) {
         if(*firstargument != '%') {
-            putchar(*firstargument);
+            putch(*firstargument);
             firstargument++;
             continue;
         }
         firstargument++;
         switch(*firstargument) {
             case 'c' :numOut =va_arg(val,int);
-                      putchar(numOut);
+                      putch(numOut);
                       break;
             case 'd' :numOut=va_arg(val,int);
                       printIntinStringFormat(numOut,10);
                       break;
             case 's': strOut=va_arg(val,char*);
-                      kernelwrite(strOut);
+                      puts(strOut);
                       break;
             case 'u': numOut=va_arg(val,int);
                       isunsignedint = 1;
@@ -102,7 +81,7 @@ void printf(const char *format, ...) {
             case 'p': voidprint = va_arg(val, uint64_t);
                       printIntinStringFormat(voidprint,16);
                       break;
-            case '%': putchar('%');
+            case '%': putch('%');
                       break;
         }
         firstargument++;

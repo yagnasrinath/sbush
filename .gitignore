@@ -3,3 +3,7 @@ rootfs/
 tags
 *.tgz
 *.gpg
+*.img
+*.iso
+newfs.506
+kernel
