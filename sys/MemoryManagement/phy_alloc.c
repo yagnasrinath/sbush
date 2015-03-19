@@ -61,6 +61,28 @@ static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_
 	return TRUE;
 }
 
+void get_4k_aligned(uint64_t *addr,uint64_t *length)
+{
+    if(((*addr)&0x00000fff)==0)
+    {
+        return;//address aready 4k aligned
+    }
+    //first get the aligned block and return one higher
+    //than the currently algined block(add 4k)
+    uint64_t residue = *addr&0x00000fff;
+    *addr = ((*addr)&0xfffff000)+0x00001000;
+    // decrementing length as we reduced the space
+    if(((*length)%PAGE_SIZE)==0)
+    {
+        *length = *length-PAGE_SIZE;
+    }
+    else
+    {
+        *length = *length - residue;
+    }
+    return; 
+}
+
 
 void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* phy_free ) {
 	// marking all pages used initially
@@ -72,6 +94,7 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 		if(is_allocatable_memory(smap,phy_base,phy_free)) {
 			uint64_t addr = smap->base;
 			uint64_t length = smap->length;
+                        get_4k_aligned(&addr,&length);
 			for(;length>=PAGE_SIZE; length-=PAGE_SIZE, addr+=PAGE_SIZE) {
 				mark_page_free(mm_phy_to_page(addr));
 			}
