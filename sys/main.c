@@ -6,6 +6,7 @@
 #include<sys/scrn.h>
 #include<sys/kb_intrpt_handler.h>
 #include<sys/MemoryManagement/phy_alloc.h>
+#include<sys/MemoryManagement/page_tables.h>
 int mymain(uint32_t* modulep, void* physbase, void* physfree);
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
@@ -28,7 +29,6 @@ extern char kernmem, physbase;
 struct tss_t tss;
 
 
-
 int mymain(uint32_t* modulep, void* physbase, void* physfree)
 {
 	init_video();// video buffer
@@ -44,6 +44,10 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
 		num_smaps++;
 	}
 	init_phy_memory( smapbase, num_smaps,  physbase,  physfree );
+        // for mapping free pages on stack
+        physfree+=(1024*1024); //incrementing by 1MB 
+
+        init_page_tables(physbase,physfree,(void*)&kernmem);
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	while(1);
 
@@ -53,7 +57,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
 void boot(void)
 {
 	// note: function changes rsp, local stack variables can't be practically used
-	register char *s, *v;
+	register char *s;
 	__asm__(
 			"movq %%rsp, %0;"
 			"movq %1, %%rsp;"
@@ -69,6 +73,6 @@ void boot(void)
 	);
 
 	s = "!!!!! start() returned !!!!!";
-	for(v = (char*)0xb8000; *s; ++s, v += 2) *v = *s;
+        printf("%s\n",s);
 	while(1);
 }

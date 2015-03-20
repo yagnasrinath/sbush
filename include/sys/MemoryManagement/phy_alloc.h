@@ -15,6 +15,8 @@ struct smap_t {
 #define NUM_PAGES 4096
 #define PAGE_SIZE 4096
 #define PAGES_PER_GROUP 8
+#define ALIGN_4K 0xFFFFFFFFFFFFF000
+#define PAGE_OFFSET 0x0000000000000FFF
 
 void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* phy_free );
 

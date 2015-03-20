@@ -37,10 +37,10 @@ static void mark_page_used(uint64_t pageNum) {
 static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_free) {
 
 	// If a NULL pointer. Then return straight away
-	if(smap->base == 0X0) {
+/*	if(smap->base == 0X0) {
 			return FALSE;
 	}
-	// Increasing the size of the phy_free by 1 MB to control the growing kernel stack
+*/	// Increasing the size of the phy_free by 1 MB to control the growing kernel stack
 	uint64_t updated_phy_free = (uint64_t)phy_free + 1024*1024;
 	if (smap->type != 1  || smap->length == 0) {
 		return FALSE;
@@ -55,22 +55,23 @@ static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_
 		return FALSE;
 	}
 	// Do not go below physical base. It is a hole there
-	if (smap->base < (uint64_t)phy_base) {
+/*	if (smap->base < (uint64_t)phy_base) {
 		return FALSE;
 	}
+*/
 	return TRUE;
 }
 
 void get_4k_aligned(uint64_t *addr,uint64_t *length)
 {
-    if(((*addr)&0x00000fff)==0)
+    if(((*addr)&PAGE_OFFSET)==0)
     {
         return;//address aready 4k aligned
     }
     //first get the aligned block and return one higher
     //than the currently algined block(add 4k)
-    uint64_t residue = *addr&0x00000fff;
-    *addr = ((*addr)&0xfffff000)+0x00001000;
+    uint64_t residue = *addr&PAGE_OFFSET;
+    *addr = ((*addr)&ALIGN_4K)+0x0000000000001000;
     // decrementing length as we reduced the space
     if(((*length)%PAGE_SIZE)==0)
     {
@@ -119,13 +120,10 @@ uint64_t allocate_phy_page() {
 				char curr_bitMap =mem_bitmap[i] ;
 
 				for(int curr_page = 0;curr_page < PAGES_PER_GROUP; curr_page++) {
-					if(curr_bitMap|(1<curr_page )) {
+					if(curr_bitMap&(1<<curr_page )) {
 							uint64_t free_page =  i*PAGES_PER_GROUP + curr_page;
-							if(free_page == 0) {
-								printf("Asigning NULL ADDRESS\n");
-							}
 							mark_page_used(free_page);
-							return free_page;
+							return free_page*PAGE_SIZE;
 					}
 
 				}

@@ -115,7 +115,13 @@ void settextcolor(unsigned char forecolor, unsigned char backcolor) {
 
 }
 void init_video() {
-	basememptr = (unsigned short *)0xB8000;
+	basememptr = (unsigned short *)0xb8000;
+	cls();
+}
+
+
+void update_video(uint64_t addr) {
+	basememptr = (unsigned short *)addr;
 	cls();
 }
 
