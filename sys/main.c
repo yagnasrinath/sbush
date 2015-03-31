@@ -48,6 +48,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
         physfree+=(1024*1024); //incrementing by 1MB 
 
         init_page_tables(physbase,physfree,(void*)&kernmem);
+
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	while(1);
 

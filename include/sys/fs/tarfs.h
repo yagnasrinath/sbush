@@ -8,6 +8,10 @@
 #ifndef SBUSH_INCLUDE_SYS_FS_TARFS_H_
 #define SBUSH_INCLUDE_SYS_FS_TARFS_H_
 
+#include<sys/defs.h>
+#include<sys/sbunix.h>
+#include<sys/utils/string.h>
+
 extern char _binary_tarfs_start;
 extern char _binary_tarfs_end;
 
@@ -31,5 +35,8 @@ struct posix_header_ustar {
 	char pad[12];
 };
 
+typedef struct posix_header_ustar HEADER;
+
+char* get_file_data(char* filename);
 
 #endif /* SBUSH_INCLUDE_SYS_FS_TARFS_H_ */
