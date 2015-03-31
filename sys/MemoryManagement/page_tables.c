@@ -39,26 +39,26 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
         *(((uint64_t*)pt)+pt_offset+index) = (kern_page) | KERNEL_RW_FLAG ;
     }
     
-    printf("index:%d\n",index);
+    kprintf("index:%d\n",index);
     *(((uint64_t*)pt)+pt_offset+(index)) = 0xb8000 | USER_RW_FLAG | PAGE_PRESENT;
     uint64_t video = 0xffff000000000000|(pml4_offset<<39)|(pdp_offset<<30)|(pd_offset<<21)|((pt_offset+index)<<12);
     update_video(video);
     _set_k_ptable_crm3(pml4);
-    printf("video:%p\n",video);
-    printf("size%d\n",physfree-physbase);
-    printf("physbase:%p\n",physbase);
-    printf("physfree:%p\n",physfree);
-    printf("kernmem:%p\n",kernmem);
-    printf("pml4:%d\n",pml4_offset);
-    printf("pdp:%d\n",pdp_offset);
-    printf("pd:%d\n",pd_offset);
-    printf("pt:%d\n",pt_offset);
-    printf("pml4:%p\n",pml4);
-    printf("pdp:%p\n",pdp);
-    printf("pd:%p\n",pd);
-    printf("pt:%p\n",pt);
+    kprintf("video:%p\n",video);
+    kprintf("size%d\n",physfree-physbase);
+    kprintf("physbase:%p\n",physbase);
+    kprintf("physfree:%p\n",physfree);
+    kprintf("kernmem:%p\n",kernmem);
+    kprintf("pml4:%d\n",pml4_offset);
+    kprintf("pdp:%d\n",pdp_offset);
+    kprintf("pd:%d\n",pd_offset);
+    kprintf("pt:%d\n",pt_offset);
+    kprintf("pml4:%p\n",pml4);
+    kprintf("pdp:%p\n",pdp);
+    kprintf("pd:%p\n",pd);
+    kprintf("pt:%p\n",pt);
     cls();
-    printf("worked - physical pages done!!\n");
+    kprintf("worked - physical pages done!!\n");
 }
 
 

@@ -1,5 +1,12 @@
-#ifndef _TARFS_H
-#define _TARFS_H
+/*
+ * tarfs.h
+ *
+ *  Created on: Mar 31, 2015
+ *      Author: ravichandrasadineni
+ */
+
+#ifndef SBUSH_INCLUDE_SYS_FS_TARFS_H_
+#define SBUSH_INCLUDE_SYS_FS_TARFS_H_
 
 extern char _binary_tarfs_start;
 extern char _binary_tarfs_end;
@@ -24,4 +31,5 @@ struct posix_header_ustar {
 	char pad[12];
 };
 
-#endif
+
+#endif /* SBUSH_INCLUDE_SYS_FS_TARFS_H_ */

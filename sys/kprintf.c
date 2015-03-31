@@ -83,7 +83,7 @@ void printIntinStringFormat(int value, int base) {
 	puts(++ptr);
 }
 
-void printf(const char *format, ...) {
+void kprintf(const char *format, ...) {
 	va_list val;
 	int numOut;
 	char *strOut;

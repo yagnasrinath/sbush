@@ -1,6 +1,6 @@
 #include <sys/sbunix.h>
 #include <sys/gdt.h>
-#include <sys/tarfs.h>
+#include <sys/fs/tarfs.h>
 #include<sys/system.h>
 #include<sys/idt.h>
 #include<sys/scrn.h>
@@ -18,7 +18,7 @@ void start(uint32_t* modulep, void* physbase, void* physfree)
 		}
 	}*/
 	mymain(  modulep,  physbase,  physfree);
-	printf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
+	kprintf("tarfs in [%p:%p]\n", &_binary_tarfs_start, &_binary_tarfs_end);
 	// kernel starts here
 }
 
@@ -73,6 +73,6 @@ void boot(void)
 	);
 
 	s = "!!!!! start() returned !!!!!";
-        printf("%s\n",s);
+        kprintf("%s\n",s);
 	while(1);
 }

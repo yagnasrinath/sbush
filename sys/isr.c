@@ -62,9 +62,9 @@ void irq_uninstall_handler(int irq)
 }
 
 void x86_64_handle_isr0(struct isr_nrm_regs *stack) {
-	printf("devided by zero exception\n");
-	printf("CS:0x%x\n",stack->cs);
-	printf("RIP:0x%x\n",stack->rip);
+	kprintf("devided by zero exception\n");
+	kprintf("CS:0x%x\n",stack->cs);
+	kprintf("RIP:0x%x\n",stack->rip);
 	HALT("");
 }
 
