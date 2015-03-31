@@ -9,7 +9,7 @@
 #include<sys/utils/string.h>
 #include <sys/sbunix.h>
 static char mem_bitmap[(NUM_PAGES/8)];
-
+static char ref_count[NUM_PAGES];
 
 
 static void mark_page_free(uint64_t pageNum) {
@@ -25,6 +25,19 @@ static void mark_page_used(uint64_t pageNum) {
 	uint64_t orval = 1 <<offset;
 	mem_bitmap[pos] &= ~(orval);
 }
+
+ void dec_phy_page_ref_count(uint64_t pageNum) {
+	ref_count[pageNum]--;
+}
+
+ void inc_phy_page_ref_count(uint64_t pageNum) {
+	ref_count[pageNum]++;
+}
+
+ int get_phy_page_ref_count(uint64_t pageNum) {
+	return ref_count[pageNum];
+}
+
 
 // returning false
 //1. if the length is zero
@@ -106,10 +119,19 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 }
 
 
-void free_phy_page(uint64_t page_num) {
-	if(page_num ==0)
-		return
-	mark_page_free(page_num);
+void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
+	int page_num = page_addr/PAGE_SIZE;
+	if(page_num == 0)
+		return;
+	dec_phy_page_ref_count(page_num);
+
+	if(get_phy_page_ref_count(page_num) ==0) {
+		if(zeroPage) {
+			// Yet to be written
+		}
+		mark_page_free(page_num);
+	}
+	return;
 }
 
 
@@ -123,6 +145,7 @@ uint64_t allocate_phy_page() {
 					if(curr_bitMap&(1<<curr_page )) {
 							uint64_t free_page =  i*PAGES_PER_GROUP + curr_page;
 							mark_page_used(free_page);
+							inc_phy_page_ref_count(free_page);
 							return free_page*PAGE_SIZE;
 					}
 

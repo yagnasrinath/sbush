@@ -54,7 +54,7 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     printf("pd:%p\n",pd);
     printf("pt:%p\n",pt);
 
-    cls();
+    //cls();
     printf("worked - physical pages done!!\n");
 }
 void handle_page_fault(void* fault_addr);

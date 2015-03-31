@@ -20,7 +20,7 @@ struct smap_t {
 
 void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* phy_free );
 
-void free_phy_page(uint64_t page_num);
+void free_phy_page(uint64_t page_addr,BOOL zeroPage);
 
 uint64_t allocate_phy_page() ;
 
