@@ -17,7 +17,7 @@ uint64_t get_present_virtual_address() ;
 uint64_t get_temp_virtual_address(uint64_t phy_addr);
 void free_temp_virtual_address(uint64_t virtual_addr);
 
-uint64_t* allocate_pages(int num_pages, uint64_t permissions);
+uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions);
 void free_page(uint64_t virtual_addr);
 
 void memset_physical_page(uint64_t phy_addr);

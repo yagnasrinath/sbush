@@ -39,7 +39,7 @@ void free_temp_virtual_address(uint64_t virtual_addr) {
 
 }
 
-uint64_t* allocate_pages(int num_pages, uint64_t permissions) {
+uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions) {
 	uint64_t start_addr = get_present_virtual_address();
 	for(int i=0; i < num_pages; i++) {
 		uint64_t phy_addr = allocate_phy_page();
