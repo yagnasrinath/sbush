@@ -35,3 +35,12 @@ _X86_64_asm_ltss:
 	mov $0x2b, %ax
 	ltr %ax
 	retq 	
+
+.global _switch_to_ring3
+_switch_to_ring3:
+     mov $0x23, %ax
+     mov %ax, %ds
+     mov %ax, %es 
+     mov %ax, %fs 
+     mov %ax, %gs 	
+	
