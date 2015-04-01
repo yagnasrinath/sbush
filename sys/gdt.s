@@ -28,3 +28,10 @@ _x86_64_asm_lgdt:
 	movq %rdx, %ds
 	movq %rdx, %ss
 	retq
+
+#Load new tss
+.global _X86_64_asm_ltss
+_X86_64_asm_ltss:
+	mov $0x2b, %ax
+	ltr %ax
+	retq 	

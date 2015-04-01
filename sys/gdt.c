@@ -53,9 +53,16 @@ static struct gdtr_t gdtr = {
 
 void _x86_64_asm_lgdt(struct gdtr_t* gdtr, uint64_t cs_idx, uint64_t ds_idx);
 
+void reload_tss(uint64_t rsp) {
+	tss.rsp0 = rsp;
+}
+
+
 void reload_gdt() {
 	_x86_64_asm_lgdt(&gdtr, 8, 16);
 }
+
+extern void _X86_64_asm_ltss();
 
 void setup_tss() {
 	struct sys_segment_descriptor* sd = (struct sys_segment_descriptor*)&gdt[5]; // 6th&7th entry in GDT
@@ -67,4 +74,6 @@ void setup_tss() {
 	sd->sd_hilimit = 0;
 	sd->sd_gran = 0;
 	sd->sd_hibase = ((uint64_t)&tss) >> 24;
+	 __asm__ __volatile__("movq %%rsp, %[tss_rsp0];" : [tss_rsp0] "=m" (tss.rsp0));
+	_X86_64_asm_ltss();
 }
