@@ -13,6 +13,10 @@ typedef          short  int16_t;
 typedef unsigned char uint8_t;
 #define TRUE  1
 #define FALSE 0
+#define PAGE_SIZE 4096
+#define TASK_NAME_LENGTH 50
+#define  MAX_FD_PER_PROC 8
 typedef int BOOL;
 
 #endif
+
