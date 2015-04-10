@@ -52,7 +52,7 @@ struct task_structure{
 	uint64_t kstack[KSTACK_SIZE];
 	mem_struct* virtual_addr_space;
 	enum TASK_STATE task_state;
-	uint64_t rsp_register;
+	uint64_t rsp;
 	char task_name[TASK_NAME_LENGTH];
 	uint64_t sleep_for;
 	BOOL is_user_proc;

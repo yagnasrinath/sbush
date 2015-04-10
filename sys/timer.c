@@ -53,9 +53,9 @@ void timer_handler(struct isr_nrm_regs r)
 	//task_struct* prev = NULL;
 	if(get_curr_task() == NULL) {
 		next= get_next_ready_proc();
-		kprintf("rsp register is %p", next->rsp_register);
+		kprintf("rsp register is %p", next->rsp);
 		_set_cr3(next->virtual_addr_space->pml4_t);
-		set_rsp(next->rsp_register);
+		set_rsp(next->rsp);
 	}
 	outportb(0x20, 0x20);
 }
