@@ -21,7 +21,13 @@ static  vma_struct  *free_vma_list;
 
 
 // current pid
-uint64_t curr_pid = 0;
+uint64_t curr_pid ;
+
+void initialize_free_list() {
+	free_task_list = NULL;
+	free_vma_list = NULL;
+	curr_pid =0;
+}
 
 // useful when doing execve on an existing process.
 void decrement_pid () {
@@ -110,7 +116,6 @@ task_struct* create_new_task(BOOL is_user_process) {
 	new_task->pid = ++curr_pid;
 	new_task->task_state = READY;
 	new_task->ppid =0;
-	kprintf("\nPID:%d\tCR3: %p", new_task->pid, new_task->virtual_addr_space->pml4_t);
 	return new_task;
 }
 

@@ -6,7 +6,7 @@
 #include "../../include/sys/utils/kstring.h"
 
 
-extern void _set_k_ptable_cr3(uint64_t pml4);
+extern void _set_cr3(uint64_t pml4);
 
 
 void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
@@ -44,7 +44,7 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     uint64_t video = 0xffff000000000000|(pml4_offset<<39)|(pdp_offset<<30)|(pd_offset<<21)|((pt_offset+index)<<12);
     index++;
     update_video(video);
-    _set_k_ptable_cr3(pml4);
+    _set_cr3(pml4);
     kprintf("video:%p\n",video);
     kprintf("size%d\n",physfree-physbase);
     kprintf("physbase:%p\n",physbase);
@@ -62,7 +62,7 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     kprintf("worked - physical pages done!!\n");
     set_present_virtual_address(kernmem + index*PAGE_SIZE);
     // saves the kernel cr3
-    set_kernel_cr3(pml4);
+    _set_cr3(pml4);
     //saves the kernel mapping to save it to the process
     set_kernel_pml4_entry(pdp | KERNEL_RW_FLAG);
 }

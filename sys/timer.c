@@ -12,19 +12,8 @@
 #include<sys/ProcessManagement/process_scheduler.h>
 int timer_ticks =0;
 int numOfsecs = 0;
-static task_struct* idle_process = NULL;
 
-static void idle_proc(void ) {
-	kprintf("In idle process \n");
-	while(1);
-}
-
-void create_idle_proc() {
-	idle_process = create_new_task(FALSE);
-	idle_process->task_state = IDLE;
-	kstrcpy(idle_process->task_name, "IDLE PROCESS");
-	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc );
-}
+extern void _set_cr3(uint64_t pml4);
 
 
 
@@ -57,6 +46,16 @@ void timer_handler(struct isr_nrm_regs r)
 	{
 		numOfsecs++;
 		printtimeatrightconer(numOfsecs);
+	}
+
+	awake_sleeping_proc();
+	task_struct* next = NULL;
+	//task_struct* prev = NULL;
+	if(get_curr_task() == NULL) {
+		next= get_next_ready_proc();
+		kprintf("rsp register is %p", next->rsp_register);
+		_set_cr3(next->virtual_addr_space->pml4_t);
+		set_rsp(next->rsp_register);
 	}
 	outportb(0x20, 0x20);
 }

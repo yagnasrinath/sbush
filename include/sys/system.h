@@ -21,5 +21,8 @@ inline void outportb (unsigned short _port, unsigned char _data)
 {
 	__asm__ __volatile__ ("outb %1, %0" : : "dN" (_port), "a" (_data));
 }
+inline void set_rsp(uint64_t rsp) {
+	__asm__ __volatile__("movq %0, %%rsp" : : "r"(rsp));
+}
 
 #endif /* SBUSH_INCLUDE_SYS_SYSTEM_H_ */

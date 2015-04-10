@@ -7,6 +7,8 @@
 #include<sys/kb_intrpt_handler.h>
 #include<sys/MemoryManagement/phy_alloc.h>
 #include<sys/MemoryManagement/page_tables.h>
+#include<sys/ProcessManagement/process_scheduler.h>
+#include<sys/ProcessManagement/process_helper.h>
 int mymain(uint32_t* modulep, void* physbase, void* physfree);
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
@@ -31,11 +33,14 @@ struct tss_t tss;
 
 int mymain(uint32_t* modulep, void* physbase, void* physfree)
 {
+
+
 	init_video();// video buffer
+
 	idt_install(); // interrupt descriptor table
 	timer_install(); // timer
 	//kb_install(); // keyboard
-	__asm__ __volatile__ ("sti"); // activating interrupts
+	// activating interrupts
 	while(modulep[0] != 0x9001) modulep += modulep[1]+2;
 	int num_smaps=0;
 
@@ -48,9 +53,12 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
         physfree+=(1024*1024); //incrementing by 1MB 
 
         init_page_tables(physbase,physfree,(void*)&kernmem);
-
+        initialize_proc_scheduler();
+        initialize_free_list();
+        create_idle_proc() ;
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
-	while(1);
+        __asm__ __volatile__ ("sti");
+    while(1);
 
 }
 

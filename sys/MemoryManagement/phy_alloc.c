@@ -95,7 +95,7 @@ void get_4k_aligned(uint64_t *addr,uint64_t *length)
     {
         *length = *length - residue;
     }
-    return; 
+    return;
 }
 
 
