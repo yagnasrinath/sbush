@@ -56,3 +56,24 @@ int kstrcmp (const char *s1, const char *s2) {
     return 0;
 }
 
+char *kstrcpy ( char *__restrict dest, const char *__restrict src) {
+    char* orgdest = dest;
+    while((*dest = *src)){
+        dest++;
+        src++;
+    }
+    return orgdest;
+}
+
+
+char *kstrncpy (char *__restrict dest, const char *__restrict src, const size_t n) {
+    char* orgdest =dest;
+    int i=0;
+    while((i++ < n)&&(*dest++ = *src++));
+
+    if(i<n) {
+        dest[i] = '\0';
+    }
+    return orgdest;
+}
+
