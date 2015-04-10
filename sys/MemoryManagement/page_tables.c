@@ -1,9 +1,9 @@
 #include<sys/MemoryManagement/page_tables.h>
 #include<sys/MemoryManagement/phy_alloc.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
-#include<sys/utils/string.h>
 #include<sys/sbunix.h>
 #include<sys/scrn.h>
+#include "../../include/sys/utils/kstring.h"
 
 
 extern void _set_k_ptable_cr3(uint64_t pml4);

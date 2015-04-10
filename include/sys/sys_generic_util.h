@@ -10,7 +10,7 @@
 
 
 #include<sys/defs.h>
-#include<sys/utils/string.h>
+#include "utils/kstring.h"
 
 
 

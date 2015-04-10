@@ -10,7 +10,7 @@
 
 #include<sys/defs.h>
 #include<sys/sbunix.h>
-#include<sys/utils/string.h>
+#include "../utils/kstring.h"
 
 extern char _binary_tarfs_start;
 extern char _binary_tarfs_end;

@@ -9,8 +9,8 @@
 #include<sys/MemoryManagement/kmalloc.h>
 #include<sys/defs.h>
 #include <sys/sbunix.h>
-#include <sys/utils/string.h>
 #include <sys/ProcessManagement/process.h>
+#include "../../include/sys/utils/kstring.h"
 
 
 // free list of task structures
@@ -100,8 +100,8 @@ task_struct* create_new_task(BOOL is_user_process) {
 		new_task->num_of_children = 0;
 		new_task->parent = NULL;
 		new_task->siblings = NULL;
-		memset(new_task->kstack, 0 , PAGE_SIZE);
-		memset(new_task->fd,0,MAX_FD_PER_PROC*8);
+		kmemset(new_task->kstack, 0 , PAGE_SIZE);
+		kmemset(new_task->fd,0,MAX_FD_PER_PROC*8);
 	}
 	else {
 		new_task = get_free_task_struct();

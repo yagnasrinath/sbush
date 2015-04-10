@@ -7,8 +7,8 @@
 
 #include<sys/idt.h>
 #include<sys/system.h>
-#include<sys/utils/string.h>
 #include<sys/kb_intrpt_handler.h>
+#include "../include/sys/utils/kstring.h"
 #define INTERRUPT 0x0e
 struct idt_t {
 	uint16_t offset_low;
@@ -80,7 +80,7 @@ void idt_install ()  {
 	irq_remap();
 	idt_ptr.size = (sizeof (struct idt_t) * 256) - 1;
 	idt_ptr.base = (uint64_t)&idt_arr;
-	memset(&idt_arr, 0, (sizeof (struct idt_t) * 256));
+	kmemset(&idt_arr, 0, (sizeof (struct idt_t) * 256));
 	// Load the ISR here
 	//idt_set_gate(0,(uint64_t)&x86_64_isr0);
 

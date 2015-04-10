@@ -5,7 +5,7 @@
  *      Author: ravichandrasadineni
  */
 #include <sys/system.h>
-#include<sys/utils/string.h>
+#include "../include/sys/utils/kstring.h"
 #define MAX_ROW 24
 #define MAX_COLUMN 80
 static unsigned short *basememptr;
@@ -26,9 +26,9 @@ static void scroll() {
 
 	if(csr_row >=MAX_ROW) {
 		copyfrom = csr_row-MAX_ROW+1;
-		memcpy(basememptr,basememptr+copyfrom*MAX_COLUMN,(csr_row-copyfrom)*MAX_COLUMN*2 );
+		kmemcpy(basememptr,basememptr+copyfrom*MAX_COLUMN,(csr_row-copyfrom)*MAX_COLUMN*2 );
 		empty = 0x20|colorattr<<8;
-		memsetw(basememptr+(csr_row-copyfrom)*MAX_COLUMN,empty,MAX_COLUMN);
+		kmemsetw(basememptr+(csr_row-copyfrom)*MAX_COLUMN,empty,MAX_COLUMN);
 		csr_row=MAX_ROW-1;
 		csr_column=0;
 	}
@@ -59,7 +59,7 @@ void cls() {
 	unsigned short blank;
 	blank = 0X20 | colorattr << 8;
 	for(int i=0;i<MAX_ROW;i++) {
-		memsetw(basememptr+i*80,blank,80);
+		kmemsetw(basememptr+i*80,blank,80);
 	}
 	csr_row = 0;
 	csr_column =0;

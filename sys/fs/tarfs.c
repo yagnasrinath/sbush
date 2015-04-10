@@ -48,7 +48,7 @@ char* get_file_data(char* filename) {
 	}
 	for(HEADER* start= (HEADER*) &_binary_tarfs_start; start < (HEADER*) &_binary_tarfs_end;  ) {
 		uint64_t file_size = convert_oct_dec(start->size);
-		if(strcmp(filename,start->name) == 0) {
+		if(kstrcmp(filename,start->name) == 0) {
 			p = (char*)(start+1);
 			//kprintf("data : %s \n", p);
 			break;
