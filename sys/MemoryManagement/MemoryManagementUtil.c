@@ -1,5 +1,14 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
+static uint64_t kernel_cr3;
+static uint64_t kernel_pml4;
 
+void set_kernel_cr3(uint64_t kernel_phy_addr) {
+	kernel_cr3 = kernel_phy_addr;
+}
+
+void set_kernel_pml4_entry(uint64_t kpml4) {
+	kernel_pml4 = kpml4;
+}
 
 uint64_t get_pml4_vir_addr(uint64_t vir_addr){
 	//self referencing virtual address for pml4e
@@ -68,4 +77,17 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 	}
 	*pt_entry = phyaddr | flags;
  }
+
+uint64_t get_new_pml4_t() {
+	uint64_t phy_page = allocate_phy_page();
+	uint64_t vaddr = get_present_virtual_address();
+	set_present_virtual_address(get_present_virtual_address() + PAGE_SIZE);
+	map_vir_to_phyaddr(vaddr,phy_page, PAGE_PRESENT|USER_RW_FLAG);
+	uint64_t *vir_addr = (uint64_t *)vaddr;
+	//self referncing
+	vir_addr[510] = phy_page;
+	vir_addr[511] = kernel_pml4;
+	return phy_page;
+}
+
 

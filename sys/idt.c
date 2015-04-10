@@ -6,7 +6,9 @@
  */
 
 #include<sys/idt.h>
+#include<sys/system.h>
 #include<sys/utils/string.h>
+#include<sys/kb_intrpt_handler.h>
 #define INTERRUPT 0x0e
 struct idt_t {
 	uint16_t offset_low;
@@ -55,7 +57,7 @@ static void inline load_idt(void* idt_ptr) {
 }
 
 
-extern void x86_64_isr0();
+//extern void x86_64_isr0();
 extern void x86_64_isr32();
 extern void x86_64_isr33();
 
@@ -80,7 +82,7 @@ void idt_install ()  {
 	idt_ptr.base = (uint64_t)&idt_arr;
 	memset(&idt_arr, 0, (sizeof (struct idt_t) * 256));
 	// Load the ISR here
-	idt_set_gate(0,(uint64_t)&x86_64_isr0);
+	//idt_set_gate(0,(uint64_t)&x86_64_isr0);
 
 
 	//Load the hardware Interrupts here
@@ -89,3 +91,14 @@ void idt_install ()  {
 	load_idt((void *)&idt_ptr);
 }
 
+void irq_handler(struct isr_nrm_regs regs)
+{
+	// timer interrupt is handled seperately. Others come here
+    if (regs.interrupt ==  33) {
+
+    	kb_intrpt_handler(regs);
+
+    }
+    // Send EOI signal to Master PIC
+    outportb(0x20, 0x20);
+}

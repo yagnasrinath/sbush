@@ -1,12 +1,12 @@
 #include<sys/MemoryManagement/page_tables.h>
 #include<sys/MemoryManagement/phy_alloc.h>
+#include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/utils/string.h>
 #include<sys/sbunix.h>
 #include<sys/scrn.h>
-//static uint64_t kernel_cr3;
-//static uint64_t kernel_pml4_entry;
 
-extern void _set_k_ptable_crm3(uint64_t pml4);
+
+extern void _set_k_ptable_cr3(uint64_t pml4);
 
 
 void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
@@ -20,7 +20,7 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     uint64_t pd   =  (uint64_t)allocate_phy_page();
     uint64_t pt   =  (uint64_t)allocate_phy_page();
 
-    uint64_t pml4_offset = (kernmem << (16            ))>>(9 + 9 + 9 + 12 + 16);
+    uint64_t pml4_offset = (kernmem << (16            ))>>(9 + 9 + 9 + 12 + 16); //511
     uint64_t pdp_offset  = (kernmem << (16 + 9        ))>>(9 + 9 + 9 + 12 + 16);
     uint64_t pd_offset  =  (kernmem << (16 + 9 + 9    ))>>(9 + 9 + 9 + 12 + 16);
     uint64_t pt_offset  =  (kernmem << (16 + 9 + 9 + 9))>>(9 + 9 + 9 + 12 + 16);
@@ -42,8 +42,9 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     kprintf("index:%d\n",index);
     *(((uint64_t*)pt)+pt_offset+(index)) = 0xb8000 | USER_RW_FLAG | PAGE_PRESENT;
     uint64_t video = 0xffff000000000000|(pml4_offset<<39)|(pdp_offset<<30)|(pd_offset<<21)|((pt_offset+index)<<12);
+    index++;
     update_video(video);
-    _set_k_ptable_crm3(pml4);
+    _set_k_ptable_cr3(pml4);
     kprintf("video:%p\n",video);
     kprintf("size%d\n",physfree-physbase);
     kprintf("physbase:%p\n",physbase);
@@ -59,6 +60,11 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     kprintf("pt:%p\n",pt);
     cls();
     kprintf("worked - physical pages done!!\n");
+    set_present_virtual_address(kernmem + index*PAGE_SIZE);
+    // saves the kernel cr3
+    set_kernel_cr3(pml4);
+    //saves the kernel mapping to save it to the process
+    set_kernel_pml4_entry(pdp | KERNEL_RW_FLAG);
 }
 
 

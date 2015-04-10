@@ -21,7 +21,6 @@ enum TASK_STATE {
 	EXIT
 };
 
-
 enum VMA_TYPE {
 	ANON,
 	TXT,
@@ -33,7 +32,7 @@ enum VMA_TYPE {
 };
 
 enum vma_perm {
-	NONE, //0
+	NOPERM, //0
 	READ,//1
 	WRITE, // 10
 	READ_WRITE,// 11
@@ -43,14 +42,14 @@ enum vma_perm {
 	EXECUTE_READ_WRITE //111
 };
 
-typedef struct mem_struct mem_struct;
-typedef struct vm_area_struct vm_area_struct;
-typedef struct task_struct task_struct;
+typedef struct mem_structure mem_struct;
+typedef struct vm_area_structure vma_struct;
+typedef struct task_structure task_struct;
 
-struct {
+struct task_structure{
 	uint64_t pid;
 	uint64_t ppid;
-	uint64_t kstack[PAGE_SIZE/8];
+	uint64_t kstack[KSTACK_SIZE];
 	mem_struct* virtual_addr_space;
 	enum TASK_STATE task_state;
 	uint64_t rsp_register;
@@ -65,23 +64,23 @@ struct {
 	uint64_t  num_of_children;
 	task_struct *next;
 	task_struct *end;
-}task_struct;
+};
 
-struct {
-	vm_area_struct *vmaList;
+struct mem_structure{
+	vma_struct *vmaList;
 	uint64_t stack_start, brk_start,brk_end;
 	uint64_t pml4_t;
-}mem_struct;
+};
 
-struct {
+struct vm_area_structure{
 	uint64_t vm_area_start;
 	uint64_t vm_area_end;
-	enum VMA_TYPE vmatype;
+	enum VMA_TYPE vma_type;
 	enum vma_perm vma_perm;
 	uint64_t file_descp;
-	vm_area_struct *next;
+	vma_struct *next;
 	mem_struct* parent_mem_struct;
-}vm_area_struct;
+};
 
 
 

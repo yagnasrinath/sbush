@@ -33,8 +33,8 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
 {
 	init_video();// video buffer
 	idt_install(); // interrupt descriptor table
-	timer_install(); // timer
-	kb_install(); // keyboard
+	//timer_install(); // timer
+	//kb_install(); // keyboard
 	__asm__ __volatile__ ("sti"); // activating interrupts
 	while(modulep[0] != 0x9001) modulep += modulep[1]+2;
 	int num_smaps=0;

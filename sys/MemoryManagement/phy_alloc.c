@@ -6,6 +6,7 @@
  */
 
 #include<sys/MemoryManagement/phy_alloc.h>
+#include<sys/MemoryManagement/virtual_page_allocator.h>
 #include<sys/utils/string.h>
 #include <sys/sbunix.h>
 static char mem_bitmap[(NUM_PAGES/8)];
@@ -127,7 +128,9 @@ void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
 
 	if(get_phy_page_ref_count(page_num) ==0) {
 		if(zeroPage) {
-			// Yet to be written
+			uint64_t vir_addr = get_temp_virtual_address(page_addr);
+			memset((uint64_t *)vir_addr, 0,PAGE_SIZE);
+			free_temp_virtual_address(vir_addr);
 		}
 		mark_page_free(page_num);
 	}

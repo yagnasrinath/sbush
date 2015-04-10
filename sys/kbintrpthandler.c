@@ -7,10 +7,9 @@
 
 #include <sys/kbsctochar.h>
 #include <sys/scrn.h>
-#include <sys/isr.h>
 #include <sys/system.h>
 #include<sys/sbunix.h>
-
+#include<sys/idt.h>
 uint16_t special_keys =0;
 static uint16_t LEFT_SHIFT_PRESS = 1;
 static uint16_t LEFT_SHIFT_RELEASE = ~(-1);
@@ -44,7 +43,7 @@ void print_char_pressed(char c) {
 }
 
 
-void  kb_intrpt_handler( struct isr_nrm_regs * stack) {
+void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 	uint8_t b = inportb(0x60);
 	if(b == SC_LEFTSHIFT) {
 		special_keys = special_keys | LEFT_SHIFT_PRESS;
@@ -64,11 +63,6 @@ void  kb_intrpt_handler( struct isr_nrm_regs * stack) {
 
 		print_char_pressed(get_asci_for_sc(b,is_shift_pressed));
 	}
-
 }
 
 
-void kb_install()
-{
-	irq_install_handler(1, kb_intrpt_handler);
-}

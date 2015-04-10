@@ -7,7 +7,8 @@
 
 
 #include<sys/MemoryManagement/kmalloc.h>
-
+#include <sys/sbunix.h>
+#include <sys/utils/string.h>
 static uint64_t current_addr =0;
 static uint64_t current_avail_size =0;
 #define BLOCK_ALIGN 16

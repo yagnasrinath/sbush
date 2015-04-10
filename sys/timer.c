@@ -5,10 +5,10 @@
  *      Author: ravichandrasadineni
  */
 
-#include<sys/isr.h>
+#include<sys/idt.h>
 #include<sys/sbunix.h>
 #include<sys/scrn.h>
-
+#include<sys/system.h>
 int timer_ticks =0;
 int numOfsecs = 0;
 
@@ -33,7 +33,7 @@ void printtimeatrightconer(int value) {
 	return ;
 
 }
-void timer_handler(struct isr_nrm_regs *r)
+void timer_handler(struct isr_nrm_regs r)
 {
 	timer_ticks++;
 	if (timer_ticks % 18 == 0)
@@ -41,9 +41,6 @@ void timer_handler(struct isr_nrm_regs *r)
 		numOfsecs++;
 		printtimeatrightconer(numOfsecs);
 	}
+	outportb(0x20, 0x20);
 }
 
-void timer_install()
-{
-	irq_install_handler(0, timer_handler);
-}

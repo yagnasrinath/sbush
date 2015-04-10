@@ -5,5 +5,5 @@
  *      Author: ravichandrasadineni
  */
 
-#include<sys/utils/sys_generic_util.h>
+#include "../../include/sys/sys_generic_util.h"
 
