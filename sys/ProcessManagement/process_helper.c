@@ -114,7 +114,7 @@ task_struct* create_new_task(BOOL is_user_process) {
 	}
 	new_task->is_user_proc = is_user_process;
 	new_task->pid = ++curr_pid;
-	new_task->task_state = READY;
+	new_task->state = READY;
 	new_task->ppid =0;
 	return new_task;
 }
@@ -137,15 +137,6 @@ vma_struct* create_new_vma(uint64_t file_desc, uint64_t vma_start, uint64_t vma_
 	return new_vma;
 }
 
-
-void ker_mmap(uint64_t start_vir_addr, uint64_t num_bytes, uint64_t perm) {
-	uint64_t  current_vir_addr = get_present_virtual_address();
-	set_present_virtual_address(PAGE_ALIGN(start_vir_addr));
-	uint64_t  end_virtual_address = start_vir_addr + num_bytes -1;
-	uint64_t num_of_pages = ((end_virtual_address - start_vir_addr)>>12) + 1;
-	vir_allocate_pages(num_of_pages,perm);
-	set_present_virtual_address(current_vir_addr);
-}
 
 
 

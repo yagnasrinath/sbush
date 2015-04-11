@@ -51,7 +51,7 @@ struct task_structure{
 	uint64_t ppid;
 	uint64_t kstack[KSTACK_SIZE];
 	mem_struct* virtual_addr_space;
-	enum TASK_STATE task_state;
+	enum TASK_STATE state;
 	uint64_t rsp;
 	char task_name[TASK_NAME_LENGTH];
 	uint64_t sleep_for;

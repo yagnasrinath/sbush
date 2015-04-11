@@ -28,10 +28,10 @@ task_struct*  get_curr_task() {
 void awake_sleeping_proc() {
 	task_struct *curr=task_list;
 	while(curr != NULL) {
-		if(curr->task_state == SLEEP) {
+		if(curr->state == SLEEP) {
 			curr->sleep_for -= 1;
 			if(curr->sleep_for  < 0) {
-				curr->task_state = READY;
+				curr->state = READY;
 			}
 		}
 		curr= curr->next;
@@ -39,15 +39,15 @@ void awake_sleeping_proc() {
 }
 
 void add_to_task_list(task_struct * new_proc) {
-	if(new_proc->task_state  == EXIT) {
+	if(new_proc->state  == EXIT) {
 		add_free_task_struct(new_proc);
 		return;
 	}
-	if(new_proc->task_state  == IDLE ){
+	if(new_proc->state  == IDLE ){
 		return;
 	}
-	if(new_proc->task_state == RUNNING) {
-		new_proc->task_state = READY;
+	if(new_proc->state == RUNNING) {
+		new_proc->state = READY;
 	}
 
 	task_struct *curr_ready_tasks  = task_list;
@@ -64,8 +64,8 @@ task_struct * get_next_ready_proc() {
 	task_struct * next_ready_task = task_list;
 	task_struct *  prev = NULL;
 	while(next_ready_task != NULL) {
-		if(next_ready_task->task_state == READY) {
-			next_ready_task->task_state = RUNNING;
+		if(next_ready_task->state == READY) {
+			next_ready_task->state = RUNNING;
 			break;
 		}
 		prev = next_ready_task;
@@ -119,7 +119,7 @@ static void idle_proc(void ) {
 
 void create_idle_proc() {
 	idle_process = create_new_task(FALSE);
-	idle_process->task_state = IDLE;
+	idle_process->state = IDLE;
 	kstrcpy(idle_process->task_name, "IDLE PROCESS");
 	kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc );

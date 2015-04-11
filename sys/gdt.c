@@ -1,5 +1,5 @@
 #include <sys/gdt.h>
-
+#include <sys/system.h>
 /* adapted from Chris Stones, shovelos */
 
 #define MAX_GDT 32

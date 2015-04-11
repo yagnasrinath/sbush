@@ -21,5 +21,6 @@ uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions);
 void free_page(uint64_t virtual_addr);
 
 void memset_physical_page(uint64_t phy_addr);
+void ker_mmap(uint64_t start_vir_addr, uint64_t num_bytes, uint64_t perm) ;
 
 #endif /* SBUSH_INCLUDE_SYS_MEMORYMANAGEMENT_VIRTUAL_PAGE_ALLOCATOR_H_ */

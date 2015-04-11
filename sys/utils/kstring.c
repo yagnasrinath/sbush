@@ -32,7 +32,7 @@ unsigned short *kmemsetw(unsigned short *dest, unsigned short val, int count) {
 	return dest;
 }
 
-int strlen(const char *str) {
+int kstrlen(const char *str) {
 	int count =0;
 	while(*str++) count++;
 	return count;
