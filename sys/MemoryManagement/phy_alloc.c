@@ -60,7 +60,7 @@ static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_
 		return FALSE;
 	}
 	// Prevent corrupting kernel space
-	if ((smap->base >=(uint64_t)phy_base) && (smap->base <=updated_phy_free)) {
+	if ((smap->base >=(uint64_t)phy_base) && ((smap->base + smap->length)  <=updated_phy_free)) {
 		return FALSE;
 	}
 
