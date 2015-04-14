@@ -9,9 +9,19 @@
 #include<sys/sbunix.h>
 #include<sys/scrn.h>
 #include<sys/system.h>
+#include<sys/gdt.h>
 #include<sys/ProcessManagement/process_scheduler.h>
 int timer_ticks =0;
 int numOfsecs = 0;
+
+
+#define switch_to_ring3 \
+		__asm__ __volatile__(\
+				"movq $0x23, %rax;"\
+				"movq %rax,  %fs;"\
+				"movq %rax,  %es;"\
+				"movq %rax,  %ds;"\
+				"movq %rax,  %gs;")
 
 extern void _set_cr3(uint64_t pml4);
 
@@ -41,6 +51,7 @@ void printtimeatrightconer(int value) {
 void timer_handler(struct isr_nrm_regs r)
 {
 
+	uint64_t curr_rsp;
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
 	{
@@ -50,28 +61,39 @@ void timer_handler(struct isr_nrm_regs r)
 
 	awake_sleeping_proc();
 	task_struct* next = NULL;
-	//task_struct* prev = NULL;
+	task_struct* prev = NULL;
 	if(get_curr_task() == NULL) {
 		next= get_next_ready_proc();
 		kprintf("rsp register is %p", next->rsp);
 		_set_cr3(next->virtual_addr_space->pml4_t);
 		set_rsp(next->rsp);
+		if(next->is_user_proc) {
+			reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
+			switch_to_ring3;
+		}
+	}else {
+		curr_rsp = read_rsp();
+		prev = get_curr_task();
+		prev ->rsp = curr_rsp;
+		add_to_task_list(prev);
+		next = get_next_ready_proc();
+		kprintf("address of the prev process is %p \n", next);
+		/*if(prev !=next) {
+			_set_cr3(next->virtual_addr_space->pml4_t);
+			set_rsp(next->rsp);
+			if(next->is_user_proc) {
+				reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
+				switch_to_ring3;
+			}
+		}*/
 	}
 	outportb(0x20, 0x20);
 }
 
 
 void timer_install() {
-		uint32_t divisor = 1193180;
-		outportb(0x43, 0x36);
-		outportb(0x40, divisor & 0xFF);
-		outportb(0x40, divisor >> 8);
+	uint32_t divisor = 1193180;
+	outportb(0x43, 0x36);
+	outportb(0x40, divisor & 0xFF);
+	outportb(0x40, divisor >> 8);
 }
-
-#define switch_to_ring3 \
-    __asm__ __volatile__(\
-        "movq $0x23, %rax;"\
-        "movq %rax,  %ds;"\
-        "movq %rax,  %es;"\
-        "movq %rax,  %fs;"\
-        "movq %rax,  %gs;")

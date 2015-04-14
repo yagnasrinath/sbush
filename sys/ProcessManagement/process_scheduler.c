@@ -22,6 +22,7 @@ void initialize_proc_scheduler() {
 }
 
 task_struct*  get_curr_task() {
+
 	return curr_proc;
 }
 

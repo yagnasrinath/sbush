@@ -24,7 +24,7 @@ void start(uint32_t* modulep, void* physbase, void* physfree)
 	// kernel starts here
 }
 
-#define INITIAL_STACK_SIZE 4096
+#define INITIAL_STACK_SIZE 8192
 char stack[INITIAL_STACK_SIZE];
 uint32_t* loader_stack;
 extern char kernmem, physbase;

@@ -26,6 +26,13 @@ inline void set_rsp(uint64_t rsp) {
 	__asm__ __volatile__("movq %0, %%rsp" : : "r"(rsp));
 }
 
+
+inline uint64_t read_rsp() {
+	uint64_t rsp;
+	__asm__ __volatile__("movq %%rsp ,%0" : "=r"(rsp) : );
+	return rsp;
+}
+
 inline uint64_t read_cr3() {
 	uint64_t cr3;
 	__asm__ __volatile__ ("movq %%cr3, %0" : "=a" (cr3):);

@@ -84,8 +84,8 @@ uint64_t get_new_pml4_t() {
 	set_present_virtual_address(get_present_virtual_address() + PAGE_SIZE);
 	map_vir_to_phyaddr(vaddr,phy_page, PAGE_PRESENT|USER_RW_FLAG);
 	uint64_t *vir_addr = (uint64_t *)vaddr;
-	//self referncing
-	vir_addr[510] = phy_page;
+	//self referencing
+	vir_addr[510] = phy_page|PAGE_PRESENT|USER_RW_FLAG;
 	vir_addr[511] = kernel_pml4;
 	return phy_page;
 }

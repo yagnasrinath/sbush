@@ -15,4 +15,5 @@ task_struct*  get_curr_task() ;
 void create_idle_proc() ;
 void awake_sleeping_proc() ;
 void initialize_proc_scheduler() ;
+void add_to_task_list(task_struct * new_proc);
 #endif /* SBUSH_INCLUDE_SYS_PROCESSMANAGEMENT_PROCESS_SCHEDULER_H_ */
