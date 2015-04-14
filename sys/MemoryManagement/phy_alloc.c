@@ -51,16 +51,16 @@ static void mark_page_used(uint64_t pageNum) {
 static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_free) {
 
 	// If a NULL pointer. Then return straight away
-/*	if(smap->base == 0X0) {
+	if(smap->base == 0X0) {
 			return FALSE;
 	}
-*/	// Increasing the size of the phy_free by 1 MB to control the growing kernel stack
+	// Increasing the size of the phy_free by 1 MB to control the growing kernel stack
 	uint64_t updated_phy_free = (uint64_t)phy_free + 1024*1024;
 	if (smap->type != 1  || smap->length == 0) {
 		return FALSE;
 	}
 	// Prevent corrupting kernel space
-	if ((smap->base >= (uint64_t)phy_base) && (smap->base <=updated_phy_free)) {
+	if ((smap->base >=(uint64_t)phy_base) && (smap->base <=updated_phy_free)) {
 		return FALSE;
 	}
 
@@ -69,9 +69,9 @@ static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_
 		return FALSE;
 	}
 	// Do not go below physical base. It is a hole there
-	if (smap->base < (uint64_t)phy_base) {
+/*	if (smap->base < (uint64_t)phy_base) {
 		return FALSE;
-	}
+	}*/
 
 	return TRUE;
 }
@@ -102,7 +102,7 @@ void get_4k_aligned(uint64_t *addr,uint64_t *length)
 void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* phy_free ) {
 	// marking all pages used initially
 	kmemset(mem_bitmap, 0x00, sizeof mem_bitmap);
-
+	uint64_t updated_phy_free = (uint64_t)phy_free + 1024*1024;
 
 	for (int i=0; i<smap_num; i++) {
 		// marking allocatable pages available
@@ -111,6 +111,9 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 			uint64_t length = smap->length;
                         get_4k_aligned(&addr,&length);
 			for(;length>=PAGE_SIZE; length-=PAGE_SIZE, addr+=PAGE_SIZE) {
+				if((addr >= (uint64_t)phy_base) && (addr <= (uint64_t)updated_phy_free) ) {
+					continue;
+				}
 				mark_page_free(mm_phy_to_page(addr));
 			}
 		}
@@ -155,6 +158,6 @@ uint64_t allocate_phy_page() {
 				}
 			}
 	}
-
+	panic("PHYSICAL MEMORY NOT AVIALABLE\n");
 	return 0;
 }
