@@ -55,6 +55,8 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
         init_page_tables(physbase,physfree,(void*)&kernmem);
         initialize_proc_scheduler();
         initialize_free_list();
+        __asm__ __volatile__("movq %0, %%rbp" : :"a"(&stack[0]));
+        __asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
         create_idle_proc() ;
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
         __asm__ __volatile__ ("sti");
