@@ -53,6 +53,7 @@ void copy_arg_to_stack(task_struct *task,char* filename, char* inp_args[]) {
 		}
 	}
 	uint64_t present_pml4 = read_cr3();
+	_set_cr3(task->virtual_addr_space->pml4_t);
 	uint64_t *user_stack = (uint64_t*)task->virtual_addr_space->stack_start;
 	uint64_t *argv[10];
 	int i = argc-1;
@@ -79,7 +80,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 
 	uint64_t present_pml4 = read_cr3();
 	kprintf("pml4t of new process is %p \n",present_pml4);
-	/*
+
 	Elf64_Phdr* programHeader = (Elf64_Phdr*)(((char*)elf_header )+ elf_header->e_phoff);
 	uint64_t  max_addr =0;
 	for(int i=0; i< elf_header->e_phnum; i++) {
@@ -108,6 +109,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		}
 		uint64_t size = programHeader->p_memsz;
 		vma_struct* new_vma = create_new_vma(0,start_addr,end_vaddr,vma_type,vma_perm);
+		kprintf("new_vma  succesfully created %p \n", new_vma );
 		if(new_task->virtual_addr_space->vmaList == NULL) {
 			new_task->virtual_addr_space->vmaList  = new_vma;
 		}
@@ -128,6 +130,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		// need to change to demand paging
 		_set_cr3(new_task->virtual_addr_space->pml4_t);
 		ker_mmap(start_addr, size, page_perm|PAGE_PRESENT);
+//		kprintf("kern_mmap returned succesfully \n");
 		kmemcpy((void*) start_addr, (void*) elf_header + programHeader->p_offset, programHeader->p_filesz);
 		// .bss section
 		if(programHeader->p_filesz != size) {
@@ -142,14 +145,16 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	}
 	uint64_t user_stack_top = USR_STK_TOP;
 	uint64_t user_stack_end = USR_STK_TOP - USR_STK_SIZE;
-	vma_struct* new_usr_stack_vma = create_new_vma(0,USR_STK_TOP,user_stack_end,STACK,READ_WRITE);
+	vma_struct* new_usr_stack_vma = create_new_vma(0,user_stack_end,USR_STK_TOP,STACK,READ_WRITE);
+	kprintf("stack vma allocated \n");
 	curr_vma->next = new_usr_stack_vma;
 	// STACK
 	// load only one page for the stack. load the rest on request.
 	_set_cr3(new_task->virtual_addr_space->pml4_t);
-	ker_mmap(user_stack_top - PAGE_SIZE, user_stack_top, USER_RW_FLAG|PAGE_PRESENT);
-	_set_cr3(present_pml4);
+	ker_mmap(user_stack_top - PAGE_SIZE, PAGE_SIZE, USER_RW_FLAG|PAGE_PRESENT);
 
+	kprintf("stack address allocated \n");
+	_set_cr3(present_pml4);
 	// HEAP
 	curr_vma = curr_vma->next;
 	uint64_t heap_start_vaddr ;
@@ -163,9 +168,9 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	new_task->virtual_addr_space->stack_start = user_stack_end - 0x8;
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
-	copy_arg_to_stack(new_task,filename, argv);
+	//copy_arg_to_stack(new_task,filename, argv);
 
-	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );*/
+	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );
 }
 
 

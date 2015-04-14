@@ -48,8 +48,9 @@ void printtimeatrightconer(int value) {
 	return ;
 
 }
-void timer_handler(struct isr_nrm_regs r)
+void timer_handler()
 {
+
 
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
@@ -71,6 +72,7 @@ void timer_handler(struct isr_nrm_regs r)
 			switch_to_ring3;
 		}
 	}else {
+		kprintf("The next process is %s \n",next->task_name);
 		register uint64_t curr_rsp __asm__("rsp");
 		prev ->rsp = curr_rsp;
 		add_to_task_list(prev);
@@ -85,6 +87,7 @@ void timer_handler(struct isr_nrm_regs r)
 		}
 	}
 	outportb(0x20, 0x20);
+
 }
 
 

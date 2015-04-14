@@ -12,7 +12,7 @@ struct smap_t {
 	uint64_t base, length;
 	uint32_t type;
 }__attribute__((packed)) *smap;
-#define NUM_PAGES 4096
+#define NUM_PAGES 32768
 #define PAGE_SIZE 4096
 #define PAGES_PER_GROUP 8
 #define ALIGN_4K 0xFFFFFFFFFFFFF000

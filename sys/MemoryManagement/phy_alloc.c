@@ -11,7 +11,7 @@
 #include "../../include/sys/utils/kstring.h"
 static char mem_bitmap[(NUM_PAGES/8)];
 static char ref_count[NUM_PAGES];
-
+int num_of_phy_blocks = 0;
 
 static void mark_page_free(uint64_t pageNum) {
 	uint64_t pos = pageNum/8;
@@ -142,6 +142,7 @@ void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
 
 
 uint64_t allocate_phy_page() {
+	num_of_phy_blocks++;
 	for(uint64_t i=0; i < sizeof mem_bitmap; i++ ) {
 			// if all pages are not used then try to find a free page
 			if(mem_bitmap[i]!= 0) {
@@ -158,6 +159,7 @@ uint64_t allocate_phy_page() {
 				}
 			}
 	}
+	kprintf("Number of physical blocks assigned %d \n", num_of_phy_blocks);
 	panic("PHYSICAL MEMORY NOT AVIALABLE\n");
 	return 0;
 }
