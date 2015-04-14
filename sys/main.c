@@ -10,6 +10,7 @@
 #include<sys/ProcessManagement/process_scheduler.h>
 #include<sys/ProcessManagement/process_helper.h>
 int mymain(uint32_t* modulep, void* physbase, void* physfree);
+extern task_struct * get_elf_task(char *filename, char *argv[]) ;
 void start(uint32_t* modulep, void* physbase, void* physfree)
 {
 
@@ -49,18 +50,19 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
 		num_smaps++;
 	}
 	init_phy_memory( smapbase, num_smaps,  physbase,  physfree );
-        // for mapping free pages on stack
-        physfree+=(1024*1024); //incrementing by 1MB 
+	// for mapping free pages on stack
+	physfree+=(1024*1024); //incrementing by 1MB
 
-        init_page_tables(physbase,physfree,(void*)&kernmem);
-        initialize_proc_scheduler();
-        initialize_free_list();
-        __asm__ __volatile__("movq %0, %%rbp" : :"a"(&stack[0]));
-        __asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
-        create_idle_proc() ;
+	init_page_tables(physbase,physfree,(void*)&kernmem);
+	__asm__ __volatile__("movq %0, %%rbp" : :"a"(&stack[0]));
+	__asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
+	initialize_proc_scheduler();
+	initialize_free_list();
+	create_idle_proc() ;
+	get_elf_task("bin/empty",NULL);
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
-        __asm__ __volatile__ ("sti");
-    while(1);
+	__asm__ __volatile__ ("sti");
+	while(1);
 
 }
 
@@ -84,6 +86,6 @@ void boot(void)
 	);
 
 	s = "!!!!! start() returned !!!!!";
-        kprintf("%s\n",s);
+	kprintf("%s\n",s);
 	while(1);
 }

@@ -38,7 +38,7 @@ static BOOL is_file_elf(Elf64_Ehdr* elf_loader) {
 }
 
 
-static void copy_arg_to_stack(task_struct *task,char* filename, char* inp_args[]) {
+void copy_arg_to_stack(task_struct *task,char* filename, char* inp_args[]) {
 	int argc = 0;
 	kstrncpy(args[argc],filename, MAX_USR_ARG_LEN-1);
 	args[argc][MAX_USR_ARG_LEN-1]= '\0';
@@ -71,13 +71,15 @@ static void copy_arg_to_stack(task_struct *task,char* filename, char* inp_args[]
 	}
 	user_stack--;
 	*user_stack = (uint64_t)argc;
-	 task->virtual_addr_space->stack_start= (uint64_t)user_stack;
-	 _set_cr3(present_pml4);
+	task->virtual_addr_space->stack_start= (uint64_t)user_stack;
+	_set_cr3(present_pml4);
 }
 
-static void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char* argv[]) {
-	uint64_t present_pml4 = read_cr3();
+void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char* argv[]) {
 
+	uint64_t present_pml4 = read_cr3();
+	kprintf("pml4t of new process is %p \n",present_pml4);
+	/*
 	Elf64_Phdr* programHeader = (Elf64_Phdr*)(((char*)elf_header )+ elf_header->e_phoff);
 	uint64_t  max_addr =0;
 	for(int i=0; i< elf_header->e_phnum; i++) {
@@ -162,7 +164,8 @@ static void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_heade
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
 	copy_arg_to_stack(new_task,filename, argv);
-	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );
+
+	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );*/
 }
 
 
@@ -171,16 +174,20 @@ task_struct * get_elf_task(char *filename, char *argv[]) {
 
 	char* data = get_file_data(filename);
 	if(data  == NULL) {
+		kprintf("data is null \n");
 		return NULL;
 	}
 	Elf64_Ehdr* elf_header = (Elf64_Ehdr*)data;
 	if(!is_file_elf(elf_header)) {
+
 		return NULL;
 	}
+
 	task_struct* new_task = create_new_task(TRUE);
+
 	if(new_task  == NULL) {
 		panic("elfoader.c : get_elf_task : create_new_task returned NULL. Probably out of resources");
 	}
 	load_elf(new_task, filename,elf_header, argv);
-	return new_task;
+	return NULL;
 }

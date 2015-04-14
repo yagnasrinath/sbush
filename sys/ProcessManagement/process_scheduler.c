@@ -73,10 +73,12 @@ task_struct * get_next_ready_proc() {
 		next_ready_task= next_ready_task->next;
 	}
 	if(next_ready_task == NULL) {
+
 		next_ready_task = idle_process;
 	}
 	else {
 		if(prev == NULL) {
+
 			task_list= task_list->next;
 		}
 		else {
@@ -90,7 +92,11 @@ task_struct * get_next_ready_proc() {
 
 void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) {
 	// setting up  stack segemnt
+
+		kprintf("process %s loaded \n", new_task->task_name);
+
 	if(new_task->is_user_proc) {
+
 		new_task->kstack[KSTACK_SIZE-1] = 0x23;
 	} else {
 		new_task->kstack[KSTACK_SIZE-1] = 0x10;
@@ -114,8 +120,8 @@ void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) 
 
 
 static void idle_proc(void ) {
-	kprintf("In the idle process \n");
-	while(1);
+		kprintf("In the idle process \n");
+		while(1) ;
 }
 
 void create_idle_proc() {

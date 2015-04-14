@@ -57,14 +57,14 @@ void timer_handler(struct isr_nrm_regs r)
 		numOfsecs++;
 		printtimeatrightconer(numOfsecs);
 	}
-
+	prev = get_curr_task();
 	awake_sleeping_proc();
-
-
-	if(get_curr_task() == NULL) {
+	if(prev == NULL) {
 		next= get_next_ready_proc();
-		kprintf("rsp register is %p", next->rsp);
+
 		_set_cr3(next->virtual_addr_space->pml4_t);
+
+
 		set_rsp(next->rsp);
 		if(next->is_user_proc) {
 			reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
@@ -72,13 +72,10 @@ void timer_handler(struct isr_nrm_regs r)
 		}
 	}else {
 		register uint64_t curr_rsp __asm__("rsp");
-		prev = get_curr_task();
 		prev ->rsp = curr_rsp;
 		add_to_task_list(prev);
 		next = get_next_ready_proc();
-		kprintf("context switch took place\n");
 		if(prev !=next) {
-
 			_set_cr3(next->virtual_addr_space->pml4_t);
 			set_rsp(next->rsp);
 			if(next->is_user_proc) {

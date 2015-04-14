@@ -9,9 +9,14 @@
 #include<sys/MemoryManagement/kmalloc.h>
 #include <sys/sbunix.h>
 #include "../../include/sys/utils/kstring.h"
-static uint64_t current_addr =0;
-static uint64_t current_avail_size =0;
+static uint64_t current_addr;
+static uint64_t current_avail_size;
 #define BLOCK_ALIGN 16
+
+void initKmalloc() {
+	current_avail_size =0;
+	current_addr = 0;
+}
 
 uint64_t* kmalloc(uint64_t size) {
 	uint64_t* ret_addr;

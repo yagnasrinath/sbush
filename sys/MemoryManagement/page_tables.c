@@ -1,8 +1,10 @@
 #include<sys/MemoryManagement/page_tables.h>
 #include<sys/MemoryManagement/phy_alloc.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
+#include<sys/MemoryManagement/kmalloc.h>
 #include<sys/sbunix.h>
 #include<sys/scrn.h>
+
 #include "../../include/sys/utils/kstring.h"
 
 
@@ -27,16 +29,16 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     // self reference pml4e - recursive mapping
     // equivalent to pml4e[pml4_offset]
     
-    *(((uint64_t*)pml4)+pml4_offset-1) = pml4 | KERNEL_RW_FLAG |PAGE_PRESENT ;
-    *(((uint64_t*)pml4)+pml4_offset) = pdp | KERNEL_RW_FLAG| PAGE_PRESENT;
-    *(((uint64_t*)pdp)+pdp_offset) = pd | KERNEL_RW_FLAG| PAGE_PRESENT;
-    *(((uint64_t*)pd)+pd_offset) = pt | KERNEL_RW_FLAG| PAGE_PRESENT;
+    *(((uint64_t*)pml4)+pml4_offset-1) = pml4 | USER_RW_FLAG |PAGE_PRESENT ;
+    *(((uint64_t*)pml4)+pml4_offset) = pdp | USER_RW_FLAG | PAGE_PRESENT;
+    *(((uint64_t*)pdp)+pdp_offset) = pd | USER_RW_FLAG | PAGE_PRESENT;
+    *(((uint64_t*)pd)+pd_offset) = pt | USER_RW_FLAG| PAGE_PRESENT;
 
     uint64_t kern_page = physbase&ALIGN_4K;
     uint64_t index=0;
     for(;kern_page<=physfree; kern_page+=PAGE_SIZE,index++)
     {
-        *(((uint64_t*)pt)+pt_offset+index) = (kern_page) | KERNEL_RW_FLAG |PAGE_PRESENT;
+        *(((uint64_t*)pt)+pt_offset+index) = (kern_page) | USER_RW_FLAG |PAGE_PRESENT;
     }
     
     kprintf("index:%d\n",index);
@@ -64,7 +66,8 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     // saves the kernel cr3
     _set_cr3(pml4);
     //saves the kernel mapping to save it to the process
-    set_kernel_pml4_entry(pdp | KERNEL_RW_FLAG|PAGE_PRESENT);
+    set_kernel_pml4_entry(pdp | USER_RW_FLAG|PAGE_PRESENT);
+    initKmalloc();
 }
 
 
