@@ -69,10 +69,10 @@ static BOOL is_allocatable_memory(struct smap_t* smap,void* phy_base, void* phy_
 		return FALSE;
 	}
 	// Do not go below physical base. It is a hole there
-/*	if (smap->base < (uint64_t)phy_base) {
+	if (smap->base < (uint64_t)phy_base) {
 		return FALSE;
 	}
-*/
+
 	return TRUE;
 }
 
