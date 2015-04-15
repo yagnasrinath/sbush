@@ -179,7 +179,7 @@ task_struct * get_elf_task(char *filename, char *argv[]) {
 
 	char* data = get_file_data(filename);
 	if(data  == NULL) {
-		//kprintf("data is null \n");
+		kprintf("data is null \n");
 		return NULL;
 	}
 	Elf64_Ehdr* elf_header = (Elf64_Ehdr*)data;

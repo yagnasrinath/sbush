@@ -29,7 +29,7 @@ uint64_t* kmalloc(uint64_t size) {
 		if(size%PAGE_SIZE) {
 			numOfPages +=1;
 		}
-		ret_addr = vir_allocate_pages(numOfPages, KERNEL_RW_FLAG|PAGE_PRESENT);
+		ret_addr = vir_allocate_pages(numOfPages,USER_RW_FLAG|PAGE_PRESENT);
 		current_avail_size = numOfPages*PAGE_SIZE - size;
 		current_addr = (uint64_t)ret_addr + size;
 	}

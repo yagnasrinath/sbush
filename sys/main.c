@@ -60,7 +60,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
 	initialize_free_list();
 	//INITSCHEDULING = FALSE;
 	create_idle_proc() ;
-	get_elf_task("bin/empty",NULL);
+	//get_elf_task("bin/empty",NULL);
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	__asm__ __volatile__ ("sti");
 	//INITSCHEDULING = TRUE;
