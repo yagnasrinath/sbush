@@ -79,7 +79,7 @@ void copy_arg_to_stack(task_struct *task,char* filename, char* inp_args[]) {
 void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char* argv[]) {
 
 	uint64_t present_pml4 = read_cr3();
-	kprintf("pml4t of new process is %p \n",present_pml4);
+	//kprintf("pml4t of new process is %p \n",present_pml4);
 
 	Elf64_Phdr* programHeader = (Elf64_Phdr*)(((char*)elf_header )+ elf_header->e_phoff);
 	uint64_t  max_addr =0;
@@ -109,7 +109,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		}
 		uint64_t size = programHeader->p_memsz;
 		vma_struct* new_vma = create_new_vma(0,start_addr,end_vaddr,vma_type,vma_perm);
-		kprintf("new_vma  succesfully created %p \n", new_vma );
+		//kprintf("new_vma  succesfully created %p \n", new_vma );
 		if(new_task->virtual_addr_space->vmaList == NULL) {
 			new_task->virtual_addr_space->vmaList  = new_vma;
 		}
@@ -146,14 +146,14 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	uint64_t user_stack_top = USR_STK_TOP;
 	uint64_t user_stack_end = USR_STK_TOP - USR_STK_SIZE;
 	vma_struct* new_usr_stack_vma = create_new_vma(0,user_stack_end,USR_STK_TOP,STACK,READ_WRITE);
-	kprintf("stack vma allocated \n");
+	//kprintf("stack vma allocated \n");
 	curr_vma->next = new_usr_stack_vma;
 	// STACK
 	// load only one page for the stack. load the rest on request.
 	_set_cr3(new_task->virtual_addr_space->pml4_t);
 	ker_mmap(user_stack_top - PAGE_SIZE, PAGE_SIZE, USER_RW_FLAG|PAGE_PRESENT);
 
-	kprintf("stack address allocated \n");
+	//kprintf("stack address allocated \n");
 	_set_cr3(present_pml4);
 	// HEAP
 	curr_vma = curr_vma->next;
@@ -163,13 +163,13 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	curr_vma->next = new_usr_heap_vma ;
 
 
-	kstrncpy(filename,new_task->task_name,TASK_NAME_LENGTH-1 );
+	kstrncpy(new_task->task_name,filename,TASK_NAME_LENGTH-1 );
 	new_task->task_name[TASK_NAME_LENGTH] = '\0'; // boundary check
 	new_task->virtual_addr_space->stack_start = user_stack_end - 0x8;
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
 	//copy_arg_to_stack(new_task,filename, argv);
-
+	new_task->state = READY;
 	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );
 }
 
@@ -179,7 +179,7 @@ task_struct * get_elf_task(char *filename, char *argv[]) {
 
 	char* data = get_file_data(filename);
 	if(data  == NULL) {
-		kprintf("data is null \n");
+		//kprintf("data is null \n");
 		return NULL;
 	}
 	Elf64_Ehdr* elf_header = (Elf64_Ehdr*)data;

@@ -51,7 +51,6 @@ irq_common:
     iretq
 
 x86_64_isr32:
-    cli
     PUSHA
     movq %rsp, %rdi
     callq timer_handler

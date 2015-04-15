@@ -52,13 +52,15 @@ void add_to_task_list(task_struct * new_proc) {
 	}
 
 	task_struct *curr_ready_tasks  = task_list;
-	while(curr_ready_tasks != NULL) {
+	if(curr_ready_tasks == NULL) {
+		task_list = new_proc;
+		return;
+	}
+	while(curr_ready_tasks->next != NULL) {
 		curr_ready_tasks = curr_ready_tasks->next;
 	}
-	if(curr_ready_tasks == NULL) {
-		curr_ready_tasks = new_proc;
-	}
 	curr_ready_tasks->next = new_proc;
+
 }
 
 task_struct * get_next_ready_proc() {
@@ -87,13 +89,14 @@ task_struct * get_next_ready_proc() {
 		}
 	}
 	curr_proc = next_ready_task;
+
 	return next_ready_task;
 }
 
 void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) {
 	// setting up  stack segemnt
 
-		kprintf("process %s loaded \n", new_task->task_name);
+	kprintf("process %s loaded \n", new_task->task_name);
 
 	if(new_task->is_user_proc) {
 
@@ -101,18 +104,18 @@ void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) 
 	} else {
 		new_task->kstack[KSTACK_SIZE-1] = 0x10;
 	}
-	// setting up data segemnt
+	// setting up code segemnt
 	if(new_task->is_user_proc) {
 		new_task->kstack[KSTACK_SIZE-4] = 0x1b;
 	} else {
 		new_task->kstack[KSTACK_SIZE-4] = 0x08;
 	}
 	new_task->kstack[KSTACK_SIZE-5] = entry;
-	new_task->kstack[KSTACK_SIZE-3] = 0x200202UL;
+	new_task->kstack[KSTACK_SIZE-3] = 0x200282UL;
 	new_task->kstack[KSTACK_SIZE-2] = stk_top;
 	// PUSHA pushes the 15 general purpose registers here(kernel stack 6 to 20)
 	// setting the return address to the POPA of x86_64_isr32
-	new_task->kstack[KSTACK_SIZE-21] = (uint64_t)x86_64_isr32 + 0x20;
+	new_task->kstack[KSTACK_SIZE-21] = (uint64_t)x86_64_isr32 + 0x18;
 	new_task->rsp = (uint64_t)&new_task->kstack[KSTACK_SIZE-22];
 	add_to_task_list(new_task);
 
@@ -120,8 +123,8 @@ void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) 
 
 
 static void idle_proc(void ) {
-		kprintf("In the idle process \n");
-		while(1) ;
+	kprintf("In the idle process \n");
+	while(1) ;
 }
 
 void create_idle_proc() {

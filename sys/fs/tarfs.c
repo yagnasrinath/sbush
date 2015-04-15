@@ -47,11 +47,11 @@ char* get_file_data(char* filename) {
 		return NULL;
 	}
 	for(HEADER* start= (HEADER*) &_binary_tarfs_start; start < (HEADER*) &_binary_tarfs_end;  ) {
-		kprintf("%s\n", start->name);
+		//kprintf("%s\n", start->name);
 		uint64_t file_size = convert_oct_dec(start->size);
 		if(kstrcmp(filename,start->name) == 0) {
 			p = (char*)(start+1);
-			kprintf("File found\n");
+			//kprintf("File found\n");
 			break;
 		}
 		start += 1;

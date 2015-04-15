@@ -18,9 +18,9 @@ task_struct* prev = NULL;
 #define switch_to_ring3 \
 		__asm__ __volatile__(\
 				"movq $0x23, %rax;"\
-				"movq %rax,  %fs;"\
-				"movq %rax,  %es;"\
 				"movq %rax,  %ds;"\
+				"movq %rax,  %es;"\
+				"movq %rax,  %fs;"\
 				"movq %rax,  %gs;")
 
 extern void _set_cr3(uint64_t pml4);
@@ -50,18 +50,19 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
-
-
 	timer_ticks++;
-	if (timer_ticks % 100 == 0)
-	{
-		numOfsecs++;
-		printtimeatrightconer(numOfsecs);
-	}
+	//if (timer_ticks % 100 == 0)
+	//{
+		//timer_ticks =0;
+		//numOfsecs++;
+		printtimeatrightconer(timer_ticks);
+	//}
 	prev = get_curr_task();
-	awake_sleeping_proc();
+	//awake_sleeping_proc();
 	if(prev == NULL) {
+
 		next= get_next_ready_proc();
+		kprintf("Process loaded is %s \n", next->task_name);
 
 		_set_cr3(next->virtual_addr_space->pml4_t);
 
@@ -72,12 +73,16 @@ void timer_handler()
 			switch_to_ring3;
 		}
 	}else {
-		kprintf("The next process is %s \n",next->task_name);
-		register uint64_t curr_rsp __asm__("rsp");
-		prev ->rsp = curr_rsp;
+
 		add_to_task_list(prev);
+		kprintf("prev process is %s \n", prev->task_name);
+
 		next = get_next_ready_proc();
+		while(1);
+
 		if(prev !=next) {
+			register uint64_t curr_rsp __asm__("rsp");
+			prev ->rsp = curr_rsp;
 			_set_cr3(next->virtual_addr_space->pml4_t);
 			set_rsp(next->rsp);
 			if(next->is_user_proc) {
@@ -87,6 +92,7 @@ void timer_handler()
 		}
 	}
 	outportb(0x20, 0x20);
+
 
 }
 
