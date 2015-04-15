@@ -30,7 +30,7 @@ char stack[INITIAL_STACK_SIZE];
 uint32_t* loader_stack;
 extern char kernmem, physbase;
 struct tss_t tss;
-
+//extern BOOL INITSCHEDULING;
 
 int mymain(uint32_t* modulep, void* physbase, void* physfree)
 {
@@ -58,10 +58,12 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree)
 	__asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
 	initialize_proc_scheduler();
 	initialize_free_list();
+	//INITSCHEDULING = FALSE;
 	create_idle_proc() ;
 	get_elf_task("bin/empty",NULL);
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	__asm__ __volatile__ ("sti");
+	//INITSCHEDULING = TRUE;
 	while(1);
 
 }

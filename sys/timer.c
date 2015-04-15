@@ -15,6 +15,8 @@ int timer_ticks =0;
 int numOfsecs = 0;
 task_struct* next;
 task_struct* prev = NULL;
+//BOOL INITSCHEDULING= FALSE;
+#define LOAD_CR3(lcr3) __asm__ __volatile__ ("movq %0, %%cr3;" :: "r"(lcr3));
 #define switch_to_ring3 \
 		__asm__ __volatile__(\
 				"movq $0x23, %rax;"\
@@ -50,49 +52,57 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
+
 	timer_ticks++;
-	//if (timer_ticks % 100 == 0)
-	//{
-		//timer_ticks =0;
-		//numOfsecs++;
-		printtimeatrightconer(timer_ticks);
-	//}
-	prev = get_curr_task();
-	//awake_sleeping_proc();
-	if(prev == NULL) {
+	if (timer_ticks % 100 == 0)
+	{
+		timer_ticks =0;
+		numOfsecs++;
+		printtimeatrightconer(numOfsecs);
+	}
+	//if(INITSCHEDULING) {
+		prev = get_curr_task();
+		//awake_sleeping_proc();
+		if(prev == NULL) {
 
-		next= get_next_ready_proc();
-		kprintf("Process loaded is %s \n", next->task_name);
+			next= get_next_ready_proc();
+			kprintf("Process loaded is %s \n", next->task_name);
 
-		_set_cr3(next->virtual_addr_space->pml4_t);
+			//_set_cr3(next->virtual_addr_space->pml4_t);
 
-
-		set_rsp(next->rsp);
-		if(next->is_user_proc) {
-			reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
-			switch_to_ring3;
-		}
-	}else {
-
-		add_to_task_list(prev);
-		kprintf("prev process is %s \n", prev->task_name);
-
-		next = get_next_ready_proc();
-		while(1);
-
-		if(prev !=next) {
-			register uint64_t curr_rsp __asm__("rsp");
-			prev ->rsp = curr_rsp;
-			_set_cr3(next->virtual_addr_space->pml4_t);
-			set_rsp(next->rsp);
+			LOAD_CR3(next->virtual_addr_space->pml4_t);
+			__asm__ __volatile__("movq %[next_rsp], %%rsp" : : [next_rsp] "m" (next->rsp));
 			if(next->is_user_proc) {
 				reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
 				switch_to_ring3;
 			}
-		}
-	}
-	outportb(0x20, 0x20);
+		}else {
+			uint64_t cur_rsp;
+			__asm__ __volatile__("movq %%rsp, %[cur_rsp]": [cur_rsp] "=r"(cur_rsp));
+			kprintf("prev process is %s \n", prev->task_name);
+			prev ->rsp = cur_rsp;
+			add_to_task_list(prev);
+			next = get_next_ready_proc();
+			if(prev !=next) {
+				//_set_cr3(next->virtual_addr_space->pml4_t);
 
+				//kprintf("CR3 register is %p \n", next->virtual_addr_space->pml4_t);
+
+				LOAD_CR3(next->virtual_addr_space->pml4_t);
+
+				__asm__ __volatile__("movq %[next_rsp], %%rsp" : : [next_rsp] "m" (next->rsp));
+
+				if(next->is_user_proc) {
+					reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
+					switch_to_ring3;
+				}
+			}
+
+		}
+
+		outportb(0x20, 0x20);
+		while(1);
+	//}
 
 }
 
