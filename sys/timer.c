@@ -44,6 +44,24 @@ task_struct* prev = NULL;
 				"popq %rdi;"\
 				"iretq;")
 
+#define PUSHA \
+		__asm__ __volatile__(\
+				"pushq %r15;"\
+				"pushq %r14;"\
+				"pushq %r13;"\
+				"pushq %r12;"\
+				"pushq %r11;"\
+				"pushq %r10;"\
+				"pushq %r9;"\
+				"pushq %r8;"\
+				"pushq %rsi;"\
+				"pushq %rbp;"\
+				"pushq %rdx;"\
+				"pushq %rcx;"\
+				"pushq %rbx;"\
+				"pushq %rax;"\
+				"pushq %rdi;")
+
 
 
 extern void _set_cr3(uint64_t pml4);
@@ -73,7 +91,7 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
-
+	PUSHA;
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
 	{
