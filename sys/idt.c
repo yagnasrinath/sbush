@@ -60,6 +60,10 @@ static void inline load_idt(void* idt_ptr) {
 //extern void x86_64_isr0();
 extern void x86_64_isr32();
 extern void x86_64_isr33();
+extern void isr0();
+extern void isr10();
+extern void isr13();
+extern void isr14();
 
 void idt_set_gate(uint16_t idtNum, uint64_t handler ) {
 	idt_arr[idtNum].offset_low = handler & 0XFFFF;
@@ -86,6 +90,10 @@ void idt_install ()  {
 
 
 	//Load the hardware Interrupts here
+	idt_set_gate(0,(uint64_t)&isr0);
+	idt_set_gate(10,(uint64_t)&isr10);
+	idt_set_gate(13,(uint64_t)&isr13);
+	idt_set_gate(14,(uint64_t)&isr14);
 	idt_set_gate(32,(uint64_t)&x86_64_isr32);
 	idt_set_gate(33,(uint64_t)&x86_64_isr33);
 	load_idt((void *)&idt_ptr);
@@ -102,3 +110,7 @@ void irq_handler(struct isr_nrm_regs regs)
     // Send EOI signal to Master PIC
     outportb(0x20, 0x20);
 }
+
+
+
+

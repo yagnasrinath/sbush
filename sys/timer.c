@@ -101,7 +101,6 @@ void timer_handler()
 		}
 
 		outportb(0x20, 0x20);
-		while(1);
 	//}
 
 }

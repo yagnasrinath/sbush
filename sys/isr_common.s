@@ -1,3 +1,7 @@
+#
+# isr_common.s 
+# 
+
 .macro PUSHA
     pushq %rdi
     pushq %rax
@@ -34,32 +38,44 @@
     popq %rdi
 .endm
 
-.extern irq_handler
-.extern timer_handler
+.text
 
-.global x86_64_isr32
-.global x86_64_isr33
-.global irq_common
+.extern isr_handler
 
-irq_common:
+.global isr0
+.global isr10
+.global isr13
+.global isr14
+.global isr_common
+
+isr0:
+    cli
+    pushq $0
+    pushq $0
+    jmp isr_common
+
+isr10:
+    cli
+    pushq $0
+    pushq $10
+    jmp isr_common
+
+isr13:
+    cli
+    pushq $0
+    pushq $13
+    jmp isr_common
+
+isr14:
+    cli
+    pushq $14
+    jmp isr_common
+
+isr_common:
     PUSHA
     movq %rsp, %rdi
-    callq irq_handler
+    callq isr_handler
     POPA
     add $0x10, %rsp
     sti
     iretq
-
-x86_64_isr32:
-    PUSHA
-    movq %rsp, %rdi
-    callq timer_handler
-    POPA
-    sti
-    iretq
- 
-x86_64_isr33:
-    cli
-    pushq $0x0
-    pushq $0x21
-    jmp irq_common
