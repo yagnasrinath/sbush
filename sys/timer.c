@@ -91,7 +91,7 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
-	PUSHA;
+	//PUSHA;
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
 	{
@@ -139,7 +139,7 @@ void timer_handler()
 
 	}
 	outportb(0x20, 0x20);
-	POPA;
+	//POPA;
 
 
 }

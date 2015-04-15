@@ -50,10 +50,12 @@ irq_common:
     iretq
     
 x86_64_isr32:
+    cli
     PUSHA
     movq %rsp, %rdi
     jmp timer_handler
     POPA
+    sti
     iretq
  
 x86_64_isr33:

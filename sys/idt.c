@@ -94,7 +94,7 @@ void idt_install ()  {
 	idt_set_gate(10,(uint64_t)&isr10);
 	idt_set_gate(13,(uint64_t)&isr13);
 	idt_set_gate(14,(uint64_t)&isr14);
-	idt_set_gate(32,(uint64_t)&timer_handler);
+	idt_set_gate(32,(uint64_t)&x86_64_isr32);
 	idt_set_gate(33,(uint64_t)&x86_64_isr33);
 	load_idt((void *)&idt_ptr);
 }

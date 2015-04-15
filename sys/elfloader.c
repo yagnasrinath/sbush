@@ -164,7 +164,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 
 
 	kstrncpy(new_task->task_name,filename,TASK_NAME_LENGTH-1 );
-	new_task->task_name[TASK_NAME_LENGTH] = '\0'; // boundary check
+	new_task->task_name[TASK_NAME_LENGTH-1] = '\0'; // boundary check
 	new_task->virtual_addr_space->stack_start = user_stack_end - 0x8;
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
