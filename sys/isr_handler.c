@@ -44,7 +44,18 @@ void tss_fault_handler(struct isr_nrm_regs regs) {
 }
 
 void gpf_handler(struct isr_nrm_regs regs) {
-	panic("gpf handler");
+
+	uint64_t lcr2 = 3;
+	__asm__ __volatile__ ("movq %%cr2, %0;" : "=r"(lcr2));
+	uint64_t lcr3 =3;
+	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
+	uint64_t lrsp =3;
+	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
+	kprintf("protection  handler cr3 %p \n",lcr3);
+	kprintf("protection  handler cr2 %p \n",lcr2);
+	kprintf("protection_fault_handler rsp %p \n",lrsp);
+	print_regiters(regs);
+	panic("Protection fault handler");
 }
 
 void page_fault_handler(struct isr_nrm_regs regs) {
@@ -54,7 +65,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	kprintf("page_fault_handler cr3 %p \n",lcr3);
+	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
 	kprintf("page_fault_handler cr2 %p \n",lcr2);
 	kprintf("page_fault_handler rsp %p \n",lrsp);
 	print_regiters(regs);

@@ -52,7 +52,7 @@ irq_common:
 x86_64_isr32:
     PUSHA
     movq %rsp, %rdi
-    callq timer_handler
+    jmp timer_handler
     POPA
     iretq
  
