@@ -115,7 +115,7 @@ void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) 
 	new_task->kstack[KSTACK_SIZE-2] = stk_top;
 	// PUSHA pushes the 15 general purpose registers here(kernel stack 6 to 20)
 	// setting the return address to the POPA of x86_64_isr32
-	new_task->kstack[KSTACK_SIZE-23] = (uint64_t)x86_64_isr32 + 0x20;
+	new_task->kstack[KSTACK_SIZE-21] = (uint64_t)x86_64_isr32 + 0x20;
 	//	new_task->rsp = (uint64_t)&new_task->kstack[KSTACK_SIZE-22];
 	new_task->rsp  = (uint64_t)&new_task->kstack[KSTACK_SIZE-24];
 	add_to_task_list(new_task);

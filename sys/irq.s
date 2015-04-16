@@ -53,7 +53,7 @@ x86_64_isr32:
     cli
     PUSHA
     movq %rsp, %rdi
-    jmp timer_handler
+    callq timer_handler
     POPA
     sti
     iretq
