@@ -122,10 +122,10 @@ void timer_handler()
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
 		next = get_next_ready_proc();
+
 		if(prev !=next) {
 			//_set_cr3(next->virtual_addr_space->pml4_t);
-
-			//kprintf("CR3 register is %p \n", next->virtual_addr_space->pml4_t);
+			kprintf("CR3 register is %p \n", next->virtual_addr_space->pml4_t);
 
 			LOAD_CR3(next->virtual_addr_space->pml4_t);
 

@@ -127,6 +127,35 @@ static void idle_proc(void ) {
 	kprintf("In the idle process \n");
 	while(1) ;
 }
+static void idle_proc2(void ) {
+
+	while(1)  {
+		kprintf("In the idle process 2 \n");
+	}
+}
+static void idle_proc3(void ) {
+
+	while(1)  {
+		kprintf("In the idle process 3 \n");
+	}
+}
+
+void create_idle_proc2() {
+	idle_process = create_new_task(FALSE);
+	idle_process->state = READY;
+	kstrcpy(idle_process->task_name, "IDLE PROCESS 2");
+	kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
+	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc2 );
+}
+
+void create_idle_proc3() {
+	idle_process = create_new_task(FALSE);
+	idle_process->state = READY;
+	kstrcpy(idle_process->task_name, "IDLE PROCESS 3");
+	kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
+	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc3 );
+}
+
 
 void create_idle_proc() {
 	idle_process = create_new_task(FALSE);
