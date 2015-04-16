@@ -62,4 +62,4 @@ x86_64_isr33:
     cli
     pushq $0x0
     pushq $0x21
-    jmpq irq_common
+    callq irq_common
