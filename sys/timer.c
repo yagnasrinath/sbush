@@ -93,16 +93,16 @@ void timer_handler()
 {
 	//PUSHA;
 	timer_ticks++;
-	if (timer_ticks % 100 == 0)
-	{
-		timer_ticks =0;
-		numOfsecs++;
-		printtimeatrightconer(numOfsecs);
-	}
+	//if (timer_ticks % 100 == 0)
+	//{
+		//timer_ticks =0;
+		//numOfsecs++;
+		printtimeatrightconer(timer_ticks );
+	//}
 	//if(INITSCHEDULING) {
-	prev = get_curr_task();
+
 	//awake_sleeping_proc();
-	if(prev == NULL) {
+	if(get_curr_task() == NULL) {
 
 		next= get_next_ready_proc();
 		kprintf("Process loaded is %s \n", next->task_name);
@@ -118,14 +118,15 @@ void timer_handler()
 	}else {
 		uint64_t cur_rsp;
 		__asm__ __volatile__("movq %%rsp, %[cur_rsp]": [cur_rsp] "=r"(cur_rsp));
+
+		prev = get_curr_task();
 		kprintf("prev process is %s \n", prev->task_name);
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
 		next = get_next_ready_proc();
-
+		kprintf("next process is %s \n", next->task_name);
 		if(prev !=next) {
 			//_set_cr3(next->virtual_addr_space->pml4_t);
-			kprintf("CR3 register is %p \n", next->virtual_addr_space->pml4_t);
 
 			LOAD_CR3(next->virtual_addr_space->pml4_t);
 
@@ -146,7 +147,7 @@ void timer_handler()
 
 
 void timer_install() {
-	uint32_t divisor = 1193180;
+	uint32_t divisor = 11931800;
 	outportb(0x43, 0x36);
 	outportb(0x40, divisor & 0xFF);
 	outportb(0x40, divisor >> 8);
