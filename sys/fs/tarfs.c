@@ -49,15 +49,15 @@ char* get_file_data(char* filename) {
 	for(HEADER* start= (HEADER*) &_binary_tarfs_start; start < (HEADER*) &_binary_tarfs_end;  ) {
 		//kprintf("%s\n", start->name);
 		uint64_t file_size = convert_oct_dec(start->size);
+		kprintf("%s\n",start->name);
 		if(kstrcmp(filename,start->name) == 0) {
 			p = (char*)(start+1);
 			//kprintf("File found\n");
 			break;
 		}
 		start += 1;
-
-		if(file_size%sizeof(HEADER)) {
-			file_size = (file_size/sizeof(HEADER))*sizeof(HEADER)+sizeof(HEADER);
+		if(file_size%512) {
+			file_size = (file_size/512)*512+512;
 		}
 		start = (HEADER* )((char *)start + file_size);
 	}
