@@ -55,7 +55,7 @@ char* get_file_data(char* filename) {
 			//kprintf("File found\n");
 			break;
 		}
-		start += 1;
+		file_size = file_size + sizeof(HEADER);
 		if(file_size%512) {
 			file_size = (file_size/512)*512+512;
 		}
