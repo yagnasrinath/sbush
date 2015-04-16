@@ -91,14 +91,13 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
-	//PUSHA;
 	timer_ticks++;
-	//if (timer_ticks % 100 == 0)
-	//{
-		//timer_ticks =0;
-		//numOfsecs++;
+	if (timer_ticks % 100 == 0)
+	{
+		timer_ticks =0;
+		numOfsecs++;
 		printtimeatrightconer(timer_ticks );
-	//}
+	}
 	//if(INITSCHEDULING) {
 
 	//awake_sleeping_proc();
@@ -120,11 +119,11 @@ void timer_handler()
 		__asm__ __volatile__("movq %%rsp, %[cur_rsp]": [cur_rsp] "=r"(cur_rsp));
 
 		prev = get_curr_task();
-		kprintf("prev process is %s \n", prev->task_name);
+		//kprintf("prev process is %s \n", prev->task_name);
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
 		next = get_next_ready_proc();
-		kprintf("next process is %s \n", next->task_name);
+		//kprintf("next process is %s \n", next->task_name);
 		if(prev !=next) {
 			//_set_cr3(next->virtual_addr_space->pml4_t);
 

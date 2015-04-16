@@ -55,10 +55,13 @@ char* get_file_data(char* filename) {
 			//kprintf("File found\n");
 			break;
 		}
+		kprintf("size of header %d\n",sizeof(HEADER));
+
 		file_size = file_size + sizeof(HEADER);
 		if(file_size%512) {
-			file_size = (file_size/512)*512+512;
+			file_size = ((file_size/512)*512)+512;
 		}
+		kprintf("file size is %d",file_size);
 		start = (HEADER* )((char *)start + file_size);
 	}
 	return p;
