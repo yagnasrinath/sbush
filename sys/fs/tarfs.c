@@ -41,29 +41,28 @@ static uint64_t convert_oct_dec(char inputChar[12]) {
 
 
 char* get_file_data(char* filename) {
-	char *p = NULL;
-	if(filename == NULL){
-		kprintf("Invalid filename");
-		return NULL;
-	}
-	for(HEADER* start= (HEADER*) &_binary_tarfs_start; start < (HEADER*) &_binary_tarfs_end;  ) {
-		//kprintf("%s\n", start->name);
-		uint64_t file_size = convert_oct_dec(start->size);
-		kprintf("%s\n",start->name);
-		if(kstrcmp(filename,start->name) == 0) {
-			p = (char*)(start+1);
-			//kprintf("File found\n");
-			break;
-		}
-		kprintf("size of header %d\n",sizeof(HEADER));
+	HEADER *header = (HEADER*) &_binary_tarfs_start;
+	    int size_of_file = 0;
+	    char *p;
 
-		file_size = file_size + sizeof(HEADER);
-		if(file_size%512) {
-			file_size = ((file_size/512)*512)+512;
-		}
-		kprintf("file size is %d",file_size);
-		start = (HEADER* )((char *)start + file_size);
-	}
-	return p;
+	    do {
+	        // Convert header->size string to octal to decimal
+	        size_of_file = convert_oct_dec((header->size));
+	        p = (char*)(header + 1);
+
+	        //kprintf("\n...File Name: %s..File Size: %d bytes..Type %s: ", header->name, size_of_file, header->typeflag);
+	        if (kstrcmp(filename, header->name) == 0) {
+	            return (void*)p;
+	        }
+
+	        if (size_of_file > 0) {
+	            header = header + size_of_file / (sizeof(HEADER) + 1) + 2;
+	        } else {
+	            header = header + 1;
+	        }
+	    } while(header < (HEADER*)&_binary_tarfs_end);
+
+	    // kprintf("\nFile not found");
+	    return NULL;
 }
 
