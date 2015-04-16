@@ -39,6 +39,9 @@ void awake_sleeping_proc() {
 	}
 }
 
+
+
+
 void add_to_task_list(task_struct * new_proc) {
 	if(new_proc->state  == EXIT) {
 		add_free_task_struct(new_proc);
@@ -57,9 +60,11 @@ void add_to_task_list(task_struct * new_proc) {
 		return;
 	}
 	while(curr_ready_tasks->next != NULL) {
+
 		curr_ready_tasks = curr_ready_tasks->next;
 	}
 	curr_ready_tasks->next = new_proc;
+	new_proc->next = NULL;
 
 }
 
