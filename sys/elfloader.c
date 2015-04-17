@@ -158,7 +158,10 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	// HEAP
 	curr_vma = curr_vma->next;
 	uint64_t heap_start_vaddr ;
-	heap_start_vaddr= ((((max_addr - 1) >> 12) + 1) << 12);
+	if(max_addr%PAGE_SIZE) {
+		max_addr = (max_addr/PAGE_SIZE)*PAGE_SIZE + 1;
+	}
+	heap_start_vaddr= max_addr;
 	vma_struct* new_usr_heap_vma =  create_new_vma(0,heap_start_vaddr,heap_start_vaddr,HEAP,READ_WRITE);
 	curr_vma->next = new_usr_heap_vma ;
 

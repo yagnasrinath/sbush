@@ -9,8 +9,8 @@
 #include<sys/MemoryManagement/virtual_page_allocator.h>
 #include <sys/sbunix.h>
 #include "../../include/sys/utils/kstring.h"
-static char mem_bitmap[(NUM_PAGES/8)];
-static char ref_count[NUM_PAGES];
+static unsigned char mem_bitmap[(NUM_PAGES/8)];
+static unsigned char ref_count[NUM_PAGES];
 int num_of_phy_blocks = 0;
 
 static void mark_page_free(uint64_t pageNum) {
@@ -101,7 +101,8 @@ void get_4k_aligned(uint64_t *addr,uint64_t *length)
 
 void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* phy_free ) {
 	// marking all pages used initially
-	kmemset(mem_bitmap, 0x00, sizeof mem_bitmap);
+	kmemset(mem_bitmap, 0x00, NUM_PAGES/8);
+	kmemset(ref_count, 0x00, NUM_PAGES);
 	uint64_t updated_phy_free = (uint64_t)phy_free + 1024*1024;
 
 	for (int i=0; i<smap_num; i++) {
