@@ -40,40 +40,63 @@ int kstrlen(const char *str) {
 
 int kstrcmp (const char *s1, const char *s2) {
 	while(*s1&&*s2){
-        if(*s1-*s2){
-            return *s1-*s2;
-        }
-        s1++;
-        s2++;
-    }
-    if((*s1)&&!(*s2)){
-        return *s1;
-    }
-    else if((*s2)&&!(*s1)) {
-        return -(*s2);
-    }
+		if(*s1-*s2){
+			return *s1-*s2;
+		}
+		s1++;
+		s2++;
+	}
+	if((*s1)&&!(*s2)){
+		return *s1;
+	}
+	else if((*s2)&&!(*s1)) {
+		return -(*s2);
+	}
 
-    return 0;
+	return 0;
 }
 
+
+int32_t atoi(char *p)
+{
+	int sign =1;
+	if (p[0] == '-' || p[0] == '+') {
+		if(p[0] == '-' )
+			sign = -1;
+		p++;
+	}
+	int i=0, output = 0;
+	while (p[i]!= '\0') {
+		if (p[i] >= 48 && p[i] <= 57) {
+			output = 10*output+p[i]-'0';
+			i++;
+		} else {
+			return 0;
+		}
+
+	}
+	return output*sign;
+}
+
+
 char *kstrcpy ( char *__restrict dest, const char *__restrict src) {
-    char* orgdest = dest;
-    while((*dest = *src)){
-        dest++;
-        src++;
-    }
-    return orgdest;
+	char* orgdest = dest;
+	while((*dest = *src)){
+		dest++;
+		src++;
+	}
+	return orgdest;
 }
 
 
 char *kstrncpy (char *__restrict dest, const char *__restrict src, const size_t n) {
-    char* orgdest =dest;
-    int i=0;
-    while((i++ < n)&&(*dest++ = *src++));
+	char* orgdest =dest;
+	int i=0;
+	while((i++ < n)&&(*dest++ = *src++));
 
-    if(i<n) {
-        dest[i] = '\0';
-    }
-    return orgdest;
+	if(i<n) {
+		dest[i] = '\0';
+	}
+	return orgdest;
 }
 

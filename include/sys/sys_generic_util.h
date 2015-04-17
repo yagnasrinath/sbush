@@ -10,8 +10,8 @@
 
 
 #include<sys/defs.h>
-#include "utils/kstring.h"
 
-
+int32_t oct_to_dec(int n);
+int32_t pow(int base, int power);
 
 #endif /* SBUSH_INCLUDE_SYS_SYS_GENERIC_UTIL_H_ */
