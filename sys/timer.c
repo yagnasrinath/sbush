@@ -96,7 +96,7 @@ void timer_handler()
 	{
 		timer_ticks =0;
 		numOfsecs++;
-		printtimeatrightconer(timer_ticks );
+		printtimeatrightconer(numOfsecs );
 	}
 	//if(INITSCHEDULING) {
 

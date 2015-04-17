@@ -125,7 +125,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 			page_perm = USER_RW_FLAG| PAGE_PRESENT;
 		}
 		else {
-			page_perm  = USER_RX_FLAG | PAGE_PRESENT;
+			page_perm  = USER_RW_FLAG | PAGE_PRESENT;
 		}
 		// need to change to demand paging
 		_set_cr3(new_task->virtual_addr_space->pml4_t);
