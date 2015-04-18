@@ -40,6 +40,7 @@ void free_temp_virtual_address(uint64_t virtual_addr) {
 }
 
 uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions) {
+	//kprintf("Number of pages allocated  %d\n",num_pages );
 	uint64_t start_addr = get_present_virtual_address();
 	for(int i=0; i < num_pages; i++) {
 		uint64_t phy_addr = allocate_phy_page();
@@ -54,7 +55,7 @@ void free_page(uint64_t virtual_addr) {
 	// returns  the virtual address for the pt entry
 	uint64_t pt_entry= get_pt_vir_addr(virtual_addr);
 	uint64_t phy_addr = (*((uint64_t *)pt_entry));
-	phy_addr = phy_addr & PHY_PAGE_BITS;
+	phy_addr = phy_addr & UNSET_FLAGS;
 	free_phy_page(phy_addr,TRUE);
 	(*((uint64_t *)pt_entry))= 0;
 	return;

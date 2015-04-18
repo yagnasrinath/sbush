@@ -39,7 +39,8 @@ enum vma_perm {
 	EXECUTE,//100
 	EXECUTEREAD,//101
 	EXECUTE_WRITE,//110
-	EXECUTE_READ_WRITE //111
+	EXECUTE_READ_WRITE,//111
+	COPY_ON_WRITE //1000
 };
 
 typedef struct mem_structure mem_struct;

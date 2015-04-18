@@ -91,3 +91,7 @@ uint64_t get_new_pml4_t() {
 }
 
 
+uint64_t get_pte_entry(uint64_t vir_addr){
+	return *(uint64_t*)(get_pt_vir_addr(vir_addr));
+}
+

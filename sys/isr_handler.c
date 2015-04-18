@@ -8,7 +8,8 @@
 #include<sys/defs.h>
 #include<sys/idt.h>
 #include<sys/sbunix.h>
-
+#include<sys/ProcessManagement/process_scheduler.h>
+#include<sys/MemoryManagement/virtual_page_allocator.h>
 
 static void print_regiters(struct isr_nrm_regs regs) {
 	kprintf("r15:%p",regs.r15);
@@ -61,15 +62,47 @@ void gpf_handler(struct isr_nrm_regs regs) {
 void page_fault_handler(struct isr_nrm_regs regs) {
 	uint64_t lcr2 = 3;
 	__asm__ __volatile__ ("movq %%cr2, %0;" : "=r"(lcr2));
-	uint64_t lcr3 =3;
+	/*uint64_t lcr3 =3;
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
-	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
+	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));*/
+	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
 	kprintf("page_fault_handler cr2 %p \n",lcr2);
-	kprintf("page_fault_handler rsp %p \n",lrsp);
-	print_regiters(regs);
-	while(1);
+	//kprintf("page_fault_handler rsp %p \n",lrsp);
+	//print_regiters(regs);
+	uint64_t fault_addr = lcr2;
+	if(lcr2 >= USR_STK_TOP) {
+		panic("PAGE FAULT IN KERNEL\n");
+	}
+	if(regs.error & 0x1) { // PAGE PRESENT
+
+	}
+	else {
+		task_struct* curr_task = get_curr_task();
+		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
+		if(curr_vmaList  == NULL) {
+			panic("No vma list for the process");
+		}
+		vma_struct* curr_vma = curr_vmaList;
+		fault_addr = PAGE_ALIGN(fault_addr);
+		kprintf("Fault address is %p\n",fault_addr );
+		while(curr_vma != NULL) {
+			uint64_t curr_start = curr_vma->vm_area_start;
+			uint64_t curr_end = curr_vma->vm_area_end;
+			//kprintf("VMA start %p\n",curr_start );
+			//kprintf("VMA end %p\n",curr_end );
+
+			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
+				ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);
+				break;
+			}
+			curr_vma = curr_vma->next;
+		}
+		if(curr_vma == NULL) {
+			// should exit process and throw segmentation fault
+			panic("Process accessed unassigned memory \n");
+		}
+	}
 }
 
 

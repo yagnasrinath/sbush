@@ -24,12 +24,15 @@ typedef unsigned char uint8_t;
 #define USER_RW_FLAG 6UL  //110
 #define USER_RX_FLAG 4UL   //100
 #define PAGE_PRESENT 1UL   // 1
-#define PHY_PAGE_BITS 0x000FFFFFFFFFF000UL
+#define RW_FLAG 2UL //2
+#define UNSET_FLAGS   0x0000FFFFFFFFF000UL
+#define FLAGS         0xFFFF000000000FFFUL
 #define USR_STK_TOP  0xF0000000000UL
 #define MAX_USR_ARG_LEN 100
 #define MAX_ARGS 10
 
 typedef int BOOL;
+
 
 #endif
 

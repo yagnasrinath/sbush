@@ -144,8 +144,8 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		curr_vma = curr_vma->next;
 	}
 	uint64_t user_stack_top = USR_STK_TOP;
-	uint64_t user_stack_end = USR_STK_TOP - USR_STK_SIZE;
-	vma_struct* new_usr_stack_vma = create_new_vma(0,user_stack_end,USR_STK_TOP,STACK,READ_WRITE);
+	uint64_t user_stack_start = USR_STK_TOP - USR_STK_SIZE;
+	vma_struct* new_usr_stack_vma = create_new_vma(0,user_stack_start,USR_STK_TOP,STACK,READ_WRITE);
 	//kprintf("stack vma allocated \n");
 	curr_vma->next = new_usr_stack_vma;
 	// STACK
@@ -168,6 +168,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 
 	kstrncpy(new_task->task_name,filename,TASK_NAME_LENGTH-1 );
 	new_task->task_name[TASK_NAME_LENGTH-1] = '\0'; // boundary check
+	//new_task->virtual_addr_space->stack_start = user_stack_top-PAGE_SIZE -0x8;
 	new_task->virtual_addr_space->stack_start = user_stack_top - 0x8;
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;

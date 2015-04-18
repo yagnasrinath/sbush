@@ -135,15 +135,15 @@ static void idle_proc(void ) {
 	while(1) ;
 }
 static void idle_proc2(void ) {
-	kprintf("In the idle process 2 \n");
-	while(1)  {
 
+	while(1)  {
+		kprintf("In the idle process 2 \n");
 	}
 }
 static void idle_proc3(void ) {
-	kprintf("In the idle process 3 \n");
-	while(1)  {
 
+	while(1)  {
+		kprintf("In the idle process 3 \n");
 	}
 }
 
