@@ -85,5 +85,5 @@ struct vm_area_structure{
 
 
 
-
+task_struct* copy_task_struct(task_struct* parent_task_struct);
 #endif /* SBUSH_INCLUDE_SYS_PROCESSMANAGEMENT_PROCESS_H_ */

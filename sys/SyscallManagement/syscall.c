@@ -1,5 +1,5 @@
 /*
- * syscall.c
+ * syscall.
  *
  *  Created on: Apr 19, 2015
  *      Author: harsha
@@ -7,7 +7,8 @@
 #include<sys/idt.h>
 #include<sys/sbunix.h>
 #include<sys/ProcessManagement/process_scheduler.h>
-uint64_t* sys_calls[20];
+#include<sys/ProcessManagement/process.h>
+
 
 #define POPA \
 		__asm__ __volatile__(\
@@ -49,13 +50,17 @@ uint64_t* sys_calls[20];
 
 
 
-/*uint64_t fork()  {
+void fork()  {
 	task_struct * curr_task = get_curr_task();
 	task_struct * child_task = copy_task_struct(curr_task);
-	schedule_process(child_task, curr_task->kstack[KSTACK_SIZE-2], curr_task->kstack[KSTACK_SIZE-5]);
-	return
-}*/
+	schedule_process(child_task, curr_task->kstack[KSTACK_SIZE-4], curr_task->kstack[KSTACK_SIZE-7]);
+	 curr_task->kstack[KSTACK_SIZE-10] = child_task->pid;
+}
 
+/*void* sys_calls[20] = {NULL,NULL,NULL,NULL,NULL,
+						   NULL,fork,NULL,NULL,NULL,
+						   NULL,NULL,NULL,NULL,NULL,
+						   NULL,NULL,NULL,NULL,NULL};*/
 
 
 
@@ -64,7 +69,16 @@ void handle_syscall() {
 	PUSHA;
 	uint64_t ret =1;
 	task_struct* curr_task = get_curr_task();
-	kprintf("ret is %d %d",ret, curr_task->kstack[KSTACK_SIZE-1]);
+	kprintf("ret is %d %d",ret, curr_task->kstack[KSTACK_SIZE-10]);
+	if(curr_task->kstack[KSTACK_SIZE-10] <0 || curr_task->kstack[KSTACK_SIZE-10] >19) {
+		kprintf("Invalid interrupt number \n");
+	}
+	else {
+		switch(curr_task->kstack[KSTACK_SIZE-10]) {
+		case 7 : fork(); break;
+		default : break;
+		}
+	}
 	POPA;
 	__asm__ __volatile__("addq $0x08, %rsp;");
 	__asm__ __volatile__("iretq");
