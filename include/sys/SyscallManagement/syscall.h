@@ -10,6 +10,5 @@
 
 #include<sys/idt.h>
 
-void handle_syscall(struct isr_nrm_regs regs);
 
 #endif /* INCLUDE_SYS_SYSCALLMANAGEMENT_SYSCALL_H_ */

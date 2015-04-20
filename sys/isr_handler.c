@@ -124,9 +124,6 @@ void isr_handler(struct isr_nrm_regs regs)
 	case 14:
 		page_fault_handler(regs);
 		break;
-	case 128:
-		handle_syscall(regs);
-		break;
 	default:
 		break;
 	}
