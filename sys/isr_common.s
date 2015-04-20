@@ -63,7 +63,6 @@ isr10:
 
 isr13:
     cli
-    pushq $0
     pushq $13
     jmp isr_common
 
@@ -74,7 +73,6 @@ isr14:
 
 isr80:
     cli
-    pushq $0
     pushq $128
     jmp isr_common
 

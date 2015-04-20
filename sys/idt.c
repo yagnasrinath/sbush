@@ -80,6 +80,21 @@ void idt_set_gate(uint16_t idtNum, uint64_t handler ) {
 }
 
 
+void idt_set_gate_prvl(uint16_t idtNum, uint64_t handler ) {
+	idt_arr[idtNum].offset_low = handler & 0XFFFF;
+	idt_arr[idtNum].offset_middle= handler >> 16 & 0XFFFF;
+	idt_arr[idtNum].offset_high = handler >> 32 &0XFFFFFFFF;
+	idt_arr[idtNum].selector = 8;
+	idt_arr[idtNum].dpl = 3;
+	idt_arr[idtNum].ist= 5;
+	idt_arr[idtNum].type = INTERRUPT;
+	idt_arr[idtNum].reserved0 =0;
+	idt_arr[idtNum].reserved1 =0;
+	idt_arr[idtNum].zero = 0;
+	idt_arr[idtNum].p = 1;
+}
+
+
 void idt_install ()  {
 	irq_remap();
 	idt_ptr.size = (sizeof (struct idt_t) * 256) - 1;
@@ -96,7 +111,8 @@ void idt_install ()  {
 	idt_set_gate(14,(uint64_t)&isr14);
 	idt_set_gate(32,(uint64_t)&x86_64_isr32);
 	idt_set_gate(33,(uint64_t)&x86_64_isr33);
-	idt_set_gate(128,(uint64_t)&isr80);
+	idt_set_gate_prvl(128,(uint64_t)&isr80);
+
 	load_idt((void *)&idt_ptr);
 }
 

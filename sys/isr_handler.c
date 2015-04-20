@@ -55,6 +55,7 @@ void gpf_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
 	kprintf("protection  handler cr3 %p \n",lcr3);
 	kprintf("protection  handler cr2 %p \n",lcr2);
+	kprintf("protection  handler errno %d \n",regs.error);
 	kprintf("protection_fault_handler rsp %p \n",lrsp);
 	print_regiters(regs);
 	panic("Protection fault handler");
