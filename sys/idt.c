@@ -64,7 +64,7 @@ extern void isr0();
 extern void isr10();
 extern void isr13();
 extern void isr14();
-extern void timer_handler();
+extern void isr80();
 void idt_set_gate(uint16_t idtNum, uint64_t handler ) {
 	idt_arr[idtNum].offset_low = handler & 0XFFFF;
 	idt_arr[idtNum].offset_middle= handler >> 16 & 0XFFFF;
@@ -96,6 +96,7 @@ void idt_install ()  {
 	idt_set_gate(14,(uint64_t)&isr14);
 	idt_set_gate(32,(uint64_t)&x86_64_isr32);
 	idt_set_gate(33,(uint64_t)&x86_64_isr33);
+	idt_set_gate(128,(uint64_t)&isr80);
 	load_idt((void *)&idt_ptr);
 }
 

@@ -10,6 +10,7 @@
 #include<sys/sbunix.h>
 #include<sys/ProcessManagement/process_scheduler.h>
 #include<sys/MemoryManagement/virtual_page_allocator.h>
+#include<sys/SyscallManagement/syscall.h>
 
 static void print_regiters(struct isr_nrm_regs regs) {
 	kprintf("r15:%p",regs.r15);
@@ -120,6 +121,9 @@ void isr_handler(struct isr_nrm_regs regs)
 		break;
 	case 14:
 		page_fault_handler(regs);
+		break;
+	case 128:
+		handle_syscall(regs);
 		break;
 	default:
 		break;

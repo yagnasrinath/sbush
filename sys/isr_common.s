@@ -46,6 +46,7 @@
 .global isr10
 .global isr13
 .global isr14
+.global isr80
 .global isr_common
 
 isr0:
@@ -71,9 +72,15 @@ isr14:
     pushq $14
     jmp isr_common
 
+isr80:
+    cli
+    pushq $0
+    pushq $128
+    jmp isr_common
+
+
 isr_common:
     PUSHA
-    movq %rsp, %rdi
     callq isr_handler
     POPA
     add $0x10, %rsp
