@@ -60,11 +60,9 @@ uint64_t* sys_calls[20];
 
 
 
-uint64_t ret =1111;
-
 void handle_syscall() {
 	PUSHA;
-	ret =0;
+	uint64_t  ret =0;
 	kprintf("syscall %s\n", ret);
 	POPA;
 	__asm__ __volatile__("addq $0x08, %rsp");
