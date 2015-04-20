@@ -25,8 +25,7 @@ uint64_t* sys_calls[20];
 				"popq %rcx;"\
 				"popq %rbx;"\
 				"popq %rax;"\
-				"popq %rdi;"\
-				"iretq;")
+				"popq %rdi;")
 
 #define PUSHA \
 		__asm__ __volatile__(\
@@ -68,7 +67,7 @@ void handle_syscall() {
 	ret =0;
 	kprintf("syscall %s\n", ret);
 	POPA;
-	__asm__ __volatile__("add $0x08, %rsp");
+	__asm__ __volatile__("addq $0x08, %rsp");
 	__asm__ __volatile__("iretq");
 
 }
