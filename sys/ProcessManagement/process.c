@@ -47,7 +47,7 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 			uint64_t curr_kern_vaddr = get_present_virtual_address();
 			while(vma_start >= parent_vma->vm_area_start){
 				uint64_t* pte_entry = (uint64_t *)get_pt_vir_addr(vma_start);
-				if(((*pte_entry) & PAGE_PRESENT)){
+				if(!((*pte_entry) & PAGE_PRESENT)){
 					break;
 				}
 				uint64_t new_phy_page = allocate_phy_page();
