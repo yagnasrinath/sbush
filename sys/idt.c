@@ -86,7 +86,7 @@ void idt_set_gate_prvl(uint16_t idtNum, uint64_t handler ) {
 	idt_arr[idtNum].offset_high = handler >> 32 &0XFFFFFFFF;
 	idt_arr[idtNum].selector = 8;
 	idt_arr[idtNum].dpl = 3;
-	idt_arr[idtNum].ist= 5;
+	idt_arr[idtNum].ist= 0;
 	idt_arr[idtNum].type = INTERRUPT;
 	idt_arr[idtNum].reserved0 =0;
 	idt_arr[idtNum].reserved1 =0;
