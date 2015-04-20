@@ -79,7 +79,7 @@ isr80:
 
 
 isr_common:
-    PUSHA
+    
     callq isr_handler
     POPA
     add $0x10, %rsp
