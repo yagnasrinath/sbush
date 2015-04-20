@@ -73,6 +73,7 @@ isr14:
 
 isr80:
     cli
+    pushq $0
     pushq $128
     jmp isr_common
 
