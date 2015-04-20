@@ -62,12 +62,10 @@ uint64_t* sys_calls[20];
 
 void handle_syscall() {
 	PUSHA;
-	task_struct * curr_task = get_curr_task();
-	curr_task->kstack[KSTACK_SIZE-8] = 12234;
-	uint64_t  ret =0;
-	kprintf("syscall %s\n", ret);
+	uint64_t ret =1;
+	kprintf("ret is %d",ret);
 	POPA;
-	__asm__ __volatile__("addq $0x08, %rsp");
+	__asm__ __volatile__("addq $0x08, %rsp;");
 	__asm__ __volatile__("iretq");
 
 }

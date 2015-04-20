@@ -39,7 +39,7 @@ static void print_regiters(struct isr_nrm_regs regs) {
 
 void divide_by_zero_handler(struct isr_nrm_regs regs) {
 	print_regiters(regs);
-	panic("Divide By Zero Error %d");
+	panic("Divide By Zero Error ");
 }
 
 void tss_fault_handler(struct isr_nrm_regs regs) {
