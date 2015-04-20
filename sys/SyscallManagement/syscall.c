@@ -64,7 +64,7 @@ void handle_syscall() {
 	PUSHA;
 	uint64_t ret =1;
 	task_struct* curr_task = get_curr_task();
-	kprintf("ret is %d %d",ret, curr_task[KSTACK_SIZE-1]);
+	kprintf("ret is %d %d",ret, curr_task->kstack[KSTACK_SIZE-1]);
 	POPA;
 	__asm__ __volatile__("addq $0x08, %rsp;");
 	__asm__ __volatile__("iretq");
