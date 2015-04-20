@@ -64,6 +64,7 @@ extern void isr0();
 extern void isr10();
 extern void isr13();
 extern void isr14();
+extern void isr80();
 extern void handle_syscall();
 void idt_set_gate(uint16_t idtNum, uint64_t handler ) {
 	idt_arr[idtNum].offset_low = handler & 0XFFFF;

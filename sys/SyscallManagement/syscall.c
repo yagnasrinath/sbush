@@ -6,6 +6,7 @@
  */
 #include<sys/idt.h>
 #include<sys/sbunix.h>
+#include<sys/utils/kstring.h>
 #include<sys/ProcessManagement/process_scheduler.h>
 #include<sys/ProcessManagement/process.h>
 
@@ -53,6 +54,9 @@
 void fork()  {
 	task_struct * curr_task = get_curr_task();
 	task_struct * child_task = copy_task_struct(curr_task);
+	kmemset(child_task->kstack, 0 , PAGE_SIZE);
+	kprintf("pml4t of child is %p \n",child_task->virtual_addr_space->pml4_t );
+	kprintf("pml4t of parent is %p \n",curr_task->virtual_addr_space->pml4_t );
 	schedule_process(child_task, curr_task->kstack[KSTACK_SIZE-4], curr_task->kstack[KSTACK_SIZE-7]);
 	 curr_task->kstack[KSTACK_SIZE-10] = child_task->pid;
 }
@@ -67,16 +71,14 @@ void fork()  {
 
 void handle_syscall() {
 	PUSHA;
-	uint64_t ret =1;
 	task_struct* curr_task = get_curr_task();
-	kprintf("ret is %d %d",ret, curr_task->kstack[KSTACK_SIZE-10]);
 	if(curr_task->kstack[KSTACK_SIZE-10] <0 || curr_task->kstack[KSTACK_SIZE-10] >19) {
 		kprintf("Invalid interrupt number \n");
 	}
 	else {
-		switch(curr_task->kstack[KSTACK_SIZE-10]) {
-		case 7 : fork(); break;
-		default : break;
+	 switch(curr_task->kstack[KSTACK_SIZE-10]) {
+		 case 7 : fork(); break;
+	 	 default : break;
 		}
 	}
 	POPA;

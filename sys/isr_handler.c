@@ -65,14 +65,14 @@ void gpf_handler(struct isr_nrm_regs regs) {
 void page_fault_handler(struct isr_nrm_regs regs) {
 	uint64_t lcr2 = 3;
 	__asm__ __volatile__ ("movq %%cr2, %0;" : "=r"(lcr2));
-	/*uint64_t lcr3 =3;
+	uint64_t lcr3 =3;
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
-	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));*/
-	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
+	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
+	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
 	kprintf("page_fault_handler cr2 %p \n",lcr2);
-	//kprintf("page_fault_handler rsp %p \n",lrsp);
-	//print_regiters(regs);
+	kprintf("page_fault_handler rsp %p \n",lrsp);
+	kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
 		panic("PAGE FAULT IN KERNEL\n");

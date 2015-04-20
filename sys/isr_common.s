@@ -41,6 +41,7 @@
 .text
 
 .extern isr_handler
+.extern handle_syscall
 
 .global isr0
 .global isr10
@@ -75,11 +76,11 @@ isr80:
     cli
     pushq $0
     pushq $128
-    jmp isr_common
-
+    callq handle_syscall
+	iretq
 
 isr_common:
-    
+	PUSHA   
     callq isr_handler
     POPA
     add $0x10, %rsp
