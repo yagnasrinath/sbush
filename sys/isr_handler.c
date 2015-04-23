@@ -6,6 +6,7 @@
  */
 
 #include<sys/defs.h>
+#include<sys/utils/kstring.h>
 #include<sys/idt.h>
 #include<sys/sbunix.h>
 #include<sys/ProcessManagement/process_scheduler.h>
@@ -69,18 +70,59 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
-	kprintf("page_fault_handler cr2 %p \n",lcr2);
-	kprintf("page_fault_handler rsp %p \n",lrsp);
-	kprintf("page fault  handler errno %d \n",regs.error);
+	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
+	//kprintf("page_fault_handler cr2 %p \n",lcr2);
+	//kprintf("page_fault_handler rsp %p \n",lrsp);
+	//kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
 		panic("PAGE FAULT IN KERNEL\n");
 	}
 	if(regs.error & 0x1) { // PAGE PRESENT
+		task_struct* curr_task = get_curr_task();
+		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
+		if(curr_vmaList  == NULL) {
+			panic("No vma list for the process");
+		}
+		vma_struct* curr_vma = curr_vmaList;
+		while(curr_vma != NULL) {
+			uint64_t curr_start = curr_vma->vm_area_start;
+			uint64_t curr_end = curr_vma->vm_area_end;
+			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
+				if(curr_vma->vma_perm == COPY_ON_WRITE) {
+					uint64_t* pte_entry = (uint64_t *)get_pt_vir_addr(fault_addr);
+					int curr_ref_count = get_phy_page_ref_count(*pte_entry);
+					if(curr_ref_count <= 0) {
+						panic("something wrong reference count is  less than or equal to zero");
+					}
+					if(curr_ref_count  == 1) {
+						kprintf("ref conut is 1\n");
+						* pte_entry  = * pte_entry | USER_RW_FLAG;
+						set_cr3(lcr3);
+					}
+					else {
+						dec_phy_page_ref_count(* pte_entry);
+						uint64_t new_phy_page = allocate_phy_page();
+						uint64_t curr_kern_vaddr = get_present_virtual_address();
+						map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, USER_RW_FLAG| PAGE_PRESENT);
+						kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
+						map_vir_to_phyaddr(fault_addr, new_phy_page, USER_RW_FLAG|PAGE_PRESENT);
+						uint64_t *pte_entry_kern_vir_addr = (uint64_t *)get_pt_vir_addr(curr_kern_vaddr);
+						*pte_entry_kern_vir_addr = 0;
+						//ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);
+					}
+					break;
+				}
 
+			}
+			curr_vma = curr_vma->next;
+		}
+		if(curr_vma == NULL ) {
+			panic("PAGE FAULT IN Not Handled when PAGE is PRESENT AND NOT COW\n");
+		}
 	}
 	else {
+		kprintf("entered the else case  %p\n",fault_addr );
 		task_struct* curr_task = get_curr_task();
 		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 		if(curr_vmaList  == NULL) {
@@ -97,6 +139,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 
 			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
 				ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);
+				kprintf("Memory allocated for  %p\n",fault_addr );
 				break;
 			}
 			curr_vma = curr_vma->next;
