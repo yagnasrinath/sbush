@@ -100,24 +100,29 @@ void free_pagetables(){
 		uint64_t *pdp_addr = (uint64_t*)(pml4e_vir_addr | i << 3);
 		if(IS_PAGE_PRESENT(*pdp_addr)){
 			for(uint64_t j=0; j <= 511; j++){
-				uint64_t *pd_addr = (uint64_t*)(pdp_vir_addr | j << 3);
+				uint64_t *pd_addr = (uint64_t*)(pdp_vir_addr | i<<12 | j << 3);
 				if(IS_PAGE_PRESENT(*pd_addr)){
 					for(uint64_t k=0; k <= 511; k++){
-						uint64_t *pt_addr = (uint64_t*)(pd_vir_addr | k << 3);
+						uint64_t *pt_addr = (uint64_t*)(pd_vir_addr | i<<21 | j<<12 | k << 3);
 						if(IS_PAGE_PRESENT(*pt_addr)){
 							for(uint64_t l=0; l <= 511; l++){
-								uint64_t *pg_addr = (uint64_t*)(pt_vir_addr | l << 3);
+								uint64_t *pg_addr = (uint64_t*)(pt_vir_addr | i<<30 | j<<21 | k<<12 | l << 3);
 								if(IS_PAGE_PRESENT(*pg_addr)){
 									free_phy_page(*pg_addr, TRUE);
+									*pg_addr = 0;
 								}
+
 							}
 							free_phy_page(*pt_addr, TRUE);
+							*pt_addr = 0;
 						}
 					}
 					free_phy_page(*pd_addr, TRUE);
+					*pd_addr = 0;
 				}
 			}
 			free_phy_page(*pdp_addr, TRUE);
+			*pdp_addr = 0;
 		}
 	}
 	set_cr3(kernel_cr3);
