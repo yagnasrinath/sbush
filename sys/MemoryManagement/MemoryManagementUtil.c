@@ -1,5 +1,6 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/system.h>
+#include<sys/sbunix.h>
 static uint64_t kernel_cr3;
 static uint64_t kernel_pml4;
 
@@ -125,6 +126,7 @@ void free_pagetables(){
 			*pdp_addr = 0;
 		}
 	}
+	kprintf("\nkerncr3 is %p \n", kernel_cr3);
 	set_cr3(kernel_cr3);
 	//Cleaning Process
 }

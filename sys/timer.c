@@ -91,7 +91,7 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
-
+	kprintf("timer handler \n");
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
 	{
