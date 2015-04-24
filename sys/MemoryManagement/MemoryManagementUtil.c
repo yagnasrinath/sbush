@@ -126,7 +126,7 @@ void free_pagetables(){
 			*pdp_addr = 0;
 		}
 	}
-	kprintf("\nkerncr3 is %p \n", kernel_cr3);
+	//kprintf("\nkerncr3 is %p \n", kernel_cr3);
 	set_cr3(kernel_cr3);
 	//Cleaning Process
 }

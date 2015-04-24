@@ -79,7 +79,7 @@ void free_exit_process() {
 				curr= curr->next;
 				prev->next = curr;
 			}
-			kprintf("address of the to_be_freed is %p \n",to_be_freed);
+			//kprintf("address of the to_be_freed is %p \n",to_be_freed);
 			free_task_struct(to_be_freed);
 
 		}
@@ -124,7 +124,7 @@ task_struct * get_next_ready_proc() {
 void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) {
 	// setting up  stack segemnt
 
-	kprintf("process %s loaded \n", new_task->task_name);
+	//kprintf("process %s loaded \n", new_task->task_name);
 
 	if(new_task->is_user_proc) {
 

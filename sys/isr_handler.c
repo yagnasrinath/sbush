@@ -70,10 +70,10 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
-	kprintf("page_fault_handler cr2 %p \n",lcr2);
-	kprintf("page_fault_handler rsp %p \n",lrsp);
-	kprintf("page fault  handler errno %d \n",regs.error);
+	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
+	//kprintf("page_fault_handler cr2 %p \n",lcr2);
+	//kprintf("page_fault_handler rsp %p \n",lrsp);
+	//kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
 		panic("PAGE FAULT IN KERNEL\n");
@@ -130,7 +130,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		}
 	}
 	else {
-		kprintf("entered the else case in page fault  %p\n",fault_addr );
+		//kprintf("entered the else case in page fault  %p\n",fault_addr );
 		task_struct* curr_task = get_curr_task();
 		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 		if(curr_vmaList  == NULL) {

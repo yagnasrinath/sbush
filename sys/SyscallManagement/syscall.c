@@ -237,11 +237,11 @@ void waitpid(){
 }
 
 void exit(){
-	kprintf("in the sys exit handler \n");
 	task_struct* curr_task = get_curr_task();
+	kprintf("in the sys exit handler %d\n",curr_task->pid);
 	curr_task->state = WAIT;
 	//kprintf("process %d cleared \n",curr_task->pid);
-	//detach_children(curr_task);
+	detach_children(curr_task);
 	detach_from_parent(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	free_pagetables();

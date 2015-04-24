@@ -30,7 +30,7 @@ static void mark_page_used(uint64_t pageNum) {
 }
 
  void dec_phy_page_ref_count(uint64_t pageNum) {
-	 kprintf("dec_phy_page_ref_count \n");
+	 //kprintf("dec_phy_page_ref_count \n");
 	 if(ref_count[pageNum] == 0) {
 		 panic("something wrong ref count is already zero");
 	 }
@@ -131,10 +131,10 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 
 
 void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
-	task_struct* curr_task = get_curr_task();
-	kprintf(" task id in phy free %d \n", curr_task->pid);
+	//task_struct* curr_task = get_curr_task();
+	//kprintf(" task id in phy free %d \n", curr_task->pid);
 	int page_num = page_addr/PAGE_SIZE;
-	kprintf("free phy page called  address, pagenum , refcount is %p, %d, %d\n", page_addr, page_num, ref_count[page_num]);
+	//kprintf("free phy page called  address, pagenum , refcount is %p, %d, %d\n", page_addr, page_num, ref_count[page_num]);
 	if(page_num == 0)
 		return;
 	dec_phy_page_ref_count(page_num);

@@ -157,7 +157,7 @@ void free_task_struct(task_struct* to_free){
 	kmemset(to_free->fd,0,MAX_FD_PER_PROC*sizeof(uint64_t));
 	to_free->is_user_proc = FALSE;
 
-	kprintf("value of kernel stack is %p \n",(uint64_t)to_free->kstack );
+	//kprintf("value of kernel stack is %p \n",(uint64_t)to_free->kstack );
 
 	kmemset(to_free->kstack, 0 , PAGE_SIZE);
 	to_free->next = NULL;
