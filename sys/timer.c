@@ -131,7 +131,7 @@ void timer_handler()
 			LOAD_CR3(next->virtual_addr_space->pml4_t);
 
 			__asm__ __volatile__("movq %[next_rsp], %%rsp" : : [next_rsp] "m" (next->rsp));
-
+			kprintf("process to load is %d \n", next->pid);
 			if(next->is_user_proc) {
 				reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
 				switch_to_ring3;

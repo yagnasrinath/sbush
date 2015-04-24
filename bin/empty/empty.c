@@ -20,7 +20,7 @@ int main(int argc, char* argv[], char* envp[]) {
 		b = (int*)malloc(sizeof(int));
 		 *b = 3;
 		printf("In child process %d\n",*b);
-		sleep(3);
+		//sleep(3);
 		printf("In child process after sleep \n");
 		printf("In child process %d\n",getpid());
 
@@ -32,7 +32,9 @@ int main(int argc, char* argv[], char* envp[]) {
 		printf("In parent process %d\n",getppid());
 		int wait = waitpid(pid,0,0);
 		printf("The value returned by waitpid is %d\n",wait);
+
 		//int *b = 4;
+
 		//printf("In parent process %d\n",b);
 	}
 

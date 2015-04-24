@@ -199,6 +199,7 @@ void waitpid(){
 	if(wait_for == -1){
 		while(child_head != NULL){
 			if(child_head->state == ZOMBIE){
+				child_head->state  = EXIT;
 				curr_task->kstack[KSTACK_SIZE-RAX] = child_head->pid;
 				return;
 			}
@@ -222,6 +223,7 @@ void waitpid(){
 				curr_task->kstack[KSTACK_SIZE-RAX] = child_head->pid;
 				return;
 			}
+			curr_task->kstack[KSTACK_SIZE-RAX] = child_head->pid;
 			curr_task->wait_pid = wait_for;
 			curr_task->state = WAIT;
 			__asm__ __volatile__("int $32;");
@@ -237,9 +239,8 @@ void waitpid(){
 void exit(){
 
 	task_struct* curr_task = get_curr_task();
-
+	kprintf("process %d cleared \n",curr_task->pid);
 	detach_children(curr_task);
-	kprintf("curr_task is %p \n", curr_task);
 	detach_from_parent(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	free_pagetables();
