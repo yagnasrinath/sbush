@@ -100,7 +100,7 @@ void timer_handler()
 		printtimeatrightconer(numOfsecs );
 	}
 	//if(INITSCHEDULING) {
-
+	free_exit_process();
 	awake_sleeping_proc();
 	if(get_curr_task() == NULL) {
 
@@ -123,7 +123,6 @@ void timer_handler()
 		//kprintf("prev process is %s \n", prev->task_name);
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
-		free_exit_process();
 		next = get_next_ready_proc();
 		//kprintf("next process is %s \n", next->task_name);
 		if(prev !=next) {

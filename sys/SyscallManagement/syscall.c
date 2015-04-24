@@ -241,8 +241,8 @@ void exit(){
 	detach_children(curr_task);
 	kprintf("curr_task is %p \n", curr_task);
 	detach_from_parent(curr_task);
-	//free_process_vma_list(curr_task->virtual_addr_space->vmaList);
-	//free_pagetables();
+	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
+	free_pagetables();
 	__asm__ __volatile__("int $32;");
 }
 
