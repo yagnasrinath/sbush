@@ -9,7 +9,13 @@
 #include<sys/utils/kstring.h>
 #include<sys/ProcessManagement/process_scheduler.h>
 #include<sys/ProcessManagement/process.h>
-
+#include<sys/ProcessManagement/process_helper.h>
+#include<sys/MemoryManagement/MemoryManagementUtil.h>
+struct timespec{
+	signed int tv_sec;
+	long tv_nsec;
+};
+typedef struct timespec timespec;
 
 #define POPA \
 		__asm__ __volatile__(\
@@ -105,7 +111,7 @@ void sys_brk() {
 		curr_task->kstack[KSTACK_SIZE-10]  = -1;
 	}
 	else {
-		 curr_task->kstack[KSTACK_SIZE-10] = addr;
+		curr_task->kstack[KSTACK_SIZE-10] = addr;
 		if(addr%PAGE_SIZE != 0) {
 			addr = PAGE_ALIGN(addr) + PAGE_SIZE;
 		}
@@ -116,18 +122,115 @@ void sys_brk() {
 }
 
 
+void sleep() {
+	task_struct * curr_task = get_curr_task();
+	uint64_t* sleep_for = (uint64_t*)curr_task->kstack[KSTACK_SIZE-9];
+	uint64_t* rem_time = (uint64_t*)curr_task->kstack[KSTACK_SIZE-15];
+	timespec* timeSpec = (timespec*)sleep_for ;
+	curr_task->state = SLEEP;
+	curr_task->sleep_for = timeSpec->tv_sec * 100;
+	timeSpec = (timespec*)rem_time ;
+	timeSpec->tv_sec = 0;
+	timeSpec->tv_nsec = 0;
+	curr_task->kstack[KSTACK_SIZE-10] = 0;
+	__asm__ __volatile__("int $32;");
+}
+
+
+
+void alarm() {
+	task_struct * curr_task = get_curr_task();
+	curr_task->state = SLEEP;
+	curr_task->sleep_for = curr_task->kstack[KSTACK_SIZE-9] * 100;
+	curr_task->kstack[KSTACK_SIZE-10] = 0;
+	__asm__ __volatile__("int $32;");
+}
+
+
+void getpid() {
+	task_struct * curr_task = get_curr_task();
+	curr_task->kstack[KSTACK_SIZE-10] = curr_task->pid;
+}
+
+
+void getppid() {
+	task_struct * curr_task = get_curr_task();
+	curr_task->kstack[KSTACK_SIZE-10] = curr_task->ppid;
+}
+
+void waitpid(){
+	task_struct * curr_task = get_curr_task();
+	task_struct *child_head = curr_task->children_head;
+	int wait_for = curr_task->kstack[KSTACK_SIZE-9];
+	if(curr_task->children_head == NULL){
+		curr_task->kstack[KSTACK_SIZE-10] = -1;
+		return;
+	}
+	if(wait_for == -1){
+		while(child_head != NULL){
+			if(child_head->state == ZOMBIE){
+				curr_task->kstack[KSTACK_SIZE-10] = child_head->pid;
+				return;
+			}
+			child_head = child_head->siblings;
+		}
+		curr_task->wait_pid = -1;
+		curr_task->state = WAIT;
+		__asm__ __volatile__("int $32;");
+	}
+	else{
+
+		while(child_head != NULL){
+			if(child_head->pid == wait_for){
+				break;
+			}
+			child_head = child_head->siblings;
+		}
+		if(child_head != NULL){
+			if(child_head ->state == ZOMBIE) {
+				child_head ->state  = EXIT;
+				curr_task->kstack[KSTACK_SIZE-10] = child_head->pid;
+				return;
+			}
+			curr_task->wait_pid = wait_for;
+			curr_task->state = WAIT;
+			__asm__ __volatile__("int $32;");
+		}
+		else{
+			curr_task->kstack[KSTACK_SIZE-10] = -1;
+			return;
+		}
+	}
+
+}
+
+void exit(){
+	task_struct* curr_task = get_curr_task();
+	detach_children(curr_task);
+	detach_from_parent(curr_task);
+	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
+	free_pagetables();
+	__asm__ __volatile__("int $32;");
+}
+
 void handle_syscall() {
 	PUSHA;
 	task_struct* curr_task = get_curr_task();
 	if(curr_task->kstack[KSTACK_SIZE-10] <0 || curr_task->kstack[KSTACK_SIZE-10] >19) {
-		kprintf("Invalid interrupt number \n");
+		kprintf("Invalid syscall number %d\n",curr_task->kstack[KSTACK_SIZE-10]);
 	}
 	else {
-	 switch(curr_task->kstack[KSTACK_SIZE-10]) {
-		 case 6 : fork(); break;
-		 case 5 : sys_brk(); break;
-		 case 1 : sys_write();break;
-	 	 default : break;
+		switch(curr_task->kstack[KSTACK_SIZE-10]) {
+		case 12 : alarm();break;
+		case 11 : sleep(); break;
+		case 10 : waitpid();break;
+		case 8  : getppid(); break;
+		case 7  : getpid(); break;
+		case 6 : fork(); break;
+		case 5 : sys_brk(); break;
+		case 4 : exit();break;
+		case 1 : sys_write();break;
+		default : break;
 		}
 	}
 	POPA;

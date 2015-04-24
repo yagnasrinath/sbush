@@ -43,10 +43,6 @@ void awake_sleeping_proc() {
 
 
 void add_to_task_list(task_struct * new_proc) {
-	if(new_proc->state  == EXIT) {
-		add_free_task_struct(new_proc);
-		return;
-	}
 	if(new_proc->state  == IDLE ){
 		return;
 	}
@@ -67,6 +63,30 @@ void add_to_task_list(task_struct * new_proc) {
 	new_proc->next = NULL;
 
 }
+
+void free_exit_process() {
+	task_struct *prev = NULL;
+	task_struct *curr=task_list;
+
+	while(curr != NULL) {
+		if(curr->state == EXIT) {
+			task_struct* to_be_freed = curr;
+			if(prev == NULL) {
+				curr = curr->next;
+			}
+			else {
+				curr= curr->next;
+				prev->next = curr;
+			}
+			free_task_struct(to_be_freed);
+		}
+		else {
+			prev= prev->next;
+			curr= curr->next;
+		}
+	}
+}
+
 
 task_struct * get_next_ready_proc() {
 	task_struct * next_ready_task = task_list;
@@ -143,9 +163,35 @@ static void idle_proc2(void ) {
 static void idle_proc3(void ) {
 
 	while(1)  {
-	//	kprintf("In the idle process 3 \n");
+		//	kprintf("In the idle process 3 \n");
 	}
 }
+
+static void init_proc(){
+	//We should start shell here
+	while(1){
+		task_struct* curr_task = get_curr_task();
+		task_struct* children = curr_task->children_head;
+		while(children != NULL){
+			if(children->state == ZOMBIE){
+				children->state = EXIT;
+			}
+			children = children->siblings;
+		}
+	}
+}
+
+
+task_struct*  create_init_proc() {
+	task_struct* init_process = create_new_task(FALSE);
+	init_process->state = READY;
+	kstrcpy(init_process->task_name, "INIT PROCESS");
+	kprintf("new process kernel stack is %p",(uint64_t)&init_process->kstack[KSTACK_SIZE-1]);
+	schedule_process(init_process,(uint64_t)&init_process->kstack[KSTACK_SIZE-1],(uint64_t)init_proc );
+	return init_process;
+}
+
+
 
 void create_idle_proc2() {
 	idle_process = create_new_task(FALSE);

@@ -100,7 +100,7 @@ void timer_handler()
 	}
 	//if(INITSCHEDULING) {
 
-	//awake_sleeping_proc();
+	awake_sleeping_proc();
 	if(get_curr_task() == NULL) {
 
 		next= get_next_ready_proc();
@@ -122,6 +122,7 @@ void timer_handler()
 		//kprintf("prev process is %s \n", prev->task_name);
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
+		//free_exit_process();
 		next = get_next_ready_proc();
 		//kprintf("next process is %s \n", next->task_name);
 		if(prev !=next) {
@@ -146,7 +147,7 @@ void timer_handler()
 
 
 void timer_install() {
-	uint32_t divisor = 11931800;
+	uint32_t divisor =  1193180;
 	outportb(0x43, 0x36);
 	outportb(0x40, divisor & 0xFF);
 	outportb(0x40, divisor >> 8);

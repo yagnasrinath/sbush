@@ -82,6 +82,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		task_struct* curr_task = get_curr_task();
 		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 		if(curr_vmaList  == NULL) {
+			kprintf("Page present : Process name %s\n",curr_task->task_name);
 			panic("No vma list for the process");
 		}
 		vma_struct* curr_vma = curr_vmaList;
@@ -96,7 +97,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						panic("something wrong reference count is  less than or equal to zero");
 					}
 					if(curr_ref_count  == 1) {
-						kprintf("ref conut is 1\n");
+						//kprintf("ref conut is 1\n");
 						* pte_entry  = * pte_entry | USER_RW_FLAG;
 						set_cr3(lcr3);
 					}
@@ -122,15 +123,16 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		}
 	}
 	else {
-		kprintf("entered the else case  %p\n",fault_addr );
+		//kprintf("entered the else case  %p\n",fault_addr );
 		task_struct* curr_task = get_curr_task();
 		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 		if(curr_vmaList  == NULL) {
+			kprintf("Page not present : Process name %s\n",curr_task->task_name);
 			panic("No vma list for the process");
 		}
 		vma_struct* curr_vma = curr_vmaList;
 		fault_addr = PAGE_ALIGN(fault_addr);
-		kprintf("Fault address is %p\n",fault_addr );
+		//kprintf("Fault address is %p\n",fault_addr );
 		while(curr_vma != NULL) {
 			uint64_t curr_start = curr_vma->vm_area_start;
 			uint64_t curr_end = curr_vma->vm_area_end;
@@ -139,7 +141,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 
 			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
 				ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);
-				kprintf("Memory allocated for  %p\n",fault_addr );
+				//kprintf("Memory allocated for  %p\n",fault_addr );
 				break;
 			}
 			curr_vma = curr_vma->next;

@@ -48,19 +48,19 @@ typedef struct vm_area_structure vma_struct;
 typedef struct task_structure task_struct;
 
 struct task_structure{
-	uint64_t pid;
-	uint64_t ppid;
+	int pid;
+	int ppid;
 	uint64_t kstack[KSTACK_SIZE];
 	mem_struct* virtual_addr_space;
 	enum TASK_STATE state;
 	uint64_t rsp;
 	char task_name[TASK_NAME_LENGTH];
-	uint64_t sleep_for;
+	int sleep_for;
 	BOOL is_user_proc;
 	task_struct* parent;
 	task_struct* children_head;
 	task_struct* siblings;
-	uint64_t wait_pid;
+	int wait_pid;
 	uint64_t *fd[MAX_FD_PER_PROC];
 	uint64_t  num_of_children;
 	task_struct *next;

@@ -19,9 +19,13 @@ static task_struct *free_task_list;
 // free list of vma list
 static  vma_struct  *free_vma_list;
 
+//init task_struct
+task_struct *init_task_struct = NULL;
 
 // current pid
 uint64_t curr_pid ;
+
+
 
 void initialize_free_list() {
 	free_task_list = NULL;
@@ -86,6 +90,78 @@ void add_free_vma_struct (vma_struct* new_vma_struct) {
 	}
 	new_vma_struct->next = free_vma_list;
 	free_vma_list = new_vma_struct;
+}
+
+
+void free_process_vma_list(vma_struct* curr_list){
+	vma_struct* free_list_head = curr_list;
+	vma_struct* free_list_tail = NULL;
+	while(curr_list != NULL){
+		curr_list->vm_area_start = 0;
+		curr_list->vm_area_end = 0;
+		curr_list->vma_perm = NOPERM;
+		curr_list->vma_type = NONE;
+		//we have to free the file struct here
+		curr_list->file_descp = 0;
+		curr_list->parent_mem_struct = NULL;
+		free_list_tail = curr_list;
+		curr_list = curr_list->next;
+	}
+	free_list_tail->next = free_vma_list;
+	free_vma_list = free_list_head;
+}
+
+void detach_children(task_struct* parent_task_struct){
+	task_struct* children = parent_task_struct->children_head;
+	task_struct* children_head = children;
+	task_struct* children_tail = NULL;
+	while(children != NULL){
+		children->ppid = init_task_struct->ppid;
+		children->parent = init_task_struct;
+		children_tail = children;
+		children = children->siblings;
+	}
+	children_tail->siblings = init_task_struct->children_head;
+	init_task_struct->children_head = children_head;
+}
+
+void detach_from_parent(task_struct* child_task_struct){
+	task_struct* parent_task_struct = child_task_struct->parent;
+	if(parent_task_struct->state == WAIT ) {
+		if(parent_task_struct->wait_pid == child_task_struct->pid || parent_task_struct->wait_pid == -1){
+			parent_task_struct->state = READY;
+			child_task_struct->state = EXIT;
+		}
+		else{
+			child_task_struct->state = ZOMBIE;
+		}
+	}
+	else{
+		child_task_struct->state = ZOMBIE;
+	}
+}
+
+void free_task_struct(task_struct* to_free){
+	to_free->children_head = NULL;
+	to_free->end = NULL;
+	kmemset(to_free->fd,0,MAX_FD_PER_PROC*sizeof(uint64_t));
+	to_free->is_user_proc = FALSE;
+	kmemset(to_free->kstack,0,KSTACK_SIZE*sizeof(uint64_t));
+	to_free->next = NULL;
+	to_free->num_of_children = 0;
+	to_free->pid = -1;
+	to_free->ppid = -1;
+	to_free->rsp  = 0;
+	to_free->siblings = NULL;
+	to_free->state = EXIT;
+	kmemset(to_free->task_name,'\0',TASK_NAME_LENGTH);
+	to_free->virtual_addr_space->brk_end = 0;
+	to_free->virtual_addr_space->stack_start= 0;
+	to_free->virtual_addr_space-> brk_start = 0;
+	to_free->virtual_addr_space->vmaList = 0;
+	to_free->virtual_addr_space->pml4_t = 0;
+	to_free->wait_pid = -2;
+	add_free_task_struct(to_free);
 }
 
 
