@@ -122,7 +122,7 @@ void timer_handler()
 		//kprintf("prev process is %s \n", prev->task_name);
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
-		//free_exit_process();
+		free_exit_process();
 		next = get_next_ready_proc();
 		//kprintf("next process is %s \n", next->task_name);
 		if(prev !=next) {

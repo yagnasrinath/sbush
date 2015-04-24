@@ -217,7 +217,7 @@ void handle_syscall() {
 	PUSHA;
 	task_struct* curr_task = get_curr_task();
 	if(curr_task->kstack[KSTACK_SIZE-10] <0 || curr_task->kstack[KSTACK_SIZE-10] >19) {
-		kprintf("Invalid syscall number %d\n",curr_task->kstack[KSTACK_SIZE-10]);
+		kprintf("Invalid syscall number %p\n",curr_task->kstack[KSTACK_SIZE-10]);
 	}
 	else {
 		switch(curr_task->kstack[KSTACK_SIZE-10]) {

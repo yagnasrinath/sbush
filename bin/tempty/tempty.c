@@ -13,5 +13,5 @@ int main(int argc, char* argv[], char* envp[]) {
 	a[9047] = 1;
 	printf("Value of a is %d\n",a[9047]);
 	while(1);
-	return 0;
+	return a[9047];
 }

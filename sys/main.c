@@ -65,7 +65,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	init_task_struct = create_init_proc();
 	create_idle_proc3();
 
-	get_elf_task("bin/empty", NULL);
+	//get_elf_task("bin/empty", NULL);
 	get_elf_task("bin/tempty", NULL);
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	__asm__ __volatile__ ("sti");

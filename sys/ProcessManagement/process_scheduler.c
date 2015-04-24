@@ -81,7 +81,7 @@ void free_exit_process() {
 			free_task_struct(to_be_freed);
 		}
 		else {
-			prev= prev->next;
+			prev = curr;
 			curr= curr->next;
 		}
 	}
