@@ -61,6 +61,10 @@ static void inline load_idt(void* idt_ptr) {
 extern void x86_64_isr32();
 extern void x86_64_isr33();
 extern void isr0();
+extern void isr6();
+extern void isr8();
+extern void isr12();
+extern void isr11();
 extern void isr10();
 extern void isr13();
 extern void isr14();
@@ -107,6 +111,10 @@ void idt_install ()  {
 
 	//Load the hardware Interrupts here
 	idt_set_gate(0,(uint64_t)&isr0);
+	idt_set_gate(6,(uint64_t)&isr6);
+	idt_set_gate(8,(uint64_t)&isr8);
+	idt_set_gate(11,(uint64_t)&isr11);
+	idt_set_gate(12,(uint64_t)&isr12);
 	idt_set_gate(10,(uint64_t)&isr10);
 	idt_set_gate(13,(uint64_t)&isr13);
 	idt_set_gate(14,(uint64_t)&isr14);

@@ -44,6 +44,10 @@
 .extern handle_syscall
 
 .global isr0
+.global isr6
+.global isr8
+.global isr11
+.global isr12
 .global isr10
 .global isr13
 .global isr14
@@ -56,12 +60,34 @@ isr0:
     pushq $0
     jmp isr_common
 
-isr10:
+
+isr6:
     cli
     pushq $0
+    pushq $6
+    jmp isr_common
+    
+isr8:
+    cli
+    pushq $8
+    jmp isr_common
+       
+isr10:
+    cli
     pushq $10
     jmp isr_common
 
+
+isr11:
+	cli
+    pushq $11
+    jmp isr_common
+
+isr12:
+	cli
+    pushq $12
+    jmp isr_common
+        
 isr13:
     cli
     pushq $13
@@ -84,5 +110,4 @@ isr_common:
     callq isr_handler
     POPA
     add $0x10, %rsp
-    sti
     iretq

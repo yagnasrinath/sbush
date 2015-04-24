@@ -163,6 +163,11 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 }
 
 
+void default_handler(struct isr_nrm_regs regs) {
+	print_regiters(regs);
+	panic("");
+}
+
 void isr_handler(struct isr_nrm_regs regs)
 {
 	switch (regs.interrupt) {
@@ -179,6 +184,6 @@ void isr_handler(struct isr_nrm_regs regs)
 		page_fault_handler(regs);
 		break;
 	default:
-		break;
+		default_handler(regs);
 	}
 }
