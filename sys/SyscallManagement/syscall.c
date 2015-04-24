@@ -241,12 +241,11 @@ void exit(){
 	task_struct* curr_task = get_curr_task();
 	curr_task->state = WAIT;
 	//kprintf("process %d cleared \n",curr_task->pid);
-	detach_children(curr_task);
+	//detach_children(curr_task);
 	detach_from_parent(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	free_pagetables();
 	__asm__ __volatile__("int $32;");
-	kprintf("in the  exit of sys exit handler \n");
 }
 
 void handle_syscall() {

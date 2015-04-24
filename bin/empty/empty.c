@@ -16,10 +16,10 @@ int main(int argc, char* argv[], char* envp[]) {
 	pid = fork();
 	if(pid == 0) {
 		printf("In child process \n");
-		int *b = NULL ;
+		int *b ;
 		b = (int*)malloc(sizeof(int));
-		//*b = 3;
-		printf("In child process %p\n",	b);
+		 *b = 3;
+		printf("In child process %d\n",*b);
 		//sleep(3);
 		//printf("In child process after sleep \n");
 		//printf("In child process %d\n",getpid());
