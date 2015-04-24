@@ -16,20 +16,20 @@ int main(int argc, char* argv[], char* envp[]) {
 	pid = fork();
 	if(pid == 0) {
 		printf("In child process \n");
-		int *b ;
+		int *b = NULL ;
 		b = (int*)malloc(sizeof(int));
-		 *b = 3;
-		printf("In child process %d\n",*b);
+		//*b = 3;
+		printf("In child process %p\n",	b);
 		//sleep(3);
-		printf("In child process after sleep \n");
-		printf("In child process %d\n",getpid());
+		//printf("In child process after sleep \n");
+		//printf("In child process %d\n",getpid());
 
-		printf("In child process %d\n",getppid());
+		//printf("In child process %d\n",getppid());
 	}
 	else {
-		printf("Pid of parent process is %d \n", pid);
-		printf("In parent process %d\n",getpid());
-		printf("In parent process %d\n",getppid());
+		//printf("Pid of parent process is %d \n", pid);
+		//printf("In parent process %d\n",getpid());
+		//printf("In parent process %d\n",getppid());
 		int wait = waitpid(pid,0,0);
 		printf("The value returned by waitpid is %d\n",wait);
 

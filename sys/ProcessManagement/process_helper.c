@@ -131,7 +131,7 @@ void detach_children(task_struct* parent_task_struct){
 
 void detach_from_parent(task_struct* child_task_struct){
 	task_struct* parent_task_struct = child_task_struct->parent;
-	kprintf("address of parent task struct is %p", parent_task_struct);
+	//kprintf("address of parent task struct is %p", parent_task_struct);
 	if(parent_task_struct != NULL) {
 		if(parent_task_struct->state == WAIT ) {
 			if(parent_task_struct->wait_pid == child_task_struct->pid || parent_task_struct->wait_pid == -1){

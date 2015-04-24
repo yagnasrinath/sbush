@@ -70,10 +70,10 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
+	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
 	kprintf("page_fault_handler cr2 %p \n",lcr2);
 	kprintf("page_fault_handler rsp %p \n",lrsp);
-	//kprintf("page fault  handler errno %d \n",regs.error);
+	kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
 		panic("PAGE FAULT IN KERNEL\n");
@@ -92,7 +92,8 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
 				if(curr_vma->vma_perm == COPY_ON_WRITE) {
 					uint64_t* pte_entry = (uint64_t *)get_pt_vir_addr(fault_addr);
-					int curr_ref_count = get_phy_page_ref_count(*pte_entry);
+					int curr_ref_count = get_phy_page_ref_count((*pte_entry)/PAGE_SIZE);
+					//kprintf("page fault handler: ref count is %d\n", curr_ref_count);
 					if(curr_ref_count <= 0) {
 						panic("something wrong reference count is  less than or equal to zero");
 					}
@@ -101,8 +102,13 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						* pte_entry  = * pte_entry | USER_RW_FLAG;
 						set_cr3(lcr3);
 					}
+					else if(curr_ref_count  < 1) {
+						kprintf("page fault for page with reference count%d", curr_ref_count);
+						panic("");
+					}
 					else {
-						dec_phy_page_ref_count(* pte_entry);
+						//kprintf("entered else \n");
+						//kprintf("pte entry is %d \n",(* pte_entry)/PAGE_SIZE);
 						uint64_t new_phy_page = allocate_phy_page();
 						uint64_t curr_kern_vaddr = get_present_virtual_address();
 						map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, USER_RW_FLAG| PAGE_PRESENT);
@@ -111,6 +117,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						uint64_t *pte_entry_kern_vir_addr = (uint64_t *)get_pt_vir_addr(curr_kern_vaddr);
 						*pte_entry_kern_vir_addr = 0;
 						//ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);
+						//kprintf("came out of else \n");
 					}
 					break;
 				}
@@ -123,7 +130,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		}
 	}
 	else {
-		//kprintf("entered the else case  %p\n",fault_addr );
+		kprintf("entered the else case in page fault  %p\n",fault_addr );
 		task_struct* curr_task = get_curr_task();
 		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 		if(curr_vmaList  == NULL) {

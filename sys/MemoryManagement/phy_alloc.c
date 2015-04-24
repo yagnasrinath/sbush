@@ -9,10 +9,12 @@
 #include<sys/MemoryManagement/virtual_page_allocator.h>
 #include <sys/sbunix.h>
 #include "../../include/sys/utils/kstring.h"
+#include <sys/ProcessManagement/process.h>
 static unsigned char mem_bitmap[(NUM_PAGES/8)];
 static unsigned char ref_count[NUM_PAGES];
 int num_of_phy_blocks = 0;
 
+extern task_struct* get_curr_task();
 static void mark_page_free(uint64_t pageNum) {
 	uint64_t pos = pageNum/8;
 	uint64_t offset = pageNum%8;
@@ -28,6 +30,10 @@ static void mark_page_used(uint64_t pageNum) {
 }
 
  void dec_phy_page_ref_count(uint64_t pageNum) {
+	 kprintf("dec_phy_page_ref_count \n");
+	 if(ref_count[pageNum] == 0) {
+		 panic("something wrong ref count is already zero");
+	 }
 	ref_count[pageNum]--;
 }
 
@@ -125,13 +131,17 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 
 
 void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
+	task_struct* curr_task = get_curr_task();
+	kprintf(" task id in phy free %d \n", curr_task->pid);
 	int page_num = page_addr/PAGE_SIZE;
+	kprintf("free phy page called  address, pagenum , refcount is %p, %d, %d\n", page_addr, page_num, ref_count[page_num]);
 	if(page_num == 0)
 		return;
 	dec_phy_page_ref_count(page_num);
 
 	if(get_phy_page_ref_count(page_num) ==0) {
 		if(zeroPage) {
+
 			uint64_t vir_addr = get_temp_virtual_address(page_addr);
 			kmemset((uint64_t *)vir_addr, 0,PAGE_SIZE);
 			free_temp_virtual_address(vir_addr);

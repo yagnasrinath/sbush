@@ -75,7 +75,7 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 
 	pt_entry = (uint64_t *)get_pt_vir_addr(viraddr);
 	if(IS_PAGE_PRESENT(*pt_entry)){
-		free_phy_page(phyaddr, TRUE);
+		free_phy_page(*pt_entry, TRUE);
 	}
 	*pt_entry = phyaddr | flags;
  }

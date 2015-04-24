@@ -121,7 +121,7 @@ void sys_write(){
 void sys_brk() {
 	task_struct * curr_task = get_curr_task();
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RDI];
-	kprintf("passed addr is %p \n", addr);
+	//kprintf("passed addr is %p \n", addr);
 	uint64_t max_possile_addr = USR_STK_TOP - USR_STK_SIZE;
 	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 	vma_struct* curr_vma = curr_vmaList;
@@ -148,7 +148,7 @@ void sys_brk() {
 		curr_vma ->vm_area_end = addr;
 		//curr_task->kstack[KSTACK_SIZE-10] = curr_vma ->vm_area_end;
 	}
-	kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
+	//kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
 }
 
 
@@ -237,14 +237,16 @@ void waitpid(){
 }
 
 void exit(){
-
+	kprintf("in the sys exit handler \n");
 	task_struct* curr_task = get_curr_task();
-	kprintf("process %d cleared \n",curr_task->pid);
+	curr_task->state = WAIT;
+	//kprintf("process %d cleared \n",curr_task->pid);
 	detach_children(curr_task);
 	detach_from_parent(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	free_pagetables();
 	__asm__ __volatile__("int $32;");
+	kprintf("in the  exit of sys exit handler \n");
 }
 
 void handle_syscall() {

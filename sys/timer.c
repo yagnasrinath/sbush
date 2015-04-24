@@ -91,7 +91,7 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
-	kprintf("timer handler \n");
+	//kprintf("timer handler \n");
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
 	{
@@ -100,12 +100,12 @@ void timer_handler()
 		printtimeatrightconer(numOfsecs );
 	}
 	//if(INITSCHEDULING) {
-	free_exit_process();
+	//free_exit_process();
 	awake_sleeping_proc();
 	if(get_curr_task() == NULL) {
 
 		next= get_next_ready_proc();
-		kprintf("Process loaded is %s \n", next->task_name);
+		//kprintf("Process loaded is %s \n", next->task_name);
 
 		//_set_cr3(next->virtual_addr_space->pml4_t);
 
@@ -131,7 +131,7 @@ void timer_handler()
 			LOAD_CR3(next->virtual_addr_space->pml4_t);
 
 			__asm__ __volatile__("movq %[next_rsp], %%rsp" : : [next_rsp] "m" (next->rsp));
-			kprintf("process to load is %d \n", next->pid);
+			kprintf("process to load is %d, cr3 is %p \n", next->pid, next->virtual_addr_space->pml4_t);
 			if(next->is_user_proc) {
 				reload_tss((uint64_t)(&(next->kstack[KSTACK_SIZE-1])));
 				switch_to_ring3;

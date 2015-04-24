@@ -141,8 +141,8 @@ void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) 
 	new_task->kstack[KSTACK_SIZE-5] = entry;
 	new_task->kstack[KSTACK_SIZE-3] = 0x200282UL;
 	new_task->kstack[KSTACK_SIZE-2] = stk_top;
-	kprintf("stackTop is %p \n",new_task->kstack[KSTACK_SIZE-2] );
-	kprintf("entry point is %p \n",new_task->kstack[KSTACK_SIZE-5] );
+	//kprintf("stackTop is %p \n",new_task->kstack[KSTACK_SIZE-2] );
+	//kprintf("entry point is %p \n",new_task->kstack[KSTACK_SIZE-5] );
 	// PUSHA pushes the 15 general purpose registers here(kernel stack 6 to 20)
 	// setting the return address to the POPA of x86_64_isr32
 	new_task->kstack[KSTACK_SIZE-21] = (uint64_t)x86_64_isr32 + 0x18;
@@ -154,7 +154,7 @@ void schedule_process(task_struct * new_task, uint64_t stk_top, uint64_t entry) 
 
 
 static void idle_proc(void ) {
-	kprintf("In the idle process \n");
+	//kprintf("In the idle process \n");
 	while(1) ;
 }
 static void idle_proc2(void ) {
@@ -189,7 +189,7 @@ task_struct*  create_init_proc() {
 	task_struct* init_process = create_new_task(FALSE);
 	init_process->state = READY;
 	kstrcpy(init_process->task_name, "INIT PROCESS");
-	kprintf("new process kernel stack is %p",(uint64_t)&init_process->kstack[KSTACK_SIZE-1]);
+	//kprintf("new process kernel stack is %p",(uint64_t)&init_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(init_process,(uint64_t)&init_process->kstack[KSTACK_SIZE-1],(uint64_t)init_proc );
 	return init_process;
 }
@@ -200,7 +200,7 @@ void create_idle_proc2() {
 	idle_process = create_new_task(FALSE);
 	idle_process->state = READY;
 	kstrcpy(idle_process->task_name, "IDLE PROCESS 2");
-	kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
+	//kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc2 );
 }
 
@@ -208,7 +208,7 @@ void create_idle_proc3() {
 	idle_process = create_new_task(FALSE);
 	idle_process->state = READY;
 	kstrcpy(idle_process->task_name, "IDLE PROCESS 3");
-	kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
+	//kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc3 );
 }
 
@@ -217,6 +217,6 @@ void create_idle_proc() {
 	idle_process = create_new_task(FALSE);
 	idle_process->state = IDLE;
 	kstrcpy(idle_process->task_name, "IDLE PROCESS");
-	kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
+	//kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc );
 }

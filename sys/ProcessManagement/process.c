@@ -77,7 +77,7 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 					set_cr3(child_pml4);
 					map_vir_to_phyaddr(vma_start,child_pte_entry,child_pte_flags);
 					set_cr3(parent_pml4);
-					inc_phy_page_ref_count(*parent_pte_entry);
+					inc_phy_page_ref_count((*parent_pte_entry)/PAGE_SIZE);
 				}
 				vma_start += PAGE_SIZE;
 			}
