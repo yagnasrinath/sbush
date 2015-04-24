@@ -69,6 +69,7 @@ void free_exit_process() {
 	task_struct *curr=task_list;
 
 	while(curr != NULL) {
+
 		if(curr->state == EXIT) {
 			task_struct* to_be_freed = curr;
 			if(prev == NULL) {
@@ -78,7 +79,9 @@ void free_exit_process() {
 				curr= curr->next;
 				prev->next = curr;
 			}
+			kprintf("address of the to_be_freed is %p \n",to_be_freed);
 			free_task_struct(to_be_freed);
+
 		}
 		else {
 			prev = curr;

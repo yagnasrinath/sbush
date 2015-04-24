@@ -112,32 +112,42 @@ void free_process_vma_list(vma_struct* curr_list){
 }
 
 void detach_children(task_struct* parent_task_struct){
+
 	task_struct* children = parent_task_struct->children_head;
 	task_struct* children_head = children;
 	task_struct* children_tail = NULL;
+
 	while(children != NULL){
 		children->ppid = init_task_struct->ppid;
 		children->parent = init_task_struct;
 		children_tail = children;
 		children = children->siblings;
 	}
-	children_tail->siblings = init_task_struct->children_head;
-	init_task_struct->children_head = children_head;
+	if(children_head != NULL) {
+		children_tail->siblings = init_task_struct->children_head;
+		init_task_struct->children_head = children_head;
+	}
 }
 
 void detach_from_parent(task_struct* child_task_struct){
 	task_struct* parent_task_struct = child_task_struct->parent;
-	if(parent_task_struct->state == WAIT ) {
-		if(parent_task_struct->wait_pid == child_task_struct->pid || parent_task_struct->wait_pid == -1){
-			parent_task_struct->state = READY;
-			child_task_struct->state = EXIT;
+	kprintf("address of parent task struct is %p", parent_task_struct);
+	if(parent_task_struct != NULL) {
+		if(parent_task_struct->state == WAIT ) {
+			if(parent_task_struct->wait_pid == child_task_struct->pid || parent_task_struct->wait_pid == -1){
+				parent_task_struct->state = READY;
+				child_task_struct->state = EXIT;
+			}
+			else{
+				child_task_struct->state = ZOMBIE;
+			}
 		}
 		else{
 			child_task_struct->state = ZOMBIE;
 		}
 	}
-	else{
-		child_task_struct->state = ZOMBIE;
+	else {
+		child_task_struct->state = EXIT;
 	}
 }
 
@@ -146,7 +156,10 @@ void free_task_struct(task_struct* to_free){
 	to_free->end = NULL;
 	kmemset(to_free->fd,0,MAX_FD_PER_PROC*sizeof(uint64_t));
 	to_free->is_user_proc = FALSE;
-	kmemset(to_free->kstack,0,KSTACK_SIZE*sizeof(uint64_t));
+
+	kprintf("value of kernel stack is %p \n",(uint64_t)to_free->kstack );
+
+	kmemset(to_free->kstack, 0 , PAGE_SIZE);
 	to_free->next = NULL;
 	to_free->num_of_children = 0;
 	to_free->pid = -1;

@@ -91,6 +91,7 @@ void printtimeatrightconer(int value) {
 }
 void timer_handler()
 {
+
 	timer_ticks++;
 	if (timer_ticks % 100 == 0)
 	{

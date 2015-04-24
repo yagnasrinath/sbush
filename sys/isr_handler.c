@@ -71,8 +71,8 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
 	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
-	//kprintf("page_fault_handler cr2 %p \n",lcr2);
-	//kprintf("page_fault_handler rsp %p \n",lrsp);
+	kprintf("page_fault_handler cr2 %p \n",lcr2);
+	kprintf("page_fault_handler rsp %p \n",lrsp);
 	//kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
@@ -147,10 +147,12 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 			curr_vma = curr_vma->next;
 		}
 		if(curr_vma == NULL) {
+			print_regiters(regs);
 			// should exit process and throw segmentation fault
 			panic("Process accessed unassigned memory \n");
 		}
 	}
+
 }
 
 
