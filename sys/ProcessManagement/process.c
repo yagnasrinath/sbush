@@ -43,22 +43,22 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 			child_vma = child_vma->next;
 		}
 		if(parent_vma->vma_type == STACK){
-			uint64_t vma_start = PAGE_ALIGN(parent_vma->vm_area_end) - PAGE_SIZE;
+			uint64_t curr_pos_in_stack = PAGE_ALIGN(parent_vma->vm_area_end) - PAGE_SIZE;
 			uint64_t curr_kern_vaddr = get_present_virtual_address();
-			while(vma_start >= parent_vma->vm_area_start){
-				uint64_t* pte_entry = (uint64_t *)get_pt_vir_addr(vma_start);
+			while(curr_pos_in_stack >= parent_vma->vm_area_start){
+				uint64_t* pte_entry = (uint64_t *)get_pt_vir_addr(curr_pos_in_stack);
 				if(!((*pte_entry) & PAGE_PRESENT)){
 					break;
 				}
 				uint64_t new_phy_page = allocate_phy_page();
 				map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, USER_RW_FLAG| PAGE_PRESENT);
-				kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)vma_start, PAGE_SIZE);
+				kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)curr_pos_in_stack, PAGE_SIZE);
 				set_cr3(child_pml4);
-				map_vir_to_phyaddr(vma_start, new_phy_page, USER_RW_FLAG|PAGE_PRESENT);
+				map_vir_to_phyaddr(curr_pos_in_stack, new_phy_page, USER_RW_FLAG|PAGE_PRESENT);
 				set_cr3(parent_pml4);
 				uint64_t *pte_entry_kern_vir_addr = (uint64_t *)get_pt_vir_addr(curr_kern_vaddr);
 				*pte_entry_kern_vir_addr = 0;
-				vma_start -= PAGE_SIZE;
+				curr_pos_in_stack -= PAGE_SIZE;
 			}
 		}
 		else{

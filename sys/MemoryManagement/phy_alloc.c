@@ -10,9 +10,10 @@
 #include <sys/sbunix.h>
 #include "../../include/sys/utils/kstring.h"
 #include <sys/ProcessManagement/process.h>
-static unsigned char mem_bitmap[(NUM_PAGES/8)];
-static unsigned char ref_count[NUM_PAGES];
+unsigned char mem_bitmap[(NUM_PAGES/8)];
+ unsigned char ref_count[NUM_PAGES];
 int num_of_phy_blocks = 0;
+
 
 extern task_struct* get_curr_task();
 static void mark_page_free(uint64_t pageNum) {

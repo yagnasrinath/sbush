@@ -71,7 +71,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
 	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
-	//kprintf("page_fault_handler cr2 %p \n",lcr2);
+	kprintf("page_fault_handler cr2 %p \n",lcr2);
 	//kprintf("page_fault_handler rsp %p \n",lrsp);
 	//kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
@@ -113,7 +113,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						uint64_t curr_kern_vaddr = get_present_virtual_address();
 						map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, USER_RW_FLAG| PAGE_PRESENT);
 						kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
-						map_vir_to_phyaddr(fault_addr, new_phy_page, USER_RW_FLAG|PAGE_PRESENT);
+						map_vir_to_phyaddr(PAGE_ALIGN(fault_addr), new_phy_page, USER_RW_FLAG|PAGE_PRESENT);
 						uint64_t *pte_entry_kern_vir_addr = (uint64_t *)get_pt_vir_addr(curr_kern_vaddr);
 						*pte_entry_kern_vir_addr = 0;
 						//ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);

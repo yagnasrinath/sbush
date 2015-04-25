@@ -51,15 +51,6 @@ uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions) {
 	return (uint64_t*) start_addr;
 }
 
-void free_page(uint64_t virtual_addr) {
-	// returns  the virtual address for the pt entry
-	uint64_t pt_entry= get_pt_vir_addr(virtual_addr);
-	uint64_t phy_addr = (*((uint64_t *)pt_entry));
-	phy_addr = phy_addr & UNSET_FLAGS;
-	free_phy_page(phy_addr,TRUE);
-	(*((uint64_t *)pt_entry))= 0;
-	return;
-}
 
 void ker_mmap(uint64_t start_vir_addr, uint64_t num_bytes, uint64_t perm) {
 	uint64_t  current_vir_addr = get_present_virtual_address();
