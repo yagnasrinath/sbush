@@ -28,7 +28,7 @@ uint64_t get_present_virtual_address() {
 uint64_t get_temp_virtual_address(uint64_t phy_addr) {
 	uint64_t curr_vir_addr = get_present_virtual_address();
 	map_vir_to_phyaddr(curr_vir_addr,phy_addr, (USER_RW_FLAG|PAGE_PRESENT));
-	return current_virtual_addr;
+	return curr_vir_addr;
 }
 
 // point the temporary page to null again

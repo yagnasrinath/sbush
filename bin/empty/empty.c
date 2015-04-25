@@ -13,10 +13,10 @@
 
 int main(int argc, char* argv[], char* envp[]) {
 	//int pid = -1;
-	for(int i=0;i<2;i++){
-
-
-			fork();
+	int i=0;
+	for(i =0;i<2;i++){
+		printf("in loop %d\n",i);
+		fork();
 			//printf("pid is %d\n",pid);
 
 	}
