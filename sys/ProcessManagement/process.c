@@ -16,7 +16,9 @@
 #include<sys/MemoryManagement/phy_alloc.h>
 #include<sys/utils/kstring.h>
 
-task_struct* copy_task_struct(task_struct* parent_task_struct){
+
+ task_struct* copy_task_struct(task_struct* parent_task_struct){
+
 	if(parent_task_struct == NULL){
 		panic("process.c: Parent Struct NULL\n");
 	}

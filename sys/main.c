@@ -59,6 +59,8 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	__asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
 	initialize_proc_scheduler();
 	initialize_free_list();
+	//volatile int a=1;
+	//while(a==1);
 
 	//INITSCHEDULING = FALSE;
 	//create_idle_proc() ;

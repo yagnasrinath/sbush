@@ -14,7 +14,8 @@ unsigned char mem_bitmap[(NUM_PAGES/8)];
  unsigned char ref_count[NUM_PAGES];
 int num_of_phy_blocks = 0;
 
-
+int num_incremented=0;
+int num_decremented=0;
 extern task_struct* get_curr_task();
 static void mark_page_free(uint64_t pageNum) {
 	uint64_t pos = pageNum/8;
@@ -32,14 +33,23 @@ static void mark_page_used(uint64_t pageNum) {
 
  void dec_phy_page_ref_count(uint64_t pageNum) {
 	 //kprintf("dec_phy_page_ref_count \n");
+	 if( ref_count[pageNum] > 1) {
+			 num_decremented++;
+		 }
 	 if(ref_count[pageNum] == 0) {
+		 kprintf("NUM incremented %d: \n",num_incremented);
+		 kprintf("NUM decremented %d: \n",num_decremented);
 		 panic("something wrong ref count is already zero");
 	 }
 	ref_count[pageNum]--;
 }
 
  void inc_phy_page_ref_count(uint64_t pageNum) {
-	ref_count[pageNum]++;
+	 if( ref_count[pageNum] >= 1) {
+		 num_incremented++;
+	 }
+
+	 ref_count[pageNum]++;
 }
 
  int get_phy_page_ref_count(uint64_t pageNum) {
@@ -110,6 +120,8 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base, void* ph
 	// marking all pages used initially
 	kmemset(mem_bitmap, 0x00, NUM_PAGES/8);
 	kmemset(ref_count, 0x00, NUM_PAGES);
+	 num_incremented =0;
+	 num_decremented = 0;
 	uint64_t updated_phy_free = (uint64_t)phy_free + 1024*1024;
 
 	for (int i=0; i<smap_num; i++) {

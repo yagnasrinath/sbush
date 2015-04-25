@@ -191,6 +191,7 @@ task_struct*  create_init_proc() {
 	kstrcpy(init_process->task_name, "INIT PROCESS");
 	//kprintf("new process kernel stack is %p",(uint64_t)&init_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(init_process,(uint64_t)&init_process->kstack[KSTACK_SIZE-1],(uint64_t)init_proc );
+	//while(1);
 	return init_process;
 }
 
