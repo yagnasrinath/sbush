@@ -165,6 +165,7 @@ void detach_from_parent(task_struct* child_task_struct){
 	else {
 		panic("NO PARENT \n");
 	}
+	kprintf("detached from parent\n");
 }
 
 void free_task_struct(task_struct* to_free){

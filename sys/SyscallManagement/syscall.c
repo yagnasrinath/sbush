@@ -246,7 +246,9 @@ void exit(){
 	detach_children(curr_task);
 	detach_from_parent(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
+	kprintf("vma list freed\n");
 	free_pagetables();
+	kprintf("page tables freed\n");
 	__asm__ __volatile__("int $32;");
 }
 
