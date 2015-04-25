@@ -73,7 +73,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
 	kprintf("page_fault_handler cr2 %p \n",lcr2);
 	//kprintf("page_fault_handler rsp %p \n",lrsp);
-	//kprintf("page fault  handler errno %d \n",regs.error);
+	kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
 		panic("PAGE FAULT IN KERNEL\n");
