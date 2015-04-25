@@ -121,7 +121,7 @@ void print_children(task_struct* task) {
 	}
 	while(children != NULL) {
 		kprintf(" %d ",children->pid );
-		children = children->siblings;
+		children = children->next_sibling;
 	}
 
 
@@ -137,10 +137,10 @@ void detach_children(task_struct* parent_task_struct){
 		children->ppid = init_task_struct->pid;
 		children->parent = init_task_struct;
 		children_tail = children;
-		children = children->siblings;
+		children = children->next_sibling;
 	}
 	if(children_head != NULL) {
-		children_tail->siblings = init_task_struct->children_head;
+		children_tail->next_sibling = init_task_struct->children_head;
 		init_task_struct->children_head = children_head;
 	}
 }
@@ -182,7 +182,7 @@ void free_task_struct(task_struct* to_free){
 	to_free->pid = -1;
 	to_free->ppid = -1;
 	to_free->rsp  = 0;
-	to_free->siblings = NULL;
+	to_free->next_sibling = NULL;
 	to_free->state = READY;
 	kmemset(to_free->task_name,'\0',TASK_NAME_LENGTH);
 	to_free->virtual_addr_space->brk_end = 0;
@@ -211,7 +211,7 @@ task_struct* create_new_task(BOOL is_user_process) {
 		new_task->children_head = NULL;
 		new_task->num_of_children = 0;
 		new_task->parent = NULL;
-		new_task->siblings = NULL;
+		new_task->next_sibling = NULL;
 		kmemset(new_task->kstack, 0 , PAGE_SIZE);
 		kmemset(new_task->fd,0,MAX_FD_PER_PROC*8);
 	}

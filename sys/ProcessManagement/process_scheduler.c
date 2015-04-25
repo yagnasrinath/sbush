@@ -183,7 +183,7 @@ static void init_proc(){
 			if(children->state == ZOMBIE){
 				children->state = EXIT;
 			}
-			children = children->siblings;
+			children = children->next_sibling;
 		}
 	}
 }

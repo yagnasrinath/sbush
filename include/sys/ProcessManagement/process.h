@@ -59,7 +59,7 @@ struct task_structure{
 	BOOL is_user_proc;
 	task_struct* parent;
 	task_struct* children_head;
-	task_struct* siblings;
+	task_struct* next_sibling;
 	int wait_pid;
 	uint64_t *fd[MAX_FD_PER_PROC];
 	uint64_t  num_of_children;

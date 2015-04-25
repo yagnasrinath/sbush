@@ -203,7 +203,7 @@ void waitpid(){
 				curr_task->kstack[KSTACK_SIZE-RAX] = child_head->pid;
 				return;
 			}
-			child_head = child_head->siblings;
+			child_head = child_head->next_sibling;
 		}
 		curr_task->wait_pid = -1;
 		curr_task->state = WAIT;
@@ -215,7 +215,7 @@ void waitpid(){
 			if(child_head->pid == wait_for){
 				break;
 			}
-			child_head = child_head->siblings;
+			child_head = child_head->next_sibling;
 		}
 		if(child_head != NULL){
 			if(child_head ->state == ZOMBIE) {
