@@ -109,7 +109,7 @@ void free_pagetables(){
 							for(uint64_t l=0; l <= 511; l++){
 								uint64_t *pg_addr = (uint64_t*)(pt_vir_addr | i<<30 | j<<21 | k<<12 | l << 3);
 								if(IS_PAGE_PRESENT(*pg_addr)){
-									//free_phy_page(*pg_addr, TRUE);
+									free_phy_page(*pg_addr, FALSE);
 									*pg_addr = 0;
 								}
 
