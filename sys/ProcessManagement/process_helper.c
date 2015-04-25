@@ -44,8 +44,8 @@ void decrement_pid () {
 }
 
 BOOL is_free_task_struct_available () {
-	return FALSE;
-	//return (free_task_list != NULL);
+	//return FALSE;
+	return (free_task_list != NULL);
 }
 
 BOOL is_free_vma_struct_available () {
@@ -191,7 +191,7 @@ void free_task_struct(task_struct* to_free){
 	to_free->virtual_addr_space->vmaList = 0;
 	//to_free->virtual_addr_space->pml4_t = 0;
 	to_free->wait_pid = -2;
-	//add_free_task_struct(to_free);
+	add_free_task_struct(to_free);
 }
 
 
