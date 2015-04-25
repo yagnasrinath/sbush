@@ -188,7 +188,7 @@ void free_task_struct(task_struct* to_free){
 	to_free->virtual_addr_space->stack_start= 0;
 	to_free->virtual_addr_space-> brk_start = 0;
 	to_free->virtual_addr_space->vmaList = 0;
-	to_free->virtual_addr_space->pml4_t = 0;
+	//to_free->virtual_addr_space->pml4_t = 0;
 	to_free->wait_pid = -2;
 	//add_free_task_struct(to_free);
 }
