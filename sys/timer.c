@@ -100,7 +100,7 @@ void timer_handler()
 		printtimeatrightconer(numOfsecs );
 	}
 	//if(INITSCHEDULING) {
-	//free_exit_process();
+	free_exit_process();
 	awake_sleeping_proc();
 	if(get_curr_task() == NULL) {
 

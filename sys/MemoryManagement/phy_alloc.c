@@ -41,7 +41,8 @@ static void mark_page_used(uint64_t pageNum) {
 		 kprintf("NUM decremented %d: \n",num_decremented);
 		 panic("something wrong ref count is already zero");
 	 }
-	ref_count[pageNum]--;
+	ref_count[pageNum] = ref_count[pageNum]-1;
+	return;
 }
 
  void inc_phy_page_ref_count(uint64_t pageNum) {
@@ -49,7 +50,8 @@ static void mark_page_used(uint64_t pageNum) {
 		 num_incremented++;
 	 }
 
-	 ref_count[pageNum]++;
+	 ref_count[pageNum] = ref_count[pageNum]+1;
+	 return;
 }
 
  int get_phy_page_ref_count(uint64_t pageNum) {
