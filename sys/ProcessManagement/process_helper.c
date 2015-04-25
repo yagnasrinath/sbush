@@ -76,7 +76,7 @@ vma_struct *get_free_vma_struct() {
 
 void add_free_task_struct (task_struct * new_task_struct) {
 	if(new_task_struct == NULL) {
-		kprintf("FATAL: NULL task structure \n");
+		panic("FATAL: NULL task structure \n");
 	}
 	new_task_struct->next = free_task_list;
 	free_task_list = new_task_struct;
@@ -111,14 +111,29 @@ void free_process_vma_list(vma_struct* curr_list){
 	free_vma_list = free_list_head;
 }
 
+void print_children(task_struct* task) {
+	task_struct* children = task->children_head;
+	kprintf("children are ");
+	if(children == NULL) {
+		kprintf("empty \n");
+		return;
+	}
+	while(children != NULL) {
+		kprintf(" %d ",children->pid );
+		children = children->siblings;
+	}
+
+
+}
+
 void detach_children(task_struct* parent_task_struct){
 
 	task_struct* children = parent_task_struct->children_head;
 	task_struct* children_head = children;
 	task_struct* children_tail = NULL;
-
+	print_children(parent_task_struct);
 	while(children != NULL){
-		children->ppid = init_task_struct->ppid;
+		children->ppid = init_task_struct->pid;
 		children->parent = init_task_struct;
 		children_tail = children;
 		children = children->siblings;
@@ -147,7 +162,7 @@ void detach_from_parent(task_struct* child_task_struct){
 		}
 	}
 	else {
-		child_task_struct->state = EXIT;
+		panic("NO PARENT \n");
 	}
 }
 
@@ -166,7 +181,7 @@ void free_task_struct(task_struct* to_free){
 	to_free->ppid = -1;
 	to_free->rsp  = 0;
 	to_free->siblings = NULL;
-	to_free->state = EXIT;
+	to_free->state = READY;
 	kmemset(to_free->task_name,'\0',TASK_NAME_LENGTH);
 	to_free->virtual_addr_space->brk_end = 0;
 	to_free->virtual_addr_space->stack_start= 0;
@@ -200,6 +215,9 @@ task_struct* create_new_task(BOOL is_user_process) {
 	}
 	else {
 		new_task = get_free_task_struct();
+		if(new_task == NULL) {
+			panic("free task struct already allocated is NULL \n");
+		}
 	}
 	new_task->is_user_proc = is_user_process;
 	new_task->pid = ++curr_pid;
@@ -215,6 +233,10 @@ vma_struct* create_new_vma(uint64_t file_desc, uint64_t vma_start, uint64_t vma_
 	}
 	else {
 		new_vma = get_free_vma_struct();
+
+	}
+	if(new_vma == NULL) {
+		panic("new VMA is NULL \n");
 	}
 	new_vma->file_descp = file_desc;
 	new_vma->next = NULL;

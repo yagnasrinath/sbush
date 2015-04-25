@@ -239,7 +239,9 @@ void waitpid(){
 void exit(){
 	task_struct* curr_task = get_curr_task();
 	kprintf("in the sys exit handler %d\n",curr_task->pid);
-	curr_task->state = WAIT;
+	/*if(curr_task->pid == 2) {
+		//panic("");
+	}*/
 	//kprintf("process %d cleared \n",curr_task->pid);
 	detach_children(curr_task);
 	detach_from_parent(curr_task);

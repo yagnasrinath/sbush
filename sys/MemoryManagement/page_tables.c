@@ -65,7 +65,7 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     // saves the kernel cr3
     set_kernel_cr3(pml4);
     _set_cr3(pml4);
-    set_present_virtual_address(kernmem + index*PAGE_SIZE);
+    set_present_virtual_address(kernmem + index*PAGE_SIZE +PAGE_SIZE);
     //saves the kernel mapping to save it to the process
     set_kernel_pml4_entry(pdp | USER_RW_FLAG|PAGE_PRESENT);
     initKmalloc();

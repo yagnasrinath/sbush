@@ -100,7 +100,7 @@ void timer_handler()
 		printtimeatrightconer(numOfsecs );
 	}
 	//if(INITSCHEDULING) {
-	free_exit_process();
+	//free_exit_process();
 	awake_sleeping_proc();
 	if(get_curr_task() == NULL) {
 
@@ -124,7 +124,7 @@ void timer_handler()
 		prev ->rsp = cur_rsp;
 		add_to_task_list(prev);
 		next = get_next_ready_proc();
-		//kprintf("next process is %s \n", next->task_name);
+		kprintf("next process is %d \n", next->pid);
 		if(prev !=next) {
 			//_set_cr3(next->virtual_addr_space->pml4_t);
 

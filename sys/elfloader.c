@@ -198,5 +198,5 @@ task_struct * get_elf_task(char *filename, char *argv[]) {
 		panic("elfoader.c : get_elf_task : create_new_task returned NULL. Probably out of resources");
 	}
 	load_elf(new_task, filename,elf_header, argv);
-	return NULL;
+	return new_task;
 }

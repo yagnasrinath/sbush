@@ -13,15 +13,16 @@
 
 int main(int argc, char* argv[], char* envp[]) {
 	int pid = -1;
-	for(int i=0;i<2;i++){
+	for(int i=0;i<15;i++){
 
 
 			pid = fork();
 			printf("pid is %d\n",pid);
 
 	}
-		//fork();
-		//while(1);
+
+
+	//while(1);
 	//}
 
 //	if(pid == 0) {
