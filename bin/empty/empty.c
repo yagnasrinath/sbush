@@ -14,7 +14,7 @@
 int main(int argc, char* argv[], char* envp[]) {
 	//int pid = -1;
 	int i=0;
-	for(i =0;i<2;i++){
+	for(i =0;i<15;i++){
 		printf("in loop %d\n",i);
 		fork();
 			//printf("pid is %d\n",pid);
