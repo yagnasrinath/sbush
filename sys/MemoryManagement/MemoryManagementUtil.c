@@ -99,18 +99,22 @@ void free_pagetables(){
 	uint64_t pdp_vir_addr = 0xFFFFFF7FBFC00000UL;
 	uint64_t pd_vir_addr = 0xFFFFFF7F80000000UL;
 	uint64_t pt_vir_addr = 0xFFFFFF0000000000UL;
+	uint64_t *pt_addr = NULL;
+	uint64_t *pd_addr = NULL;
+	uint64_t *pg_addr = NULL;
+	uint64_t *pdp_addr  = NULL;
 	//uint64_t norm_addr = 0xFFFF000000000000UL;
 	for(uint64_t i=0;i<=509;i++){
-		uint64_t *pdp_addr = (uint64_t*)(pml4e_vir_addr | (i << 3));
+		pdp_addr = (uint64_t*)(pml4e_vir_addr | (i << 3));
 		if(IS_PAGE_PRESENT(*pdp_addr)){
 			for(uint64_t j=0; j <= 511; j++){
-				uint64_t *pd_addr = (uint64_t*)(pdp_vir_addr | (i<<12) | (j << 3));
+				pd_addr = (uint64_t*)(pdp_vir_addr | (i<<12) | (j << 3));
 				if(IS_PAGE_PRESENT(*pd_addr)){
 					for(uint64_t k=0; k <= 511; k++){
-						uint64_t *pt_addr = (uint64_t*)(pd_vir_addr | (i<<21) | (j<<12) | (k << 3));
+						pt_addr = (uint64_t*)(pd_vir_addr | (i<<21) | (j<<12) | (k << 3));
 						if(IS_PAGE_PRESENT(*pt_addr)){
 							for(uint64_t l=0; l <= 511; l++){
-								uint64_t *pg_addr = (uint64_t*)(pt_vir_addr | (i<<30) | (j<<21) | (k<<12) | (l << 3));
+								pg_addr = (uint64_t*)(pt_vir_addr | (i<<30) | (j<<21) | (k<<12) | (l << 3));
 								if(IS_PAGE_PRESENT(*pg_addr)){
 									//uint64_t* curr_vir_addr = (uint64_t*)(norm_addr | (i<<39) | (j<<30) | (k<<21) | (l << 12));
 									//	kmemset(curr_vir_addr,'\0', PAGE_SIZE);
