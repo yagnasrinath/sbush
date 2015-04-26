@@ -55,7 +55,7 @@ uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions) {
 void ker_mmap(uint64_t start_vir_addr, uint64_t num_bytes, uint64_t perm) {
 	uint64_t  current_vir_addr = get_present_virtual_address();
 	set_present_virtual_address(PAGE_ALIGN(start_vir_addr));
-	uint64_t temp = start_vir_addr + num_bytes;
+	uint64_t temp = start_vir_addr + num_bytes-1;
 	uint64_t num_of_pages = ((PAGE_ALIGN(temp) -(PAGE_ALIGN(start_vir_addr)))/PAGE_SIZE)+1;
 	//uint64_t  end_virtual_address = start_vir_addr + num_bytes -1;
 	//uint64_t num_of_pages = ((end_virtual_address - start_vir_addr)>>12) + 1;
