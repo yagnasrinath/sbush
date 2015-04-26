@@ -95,6 +95,7 @@ uint64_t get_new_pml4_t() {
 }
 
 void free_pagetables(){
+	kprintf("page tables freed\n");
 	uint64_t pml4e_vir_addr = 0xFFFFFF7FBFDFE000UL;
 	uint64_t pdp_vir_addr = 0xFFFFFF7FBFC00000UL;
 	uint64_t pd_vir_addr = 0xFFFFFF7F80000000UL;
@@ -103,17 +104,21 @@ void free_pagetables(){
 	uint64_t *pd_addr = NULL;
 	uint64_t *pg_addr = NULL;
 	uint64_t *pdp_addr  = NULL;
+	uint64_t i=0;
+	uint64_t j=0;
+	uint64_t k=0;
+	uint64_t l=0;
 	//uint64_t norm_addr = 0xFFFF000000000000UL;
-	for(uint64_t i=0;i<=509;i++){
+	for(i=0;i<=509;i++){
 		pdp_addr = (uint64_t*)(pml4e_vir_addr | (i << 3));
 		if(IS_PAGE_PRESENT(*pdp_addr)){
-			for(uint64_t j=0; j <= 511; j++){
+			for( j=0; j <= 511; j++){
 				pd_addr = (uint64_t*)(pdp_vir_addr | (i<<12) | (j << 3));
 				if(IS_PAGE_PRESENT(*pd_addr)){
-					for(uint64_t k=0; k <= 511; k++){
+					for(k=0; k <= 511; k++){
 						pt_addr = (uint64_t*)(pd_vir_addr | (i<<21) | (j<<12) | (k << 3));
 						if(IS_PAGE_PRESENT(*pt_addr)){
-							for(uint64_t l=0; l <= 511; l++){
+							for(l=0; l <= 511; l++){
 								pg_addr = (uint64_t*)(pt_vir_addr | (i<<30) | (j<<21) | (k<<12) | (l << 3));
 								if(IS_PAGE_PRESENT(*pg_addr)){
 									//uint64_t* curr_vir_addr = (uint64_t*)(norm_addr | (i<<39) | (j<<30) | (k<<21) | (l << 12));
@@ -143,7 +148,7 @@ void free_pagetables(){
 	//kprintf("\nkerncr3 is %p \n", kernel_cr3);
 	set_cr3(kernel_cr3);
 	//Cleaning Process
-	kprintf("page tables freed\n");
+
 }
 
 
