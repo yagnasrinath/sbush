@@ -13,7 +13,7 @@
 
 int main(int argc, char* argv[], char* envp[]) {
 	//int pid = -1;
-	int i=0;
+	int i=fork();
 	printf("in process loop %d\n",i);
 
 
