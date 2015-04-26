@@ -119,26 +119,31 @@ void free_pagetables(){
 									//uint64_t* curr_vir_addr = (uint64_t*)(norm_addr | (i<<39) | (j<<30) | (k<<21) | (l << 12));
 									//	kmemset(curr_vir_addr,'\0', PAGE_SIZE);
 									free_phy_page(*pg_addr, FALSE);
+									invlpg(pg_addr);
 									*pg_addr = 0;
 								}
 
 							}
 
 							free_phy_page(*pt_addr, TRUE);
+							invlpg(pt_addr);
 							*pt_addr = 0;
 						}
 					}
 					free_phy_page(*pd_addr, TRUE);
+					invlpg(pd_addr);
 					*pd_addr = 0;
 				}
 			}
 			free_phy_page(*pdp_addr, TRUE);
+			invlpg(pdp_addr);
 			*pdp_addr = 0;
 		}
 	}
 	//kprintf("\nkerncr3 is %p \n", kernel_cr3);
 	set_cr3(kernel_cr3);
 	//Cleaning Process
+	kprintf("page tables freed\n");
 }
 
 

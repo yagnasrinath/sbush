@@ -24,6 +24,13 @@ static inline unsigned char inportb (unsigned short _port) {
 	return rv;
 }
 
+
+static inline void invlpg(void* m)
+{
+    /* Clobber memory to avoid optimizer re-ordering access before invlpg, which may cause nasty bugs. */
+    __asm__ __volatile__ ( "invlpg (%0)" : : "b"(m) : "memory" );
+}
+
 static inline void outportb (unsigned short _port, unsigned char _data)
 {
 	__asm__ __volatile__ ("outb %1, %0" : : "dN" (_port), "a" (_data));

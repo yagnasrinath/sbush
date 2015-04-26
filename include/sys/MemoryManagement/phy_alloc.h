@@ -31,6 +31,6 @@ static inline uint64_t mm_phy_to_page(uint64_t phy) {
 }
 void inc_phy_page_ref_count(uint64_t pageNum);
 void dec_phy_page_ref_count(uint64_t pageNum);
-int get_phy_page_ref_count(uint64_t pageNum);
+uint64_t get_phy_page_ref_count(uint64_t pageNum);
 
 #endif /* SBUSH_SYS_MEMOYMANAGEMENT_PHY_ALLOC_H_ */

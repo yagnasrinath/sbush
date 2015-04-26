@@ -248,7 +248,6 @@ void exit(){
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
 	free_pagetables();
-	kprintf("page tables freed\n");
 	__asm__ __volatile__("int $32;");
 }
 
