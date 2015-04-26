@@ -14,13 +14,8 @@
 int main(int argc, char* argv[], char* envp[]) {
 	//int pid = -1;
 	int i=0;
-	for(i =0;i<13;i++){
+	printf("in process loop %d\n",i);
 
-		int pid = fork();
-		printf("in loop %d\n",pid);
-			//printf("pid is %d\n",pid);
-
-	}
 
 
 	//while(1);
