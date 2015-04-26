@@ -80,7 +80,7 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 		free_phy_page(*pt_entry, TRUE);
 	}
 	*pt_entry = phyaddr | flags;
- }
+}
 
 uint64_t get_new_pml4_t() {
 	uint64_t phy_page = allocate_phy_page();
@@ -116,9 +116,7 @@ void free_pagetables(){
 				pd_addr = (uint64_t*)(pdp_vir_addr | (i<<12) | (j << 3));
 				if(IS_PAGE_PRESENT(*pd_addr)){
 					for(k=0; k <= 511; k++){
-						if(i==30 && j==0) {
-							kprintf("for breakpoint");
-						}
+						kprintf("for breakpoint %d %d %d", i,j,k);
 						pt_addr = (uint64_t*)(pd_vir_addr | (i<<21) | (j<<12) | (k << 3));
 						if(IS_PAGE_PRESENT(*pt_addr)){
 							for(l=0; l <= 511; l++){
