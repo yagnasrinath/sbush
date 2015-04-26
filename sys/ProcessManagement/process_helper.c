@@ -143,6 +143,7 @@ void detach_children(task_struct* parent_task_struct){
 		children_tail->next_sibling = init_task_struct->children_head;
 		init_task_struct->children_head = children_head;
 	}
+	parent_task_struct->children_head = NULL;
 }
 
 void detach_from_parent(task_struct* child_task_struct){

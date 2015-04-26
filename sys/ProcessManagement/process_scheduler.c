@@ -53,6 +53,7 @@ void add_to_task_list(task_struct * new_proc) {
 	task_struct *curr_ready_tasks  = task_list;
 	if(curr_ready_tasks == NULL) {
 		task_list = new_proc;
+		new_proc->next = NULL;
 		return;
 	}
 	while(curr_ready_tasks->next != NULL) {
@@ -176,7 +177,7 @@ static void idle_proc3(void ) {
 static void init_proc(){
 	//We should start shell here
 	while(1){
-		kprintf("##########################################################################");
+	//	kprintf("##########################################################################");
 		task_struct* curr_task = get_curr_task();
 		task_struct* children = curr_task->children_head;
 		while(children != NULL){

@@ -73,7 +73,10 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	empty_task->parent = init_task_struct;
 	empty_task->ppid = init_task_struct->pid;
 	init_task_struct->children_head = empty_task;
-	//get_elf_task("bin/tempty", NULL);
+	 empty_task = get_elf_task("bin/tempty", NULL);
+	 empty_task->parent = init_task_struct;
+	 	empty_task->ppid = init_task_struct->pid;
+	 	init_task_struct->children_head = empty_task;
 	//printf("Available Physical Memory [%d-%d]\n", smap->base, smap->length);
 	__asm__ __volatile__ ("sti");
 	//INITSCHEDULING = TRUE;

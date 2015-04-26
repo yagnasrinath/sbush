@@ -11,7 +11,7 @@
 #include "../../include/sys/utils/kstring.h"
 #include <sys/ProcessManagement/process.h>
 unsigned char mem_bitmap[(NUM_PAGES/8)];
- unsigned char ref_count[NUM_PAGES];
+ unsigned short  ref_count[NUM_PAGES];
 int num_of_phy_blocks = 0;
 
 int num_incremented=0;

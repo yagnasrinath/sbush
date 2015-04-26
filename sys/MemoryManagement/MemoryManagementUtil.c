@@ -1,6 +1,7 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/system.h>
 #include<sys/sbunix.h>
+#include<sys/utils/kstring.h>
 static uint64_t kernel_cr3;
 static uint64_t kernel_pml4;
 
@@ -75,6 +76,7 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 
 	pt_entry = (uint64_t *)get_pt_vir_addr(viraddr);
 	if(IS_PAGE_PRESENT(*pt_entry)){
+		panic("page mapped where it should not be");
 		free_phy_page(*pt_entry, TRUE);
 	}
 	*pt_entry = phyaddr | flags;
@@ -97,23 +99,27 @@ void free_pagetables(){
 	uint64_t pdp_vir_addr = 0xFFFFFF7FBFC00000UL;
 	uint64_t pd_vir_addr = 0xFFFFFF7F80000000UL;
 	uint64_t pt_vir_addr = 0xFFFFFF0000000000UL;
+	//uint64_t norm_addr = 0xFFFF000000000000UL;
 	for(uint64_t i=0;i<=509;i++){
-		uint64_t *pdp_addr = (uint64_t*)(pml4e_vir_addr | i << 3);
+		uint64_t *pdp_addr = (uint64_t*)(pml4e_vir_addr | (i << 3));
 		if(IS_PAGE_PRESENT(*pdp_addr)){
 			for(uint64_t j=0; j <= 511; j++){
-				uint64_t *pd_addr = (uint64_t*)(pdp_vir_addr | i<<12 | j << 3);
+				uint64_t *pd_addr = (uint64_t*)(pdp_vir_addr | (i<<12) | (j << 3));
 				if(IS_PAGE_PRESENT(*pd_addr)){
 					for(uint64_t k=0; k <= 511; k++){
-						uint64_t *pt_addr = (uint64_t*)(pd_vir_addr | i<<21 | j<<12 | k << 3);
+						uint64_t *pt_addr = (uint64_t*)(pd_vir_addr | (i<<21) | (j<<12) | (k << 3));
 						if(IS_PAGE_PRESENT(*pt_addr)){
 							for(uint64_t l=0; l <= 511; l++){
-								uint64_t *pg_addr = (uint64_t*)(pt_vir_addr | i<<30 | j<<21 | k<<12 | l << 3);
+								uint64_t *pg_addr = (uint64_t*)(pt_vir_addr | (i<<30) | (j<<21) | (k<<12) | (l << 3));
 								if(IS_PAGE_PRESENT(*pg_addr)){
-									free_phy_page(*pg_addr, TRUE);
+									//uint64_t* curr_vir_addr = (uint64_t*)(norm_addr | (i<<39) | (j<<30) | (k<<21) | (l << 12));
+									//	kmemset(curr_vir_addr,'\0', PAGE_SIZE);
+									free_phy_page(*pg_addr, FALSE);
 									*pg_addr = 0;
 								}
 
 							}
+
 							free_phy_page(*pt_addr, TRUE);
 							*pt_addr = 0;
 						}

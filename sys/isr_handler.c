@@ -76,7 +76,9 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	kprintf("page fault  handler errno %d \n",regs.error);
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
+		print_regiters(regs);
 		panic("PAGE FAULT IN KERNEL\n");
+
 	}
 	if(regs.error & 0x1) { // PAGE PRESENT
 		task_struct* curr_task = get_curr_task();
