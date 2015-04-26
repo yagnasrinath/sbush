@@ -116,7 +116,7 @@ void free_pagetables(){
 				pd_addr = (uint64_t*)(pdp_vir_addr | (i<<12) | (j << 3));
 				if(IS_PAGE_PRESENT(*pd_addr)){
 					for(k=0; k <= 511; k++){
-						if(i==30 && j==100) {
+						if(i==30 && j==50) {
 							kprintf("for breakpoint");
 						}
 						pt_addr = (uint64_t*)(pd_vir_addr | (i<<21) | (j<<12) | (k << 3));
