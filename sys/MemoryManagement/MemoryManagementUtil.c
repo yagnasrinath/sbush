@@ -112,6 +112,7 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 		//panic("page mapped where it should not be ");
 		free_phy_page(*pt_entry, TRUE);
 	}
+	kprintf("flags are %d\n", flags);
 	*pt_entry = phyaddr | flags;
 }
 
