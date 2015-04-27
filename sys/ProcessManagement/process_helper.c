@@ -229,6 +229,7 @@ task_struct* create_new_task(BOOL is_user_process) {
 	new_task->state = READY;
 	new_task->pid =curr_pid;
 	new_task->ppid =0;
+	__asm__ __volatile__("");
 	new_task->pid =curr_pid;
 	if(new_task->pid  == 0) {
 		panic("new task pid is 0");
