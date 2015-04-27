@@ -100,8 +100,8 @@ void fork()  {
 	task_struct * curr_task = get_curr_task();
 	task_struct * child_task = copy_task_struct(curr_task);
 	kmemset(child_task->kstack, 0 , PAGE_SIZE);
-	kprintf("pml4t of child is %p \n",child_task->virtual_addr_space->pml4_t );
-	kprintf("pml4t of parent is %p \n",curr_task->virtual_addr_space->pml4_t );
+	//kprintf("pml4t of child is %p \n",child_task->virtual_addr_space->pml4_t );
+	//kprintf("pml4t of parent is %p \n",curr_task->virtual_addr_space->pml4_t );
 	schedule_process(child_task, curr_task->kstack[KSTACK_SIZE-STK_TOP], curr_task->kstack[KSTACK_SIZE-ENTRY]);
 	curr_task->kstack[KSTACK_SIZE-RAX] = child_task->pid;
 }
