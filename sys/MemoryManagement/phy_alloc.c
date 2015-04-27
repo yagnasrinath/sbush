@@ -23,7 +23,8 @@ void print_present_pages() {
 	kprintf("\n####\n");
 	for(int i=0; i < NUM_PAGES; i ++) {
 		if(ref_count[i] > 0) {
-			kprintf("%d, %d",i,ref_count[i]);
+			kprintf("(%d",i);
+			kprintf(" %d),",ref_count[i]);
 		}
 
 	}
