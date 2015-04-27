@@ -22,6 +22,7 @@ static  vma_struct  *free_vma_list;
 //init task_struct
 task_struct *init_task_struct = NULL;
 
+task_struct* new_task = NULL;
 // current pid
 int curr_pid ;
 
@@ -199,7 +200,7 @@ void free_task_struct(task_struct* to_free){
 
 
 task_struct* create_new_task(BOOL is_user_process) {
-	task_struct* new_task = NULL;
+
 	if(!is_free_task_struct_available()) {
 		new_task = (task_struct*)kmalloc(sizeof(task_struct));
 		mem_struct* mm_struct = (mem_struct*)kmalloc(sizeof(mem_struct));
