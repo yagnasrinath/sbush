@@ -12,9 +12,9 @@
 
 
 int main(int argc, char* argv[], char* envp[]) {
-	//int pid = -1;
-	int i=fork();
-	printf("in process loop %d\n",i);
+	for(int i=0; i < 2; i++ ) {
+		int pid=fork();
+	}
 
 
 
