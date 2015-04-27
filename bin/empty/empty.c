@@ -12,7 +12,7 @@
 
 
 int main(int argc, char* argv[], char* envp[]) {
-	for(int i=0; i < 1; i++ ) {
+	for(int i=0; i < 3; i++ ) {
 		char* a = (char *)malloc(423);
 		strncpy(a,"hi",2);
 		fork();

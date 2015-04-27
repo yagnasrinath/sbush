@@ -138,7 +138,7 @@ void sys_brk() {
 		panic("SYs_break : NO HEAP VMA");
 	}
 	if(addr ==0) {
-		curr_task->kstack[KSTACK_SIZE-RAX] = curr_vma->vm_area_end;
+		curr_task->kstack[KSTACK_SIZE-RAX] = curr_vma->vm_area_end-1;
 	}
 	else if ( addr >= max_possile_addr) {
 		panic("addr  is greater that max possible addr");
@@ -149,7 +149,7 @@ void sys_brk() {
 		if(addr%PAGE_SIZE != 0) {
 			addr = PAGE_ALIGN(addr) + PAGE_SIZE;
 		}
-		curr_vma ->vm_area_end = addr;
+		curr_vma ->vm_area_end = addr+1;
 		//curr_task->kstack[KSTACK_SIZE-10] = curr_vma ->vm_area_end;
 	}
 	//kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
@@ -275,7 +275,7 @@ void exit(){
 	print_mem_map(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
-	//free_pagetables();
+	free_pagetables();
 	//print_present_pages();
 
 	__asm__ __volatile__("int $32;");

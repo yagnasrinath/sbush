@@ -69,7 +69,7 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 			if(vma_end%PAGE_SIZE) {
 				vma_end = PAGE_ALIGN(vma_end) + PAGE_SIZE;
 			}
-			while(vma_start <= vma_end){
+			while(vma_start < vma_end){
 				uint64_t* parent_pte_entry = (uint64_t*)get_pt_vir_addr(vma_start);
 				if(is_page_present_for_virtual_addr(vma_start)){
 					if((*parent_pte_entry) & RW_FLAG){

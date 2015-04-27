@@ -70,10 +70,10 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	kprintf("\n page_fault_handler cr3 %p \n",lcr3);
-	kprintf("page_fault_handler cr2 %p \n",lcr2);
+	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
+	//kprintf("page_fault_handler cr2 %p \n",lcr2);
 	//kprintf("page_fault_handler rsp %p \n",lrsp);
-	kprintf("page fault  handler errno %d \n",regs.error);
+	//kprintf("page fault  handler errno %d \n",regs.error);
 	task_struct* curr_task = get_curr_task();
 	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 	uint64_t fault_addr = lcr2;
@@ -90,13 +90,9 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		}
 		vma_struct* curr_vma = curr_vmaList;
 		while(curr_vma != NULL) {
-			kprintf("vma_start %p \n", curr_vma->vm_area_start);
-			kprintf("vma_end %p\n", curr_vma->vm_area_end);
-			kprintf("vma_type %d\n", curr_vma->vma_type);
-			kprintf("vma_perm %d\n", curr_vma->vma_perm);
 			uint64_t curr_start = curr_vma->vm_area_start;
 			uint64_t curr_end = curr_vma->vm_area_end;
-			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
+			if((fault_addr  >= curr_start) && (fault_addr < curr_end)) {
 				if(curr_vma->vma_perm == COPY_ON_WRITE) {
 					uint64_t* pte_entry = (uint64_t *)get_pt_vir_addr(fault_addr);
 					int curr_ref_count = get_phy_page_ref_count((*pte_entry)/PAGE_SIZE);
@@ -149,10 +145,6 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		fault_addr = PAGE_ALIGN(fault_addr);
 		//kprintf("Fault address is %p\n",fault_addr );
 		while(curr_vma != NULL) {
-			kprintf("vma_start %p \n", curr_vma->vm_area_start);
-			kprintf("vma_end %p\n", curr_vma->vm_area_end);
-			kprintf("vma_type %d\n", curr_vma->vma_type);
-			kprintf("vma_perm %d\n", curr_vma->vma_perm);
 			uint64_t curr_start = curr_vma->vm_area_start;
 			uint64_t curr_end = curr_vma->vm_area_end;
 			//kprintf("VMA start %p\n",curr_start );
