@@ -17,6 +17,16 @@ int num_of_phy_blocks = 0;
 int num_incremented=0;
 int num_decremented=0;
 extern task_struct* get_curr_task();
+
+
+void print_bitmap() {
+	kprintf("\n###########\n");
+	for(int i=0; i <20;  i++) {
+		kprintf("%d", mem_bitmap[i]);
+	}
+	kprintf("\n###########\n");
+}
+
 static void mark_page_free(uint64_t pageNum) {
 	uint64_t pos = pageNum/8;
 	uint64_t offset = pageNum%8;

@@ -11,6 +11,9 @@
 #include<sys/ProcessManagement/process.h>
 #include<sys/ProcessManagement/process_helper.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
+
+void print_bitmap() ;
+
 struct timespec{
 	signed int tv_sec;
 	long tv_nsec;
@@ -237,6 +240,8 @@ void waitpid(){
 }
 
 void exit(){
+
+
 	task_struct* curr_task = get_curr_task();
 	kprintf("in the sys exit handler %d\n",curr_task->pid);
 	/*if(curr_task->pid == 2) {
@@ -248,6 +253,7 @@ void exit(){
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
 	free_pagetables();
+	print_bitmap();
 	__asm__ __volatile__("int $32;");
 }
 

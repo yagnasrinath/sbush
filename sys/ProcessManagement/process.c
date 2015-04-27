@@ -15,7 +15,7 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/MemoryManagement/phy_alloc.h>
 #include<sys/utils/kstring.h>
-
+extern void print_bitmap() ;
 
  task_struct* copy_task_struct(task_struct* parent_task_struct){
 
@@ -102,5 +102,6 @@
 		child_task_struct->next_sibling = parent_task_struct->children_head;
 		parent_task_struct->children_head = child_task_struct;
 	}
+	 print_bitmap() ;
 	return child_task_struct;
 }
