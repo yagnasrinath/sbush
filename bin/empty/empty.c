@@ -13,7 +13,7 @@
 
 int main(int argc, char* argv[], char* envp[]) {
 	for(int i=0; i < 2; i++ ) {
-		int pid=fork();
+		fork();
 	}
 
 
