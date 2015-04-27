@@ -23,7 +23,7 @@ static  vma_struct  *free_vma_list;
 task_struct *init_task_struct = NULL;
 
 // current pid
-uint64_t curr_pid ;
+int curr_pid ;
 
 
 
@@ -180,8 +180,8 @@ void free_task_struct(task_struct* to_free){
 	kmemset(to_free->kstack, 0 , PAGE_SIZE);
 	to_free->next = NULL;
 	to_free->num_of_children = 0;
-	to_free->pid = -1;
-	to_free->ppid = -1;
+	to_free->pid = 0;
+	to_free->ppid = 0;
 	to_free->rsp  = 0;
 	to_free->next_sibling = NULL;
 	to_free->state = READY;
@@ -191,7 +191,7 @@ void free_task_struct(task_struct* to_free){
 	to_free->virtual_addr_space-> brk_start = 0;
 	to_free->virtual_addr_space->vmaList = 0;
 	//to_free->virtual_addr_space->pml4_t = 0;
-	to_free->wait_pid = -2;
+	to_free->wait_pid = 0;
 	add_free_task_struct(to_free);
 }
 
@@ -224,6 +224,9 @@ task_struct* create_new_task(BOOL is_user_process) {
 	}
 	new_task->is_user_proc = is_user_process;
 	new_task->pid = ++curr_pid;
+	if(new_task->pid  == 0) {
+		panic("new task pid is 0");
+	}
 	new_task->state = READY;
 	new_task->ppid =0;
 	return new_task;

@@ -26,7 +26,7 @@ typedef unsigned char uint8_t;
 #define PAGE_PRESENT 1UL   // 1
 #define RW_FLAG 2UL //2
 #define UNSET_FLAGS   0x0000FFFFFFFFF000UL
-#define FLAGS         0xFFFF000000000FFFUL
+#define FLAGS         0x0000000000000FFFUL
 #define USR_STK_TOP  0xF0000000000UL
 #define MAX_USR_ARG_LEN 100
 #define MAX_ARGS 10

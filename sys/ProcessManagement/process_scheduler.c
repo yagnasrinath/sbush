@@ -121,7 +121,6 @@ task_struct * get_next_ready_proc() {
 		}
 	}
 	curr_proc = next_ready_task;
-
 	return next_ready_task;
 }
 

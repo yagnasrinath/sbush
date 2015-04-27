@@ -55,6 +55,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	//physfree += (1024 * 1024); //incrementing by 1MB
 
 	init_page_tables(physbase, physfree, (void*) &kernmem);
+
 	__asm__ __volatile__("movq %0, %%rbp" : :"a"(&stack[0]));
 	__asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
 	initialize_proc_scheduler();

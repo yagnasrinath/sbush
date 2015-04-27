@@ -2,6 +2,7 @@
 #include<sys/system.h>
 #include<sys/sbunix.h>
 #include<sys/utils/kstring.h>
+#include<sys/defs.h>
 static uint64_t kernel_cr3;
 static uint64_t kernel_pml4;
 
@@ -54,6 +55,37 @@ uint64_t get_pt_vir_addr(uint64_t vir_addr){
 }
 
 
+
+BOOL is_page_present_for_virtual_addr(uint64_t viraddr) {
+	uint64_t *pml4_entry, *pdp_entry, *pd_entry, *pt_entry;
+
+		pml4_entry = (uint64_t *)get_pml4_vir_addr(viraddr);
+
+
+		if(!IS_PAGE_PRESENT(*pml4_entry)){
+			return FALSE;
+		}
+
+		pdp_entry = (uint64_t *)get_pdp_vir_addr(viraddr);
+		if(!IS_PAGE_PRESENT(*pdp_entry)){
+			return FALSE;
+		}
+
+		pd_entry = (uint64_t *)get_pd_vir_addr(viraddr);
+		if(!IS_PAGE_PRESENT(*pd_entry)){
+			return FALSE;
+		}
+
+		pt_entry = (uint64_t *)get_pt_vir_addr(viraddr);
+		if(!IS_PAGE_PRESENT(*pt_entry)){
+			return FALSE;
+		}
+		return TRUE;
+
+
+}
+
+
 void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 	uint64_t *pml4_entry, *pdp_entry, *pd_entry, *pt_entry;
 
@@ -76,7 +108,8 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 
 	pt_entry = (uint64_t *)get_pt_vir_addr(viraddr);
 	if(IS_PAGE_PRESENT(*pt_entry)){
-		panic("page mapped where it should not be");
+		//kprintf("%d", *pt_entry);
+		//panic("page mapped where it should not be ");
 		free_phy_page(*pt_entry, TRUE);
 	}
 	*pt_entry = phyaddr | flags;
@@ -95,7 +128,7 @@ uint64_t get_new_pml4_t() {
 }
 
 void free_pagetables(){
-	kprintf("page tables freed\n");
+
 	uint64_t pml4e_vir_addr = 0xFFFFFF7FBFDFE000UL;
 	uint64_t pdp_vir_addr = 0xFFFFFF7FBFC00000UL;
 	uint64_t pd_vir_addr = 0xFFFFFF7F80000000UL;
@@ -123,36 +156,33 @@ void free_pagetables(){
 								if(IS_PAGE_PRESENT(*pg_addr)){
 									//uint64_t* curr_vir_addr = (uint64_t*)(norm_addr | (i<<39) | (j<<30) | (k<<21) | (l << 12));
 									//	kmemset(curr_vir_addr,'\0', PAGE_SIZE);
-									free_phy_page(*pg_addr, FALSE);
-									invlpg(pg_addr);
+									free_phy_page(*pg_addr, TRUE);
+									//invlpg(pg_addr);
 									*pg_addr = 0;
 								}
 
 							}
 
 							free_phy_page(*pt_addr, TRUE);
-							invlpg(pt_addr);
+							//invlpg(pt_addr);
 							*pt_addr = 0;
 						}
 					}
 					free_phy_page(*pd_addr, TRUE);
-					invlpg(pd_addr);
+					//invlpg(pd_addr);
 					*pd_addr = 0;
 				}
 			}
 			free_phy_page(*pdp_addr, TRUE);
-			invlpg(pdp_addr);
+			//invlpg(pdp_addr);
 			*pdp_addr = 0;
 		}
 	}
+	kprintf("page tables freed\n");
 	kprintf("\nkerncr3 is %p \n", kernel_cr3);
 	set_cr3(kernel_cr3);
 	//Cleaning Process
 
 }
 
-
-uint64_t get_pte_entry(uint64_t vir_addr){
-	return *(uint64_t*)(get_pt_vir_addr(vir_addr));
-}
 

@@ -74,6 +74,8 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	kprintf("page_fault_handler cr2 %p \n",lcr2);
 	//kprintf("page_fault_handler rsp %p \n",lrsp);
 	kprintf("page fault  handler errno %d \n",regs.error);
+	task_struct* curr_task = get_curr_task();
+	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
 		print_regiters(regs);
@@ -81,14 +83,17 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 
 	}
 	if(regs.error & 0x1) { // PAGE PRESENT
-		task_struct* curr_task = get_curr_task();
-		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
+
 		if(curr_vmaList  == NULL) {
 			kprintf("Page present : Process name %s\n",curr_task->task_name);
 			panic("No vma list for the process");
 		}
 		vma_struct* curr_vma = curr_vmaList;
 		while(curr_vma != NULL) {
+			kprintf("vma_start %p \n", curr_vma->vm_area_start);
+			kprintf("vma_end %p\n", curr_vma->vm_area_end);
+			kprintf("vma_type %d\n", curr_vma->vma_type);
+			kprintf("vma_perm %d\n", curr_vma->vma_perm);
 			uint64_t curr_start = curr_vma->vm_area_start;
 			uint64_t curr_end = curr_vma->vm_area_end;
 			if((fault_addr  >= curr_start) && (fault_addr <= curr_end)) {
@@ -128,13 +133,14 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 			curr_vma = curr_vma->next;
 		}
 		if(curr_vma == NULL ) {
-			panic("PAGE FAULT IN Not Handled when PAGE is PRESENT AND NOT COW\n");
+			panic("PAGE FAULT is  Not Handled when PAGE is PRESENT AND NOT COW\n");
 		}
 	}
 	else {
 		//kprintf("entered the else case in page fault  %p\n",fault_addr );
 		task_struct* curr_task = get_curr_task();
 		vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
+
 		if(curr_vmaList  == NULL) {
 			kprintf("Page not present : Process name %s\n",curr_task->task_name);
 			panic("No vma list for the process");
@@ -143,6 +149,10 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		fault_addr = PAGE_ALIGN(fault_addr);
 		//kprintf("Fault address is %p\n",fault_addr );
 		while(curr_vma != NULL) {
+			kprintf("vma_start %p \n", curr_vma->vm_area_start);
+			kprintf("vma_end %p\n", curr_vma->vm_area_end);
+			kprintf("vma_type %d\n", curr_vma->vma_type);
+			kprintf("vma_perm %d\n", curr_vma->vma_perm);
 			uint64_t curr_start = curr_vma->vm_area_start;
 			uint64_t curr_end = curr_vma->vm_area_end;
 			//kprintf("VMA start %p\n",curr_start );

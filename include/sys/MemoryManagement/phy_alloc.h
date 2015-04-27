@@ -24,6 +24,7 @@ void init_phy_memory(struct smap_t* smap, int smap_num, void* phy_base,
 void free_phy_page(uint64_t page_addr, BOOL zeroPage);
 
 uint64_t allocate_phy_page();
+void memset_phy_pages();
 
 static inline uint64_t mm_phy_to_page(uint64_t phy) {
 

@@ -140,7 +140,8 @@ void sys_brk() {
 	if(addr ==0) {
 		curr_task->kstack[KSTACK_SIZE-RAX] = curr_vma->vm_area_end;
 	}
-	else if (addr < curr_vma->vm_area_end || addr >= max_possile_addr) {
+	else if ( addr >= max_possile_addr) {
+		panic("addr  is greater that max possible addr");
 		curr_task->kstack[KSTACK_SIZE-RAX]  = -1;
 	}
 	else {
@@ -249,8 +250,10 @@ void print_mem_map (task_struct* curr_task) {
 		uint64_t vma_end = PAGE_ALIGN(curr_vma->vm_area_end);
 		while(vma_start <= vma_end){
 			uint64_t* parent_pte_entry = (uint64_t*)get_pt_vir_addr(vma_start);
-			kprintf("(%d ",parent_pte_entry );
-			kprintf("%d) ",(*parent_pte_entry)/PAGE_SIZE );
+			if(is_page_present_for_virtual_addr(vma_start)) {
+				kprintf("(%p ",vma_start );
+				kprintf("%d) ",(*parent_pte_entry)/PAGE_SIZE );
+			}
 			vma_start += PAGE_SIZE;
 		}
 		curr_vma  = curr_vma->next;
@@ -272,8 +275,8 @@ void exit(){
 	print_mem_map(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
-	free_pagetables();
-	print_present_pages();
+	//free_pagetables();
+	//print_present_pages();
 
 	__asm__ __volatile__("int $32;");
 }

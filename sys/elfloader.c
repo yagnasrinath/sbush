@@ -90,11 +90,11 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		}
 		int vma_type;
 		int vma_perm ;
-		if(programHeader->p_type == 6) {
+		if(programHeader->p_flags == 6) {
 			vma_type = DATA;
 			vma_perm = READ_WRITE;
 		}
-		else if (programHeader->p_type == 5) {
+		else if (programHeader->p_flags == 5) {
 			vma_type = TXT;
 			vma_perm = READ;
 		}
@@ -175,7 +175,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	//copy_arg_to_stack(new_task,filename, argv);
 	new_task->state = READY;
 	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );
-	print_present_pages();
+	//print_present_pages();
 }
 
 
