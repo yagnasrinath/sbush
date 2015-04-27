@@ -51,9 +51,8 @@ static void mark_page_used(uint64_t pageNum) {
 			 num_decremented++;
 		 }
 	 if(ref_count[pageNum] == 0) {
-		 kprintf("NUM incremented %d: \n",num_incremented);
-		 kprintf("NUM decremented %d: \n",num_decremented);
-		 panic("something wrong ref count is already zero");
+		 kprintf("something wrong ref count is already zero %d", pageNum);
+		 panic("");
 	 }
 	ref_count[pageNum] = ref_count[pageNum]-1;
 	return;
