@@ -25,7 +25,7 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 	task_struct* child_task_struct = create_new_task(TRUE);
 	uint64_t child_pml4 = child_task_struct->virtual_addr_space->pml4_t;
 	uint64_t parent_pml4 = parent_task_struct->virtual_addr_space->pml4_t;
-	kmemcpy(child_task_struct->virtual_addr_space, parent_task_struct->virtual_addr_space, sizeof(mem_struct));
+	//kmemcpy(child_task_struct->virtual_addr_space, parent_task_struct->virtual_addr_space, sizeof(mem_struct));
 	child_task_struct->virtual_addr_space->pml4_t = child_pml4;
 	child_task_struct->virtual_addr_space->vmaList = NULL;
 
