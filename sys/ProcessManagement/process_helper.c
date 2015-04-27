@@ -225,7 +225,6 @@ task_struct* create_new_task(BOOL is_user_process) {
 	}
 	new_task->is_user_proc = is_user_process;
 	new_task->pid = ++curr_pid;
-
 	new_task->state = READY;
 	new_task->ppid =0;
 	if(new_task->pid  == 0) {

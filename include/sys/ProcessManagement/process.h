@@ -48,8 +48,8 @@ typedef struct vm_area_structure vma_struct;
 typedef struct task_structure task_struct;
 
 struct task_structure{
-	int pid;
 	int ppid;
+	int pid;
 	uint64_t kstack[KSTACK_SIZE];
 	mem_struct* virtual_addr_space;
 	enum TASK_STATE state;
