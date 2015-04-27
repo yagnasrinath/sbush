@@ -13,36 +13,37 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 
 void print_present_pages();
+uint64_t get_pt_vir_addr(uint64_t);
 struct timespec{
 	signed int tv_sec;
 	long tv_nsec;
 };
 typedef struct timespec timespec;
 
- enum registers {
-	 ZERO,
-	 SS1,
-	 SS2,
-	 STK_TOP,
-	 FLAGS_PROC,
-	 CS,
-	 ENTRY,
-	 LOCAL_VAR,
-	 RDI,
-	 RAX,
-	 RBX,
-	 RCX,
-	 RDX,
-	 RBP,
-	 RSI,
-	 R8,
-	 R9,
-	 R10,
-	 R11,
-	 R12,
-	 R13,
-	 R14,
-	 R15
+enum registers {
+	ZERO,
+	SS1,
+	SS2,
+	STK_TOP,
+	FLAGS_PROC,
+	CS,
+	ENTRY,
+	LOCAL_VAR,
+	RDI,
+	RAX,
+	RBX,
+	RCX,
+	RDX,
+	RBP,
+	RSI,
+	R8,
+	R9,
+	R10,
+	R11,
+	R12,
+	R13,
+	R14,
+	R15
 
 
 };
@@ -238,6 +239,25 @@ void waitpid(){
 
 }
 
+
+void print_mem_map (task_struct* curr_task) {
+	kprintf("\n##########\n");
+
+	vma_struct * curr_vma = curr_task->virtual_addr_space->vmaList;
+	while(curr_vma != NULL) {
+		uint64_t vma_start = PAGE_ALIGN(curr_vma->vm_area_start);
+		uint64_t vma_end = PAGE_ALIGN(curr_vma->vm_area_end);
+		while(vma_start <= vma_end){
+			uint64_t* parent_pte_entry = (uint64_t*)get_pt_vir_addr(vma_start);
+			kprintf("(%d ",parent_pte_entry );
+			kprintf("%d) ",(*parent_pte_entry)/PAGE_SIZE );
+			vma_start += PAGE_SIZE;
+		}
+		curr_vma  = curr_vma->next;
+	}
+	kprintf("\n##########\n");
+}
+
 void exit(){
 
 
@@ -249,10 +269,12 @@ void exit(){
 	//kprintf("process %d cleared \n",curr_task->pid);
 	detach_children(curr_task);
 	detach_from_parent(curr_task);
+	print_mem_map(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
 	free_pagetables();
 	print_present_pages();
+
 	__asm__ __volatile__("int $32;");
 }
 
