@@ -15,7 +15,7 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/MemoryManagement/phy_alloc.h>
 #include<sys/utils/kstring.h>
-extern void print_bitmap() ;
+extern void print_present_pages();
 
  task_struct* copy_task_struct(task_struct* parent_task_struct){
 
@@ -80,7 +80,7 @@ extern void print_bitmap() ;
 					map_vir_to_phyaddr(vma_start,child_pte_entry,child_pte_flags);
 					set_cr3(parent_pml4);
 					uint64_t page_num = (*parent_pte_entry)/PAGE_SIZE;
-					kprintf("current_ref_count is %d \n",get_phy_page_ref_count(page_num));
+					//kprintf("current_ref_count is %d \n",get_phy_page_ref_count(page_num));
 					inc_phy_page_ref_count(page_num);
 				}
 				vma_start += PAGE_SIZE;
@@ -102,6 +102,6 @@ extern void print_bitmap() ;
 		child_task_struct->next_sibling = parent_task_struct->children_head;
 		parent_task_struct->children_head = child_task_struct;
 	}
-	 print_bitmap() ;
+	print_present_pages();
 	return child_task_struct;
 }

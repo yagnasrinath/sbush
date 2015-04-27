@@ -18,7 +18,7 @@
 #define ELFMAG2         'L'
 #define ELFMAG3         'F'
 #define LOADABLE 		 1
-
+extern void print_present_pages();
 extern void _set_cr3(uint64_t cr3);
 static char args[MAX_ARGS][MAX_USR_ARG_LEN];
 static BOOL is_file_elf(Elf64_Ehdr* elf_loader) {
@@ -175,6 +175,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	//copy_arg_to_stack(new_task,filename, argv);
 	new_task->state = READY;
 	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );
+	print_present_pages();
 }
 
 

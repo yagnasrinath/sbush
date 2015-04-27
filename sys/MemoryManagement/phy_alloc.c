@@ -19,12 +19,15 @@ int num_decremented=0;
 extern task_struct* get_curr_task();
 
 
-void print_bitmap() {
-	kprintf("\n###########\n");
-	for(int i=0; i <20;  i++) {
-		kprintf("%d", mem_bitmap[i]);
+void print_present_pages() {
+	kprintf("\n####\n");
+	for(int i=0; i < NUM_PAGES; i ++) {
+		if(ref_count[i] > 0) {
+			kprintf("%d, %d",i,ref_count[i]);
+		}
+
 	}
-	kprintf("\n###########\n");
+	kprintf("\n####\n");
 }
 
 static void mark_page_free(uint64_t pageNum) {

@@ -12,8 +12,7 @@
 #include<sys/ProcessManagement/process_helper.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 
-void print_bitmap() ;
-
+void print_present_pages();
 struct timespec{
 	signed int tv_sec;
 	long tv_nsec;
@@ -253,7 +252,7 @@ void exit(){
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
 	free_pagetables();
-	print_bitmap();
+	print_present_pages();
 	__asm__ __volatile__("int $32;");
 }
 
