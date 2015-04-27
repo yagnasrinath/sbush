@@ -231,7 +231,6 @@ task_struct* create_new_task(BOOL is_user_process) {
 	if(new_task->pid  == 0) {
 		panic("new task pid is 0");
 	}
-	kprintf("reached here pid %d \n", new_task->pid);
 	return new_task;
 }
 
