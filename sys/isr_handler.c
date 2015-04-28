@@ -129,6 +129,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 			curr_vma = curr_vma->next;
 		}
 		if(curr_vma == NULL ) {
+			kprintf("%p\n",curr_vmaList);
 			panic("PAGE FAULT is  Not Handled when PAGE is PRESENT AND NOT COW\n");
 		}
 	}

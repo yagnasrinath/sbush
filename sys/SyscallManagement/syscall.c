@@ -124,7 +124,7 @@ void sys_write(){
 void sys_brk() {
 	task_struct * curr_task = get_curr_task();
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RDI];
-	//kprintf("passed addr is %p \n", addr);
+	kprintf("passed addr is %p \n", addr);
 	uint64_t max_possile_addr = USR_STK_TOP - USR_STK_SIZE;
 	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 	vma_struct* curr_vma = curr_vmaList;
@@ -275,7 +275,7 @@ void exit(){
 	print_mem_map(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
-	free_pagetables();
+	//free_pagetables();
 	//print_present_pages();
 
 	__asm__ __volatile__("int $32;");
