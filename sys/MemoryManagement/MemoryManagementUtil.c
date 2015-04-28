@@ -93,27 +93,39 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 
 
 	if(!IS_PAGE_PRESENT(*pml4_entry)){
-		*pml4_entry = allocate_phy_page() |USER_RW_FLAG | PAGE_PRESENT;
+		uint64_t pml4 = allocate_phy_page();
+		kprintf("pml4t->%p\n",pml4);
+
+		*pml4_entry = pml4 |USER_RW_FLAG | PAGE_PRESENT;
 	}
 
 	pdp_entry = (uint64_t *)get_pdp_vir_addr(viraddr);
 	if(!IS_PAGE_PRESENT(*pdp_entry)){
-		*pdp_entry = allocate_phy_page() | USER_RW_FLAG | PAGE_PRESENT;
+		uint64_t pdp = allocate_phy_page();
+		kprintf("pdp->%p\n",pdp);
+
+		*pdp_entry = pdp | USER_RW_FLAG | PAGE_PRESENT;
 	}
 
 	pd_entry = (uint64_t *)get_pd_vir_addr(viraddr);
 	if(!IS_PAGE_PRESENT(*pd_entry)){
-		*pd_entry = allocate_phy_page() | USER_RW_FLAG | PAGE_PRESENT;
+		uint64_t pd = allocate_phy_page();
+		kprintf("pd->%p\n",pd);
+
+		*pd_entry = pd | USER_RW_FLAG | PAGE_PRESENT;
 	}
 
 	pt_entry = (uint64_t *)get_pt_vir_addr(viraddr);
 	if(IS_PAGE_PRESENT(*pt_entry)){
+
 		//kprintf("%d", *pt_entry);
 		//panic("page mapped where it should not be ");
 		free_phy_page(*pt_entry, TRUE);
 	}
 	//kprintf("flags are %d\n", flags);
 	*pt_entry = phyaddr | flags;
+	kprintf("phyaddr->%p\n",phyaddr);
+
 }
 
 uint64_t get_new_pml4_t() {
