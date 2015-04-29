@@ -28,6 +28,7 @@ enum
 {
 	FILE_TYPE,
 	DIRECTORY_TYPE,
+	PIPE_TYPE,
 }file_type;
 
 typedef struct pipe_dev
