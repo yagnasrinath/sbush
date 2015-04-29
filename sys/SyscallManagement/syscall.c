@@ -289,10 +289,10 @@ void exit(){
 	//kprintf("process %d cleared \n",curr_task->pid);
 	detach_children(curr_task);
 	detach_from_parent(curr_task);
-	print_mem_map(curr_task);
+	//print_mem_map(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 	kprintf("vma list freed\n");
-	//free_pagetables();
+	free_pagetables();
 	//print_present_pages();
 
 	__asm__ __volatile__("int $32;");
