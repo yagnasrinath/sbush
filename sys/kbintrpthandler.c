@@ -11,11 +11,11 @@
 #include<sys/sbunix.h>
 #include<sys/idt.h>
 #include<sys/utils/kstring.h>
-uint16_t special_keys =0;
-static uint16_t LEFT_SHIFT_PRESS = 1;
-static uint16_t LEFT_SHIFT_RELEASE = ~(-1);
-static uint16_t RIGHT_SHIFT_PRESS = 2;
-static uint16_t RIGHT_SHIFT_RELEASE = ~(-2);
+static  volatile uint16_t special_keys =0;
+static  volatile  uint16_t LEFT_SHIFT_PRESS = 1;
+static  volatile  uint16_t LEFT_SHIFT_RELEASE = ~(-1);
+static  volatile  uint16_t RIGHT_SHIFT_PRESS = 2;
+static  volatile  uint16_t RIGHT_SHIFT_RELEASE = ~(-2);
 static volatile uint16_t flag =0;
 static volatile uint64_t last_addr;
 static volatile uint64_t counter;
@@ -41,9 +41,7 @@ int gets(uint64_t addr, uint64_t length)
 	last_addr=get_current_addr();
 	while (flag == 1);
 	__asm__ __volatile__ ("cli");
-	kprintf("buf is %s\n", buf);
 	kmemcpy((void *)user_buf, (void *)buf, counter);
-	kprintf("user_buf is %s\n", user_buf);
 	int count = counter;
 	counter = 0;
 	num_char_to_read = 0;
@@ -90,10 +88,10 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 	else if (b == (SC_RIGHTSHIFT  |0X80)) {
 		special_keys = special_keys & RIGHT_SHIFT_RELEASE;
 	}
-	else {
+	else if( b < 0X80){
 		BOOL is_shift_pressed = (special_keys && LEFT_SHIFT_PRESS) ||
 				(special_keys && RIGHT_SHIFT_PRESS);
-		char val = get_asci_for_sc(b,is_shift_pressed);
+		uint64_t val = get_asci_for_sc(b,is_shift_pressed);
 		if (flag == 1) {
 			if (val == '\n') {
 				buf[counter++] = '\0';
@@ -106,9 +104,8 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 					counter--;
 				}
 			} else {
-				buf[counter++] = val;
-				kprintf("buf is, counter is  %s, %d\n", buf,counter);
-
+				buf[counter] = val;
+				counter += 1;
 				putch(val);
 				if(counter == num_char_to_read) {
 					flag = 0;
