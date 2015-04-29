@@ -17,7 +17,7 @@ typedef unsigned char uint8_t;
 #define KSTACK_SIZE 512   // since it is an array of uint64_t 8*12
 #define USR_STK_SIZE 0x10000 // 64KB *
 #define TASK_NAME_LENGTH 50
-#define  MAX_FD_PER_PROC 8
+#define  MAX_FD_PER_PROC 12
 #define PAGE_ALIGN(ADDR) ((ADDR) >> 12 << 12)
 #define KERNEL_RW_FLAG 2UL  // 10
 #define KERNEL_RX_FLAG 0UL  //0
@@ -33,6 +33,12 @@ typedef unsigned char uint8_t;
 
 typedef int BOOL;
 
+#define MAX_FILE_NAME_LEN 50
+#define MAXCHILD 12
+
+struct dirent {
+    char d_name[MAX_FILE_NAME_LEN];
+};
 
 #endif
 

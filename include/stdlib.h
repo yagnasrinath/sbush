@@ -44,14 +44,7 @@ int dup2(int oldfd, int newfd);
 
 
 // directories
-#define NAME_MAX 255
-struct dirent
-{
-	long d_ino;
-	off_t d_off;
-	unsigned short d_reclen;
-	char d_name [NAME_MAX+1];
-};
+#define NAME_MAX 49
 int getdirentries(int fd, struct dirent* direntry , int size );
 void *opendir(const char *name);
 struct dirent *readdir(void *dir);

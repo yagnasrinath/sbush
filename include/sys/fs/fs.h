@@ -9,8 +9,20 @@
 #define INCLUDE_SYS_FS_FS_H_
 #include<sys/defs.h>
 
-#define MAXLEN 50
-#define MAXCHILD 8
+
+
+
+enum
+{
+	O_RDONLY = 0,
+	O_WRONLY = 1,
+	O_RDWR = 2,
+	O_CREAT = 0x40,
+	O_DIRECTORY = 0x10000
+}file_flags;
+
+
+
 
 enum
 {
@@ -28,7 +40,7 @@ typedef struct pipe_dev
 
 typedef struct file
 {
-	char file_name[MAXLEN];
+	char file_name[MAX_FILE_NAME_LEN];
 	uint64_t start;
 	uint64_t end;
 	uint64_t curr;

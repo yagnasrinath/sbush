@@ -282,6 +282,44 @@ void print_mem_map (task_struct* curr_task) {
 	kprintf("\n##########\n");
 }
 
+
+void sys_getdents()
+{
+	task_struct* curr_task = get_curr_task();
+	uint64_t fd  = curr_task->kstack[KSTACK_SIZE-RDI];
+	struct dirent* curr_dirent = (struct dirent*)curr_task->kstack[KSTACK_SIZE-RSI];
+	kmemset(curr_dirent, '\0', sizeof(curr_dirent));
+	if(fd < 0 || fd > MAX_FD_PER_PROC ) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		kprintf("reached here 1\n");
+		return;
+	}
+	file_des_t* curr_file_desp =  curr_task->fd[fd];
+	if(curr_file_desp == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		kprintf("reached here 2 \n");
+		return;
+	}
+	if(curr_file_desp->file_type != DIRECTORY_TYPE) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		kprintf("reached here 3 \n");
+		return;
+	}
+	if( curr_file_desp->curr >= curr_file_desp->file_ptr->end ) {
+
+		curr_task->kstack[KSTACK_SIZE-RAX] = 0;
+		kprintf("reached here 4 \n");
+		return;
+	}
+
+	kmemcpy(curr_dirent->d_name,curr_file_desp->file_ptr->fchild[ curr_file_desp->curr], MAX_FILE_NAME_LEN);
+	curr_file_desp->curr  += 1;
+	curr_task->kstack[KSTACK_SIZE-RAX] = 1;
+	return;
+
+}
+
+
 void sys_open()
 {
 	task_struct* curr_task = get_curr_task();
@@ -291,9 +329,10 @@ void sys_open()
 
 	file_t* aux_node=NULL;
 	file_t* curr_node=root_node;
+
+
 	char* path_copy = (char*)kmalloc(sizeof(char)*kstrlen(path));
 	kstrcpy(path_copy,path);
-	while(1);
 	char* temp = kstrtok(path,"/");
 	int i=0;
 	if(temp == NULL)
@@ -301,34 +340,63 @@ void sys_open()
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
 		return;
 	}
+	int k=0;
 	while(temp!=NULL)
 	{
+
 		aux_node=curr_node;
+
+		if(curr_node->type == FILE_TYPE) {
+			curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+			return;
+		}
+
 		for(i=2;i<curr_node->end;i++)
 		{
+
 			if(kstrcmp(temp,curr_node->fchild[i]->file_name)==0)
 			{
+
 				curr_node=(file_t*)curr_node->fchild[i];
+
 				break;
 			}
 		}
+
 		if(i==aux_node->end)
 		{
 			curr_task->kstack[KSTACK_SIZE-RAX] = -1;
 			return;
 		}
+
 		temp = kstrtok(NULL,"/");
+		k++;
+
 	}
 
 	if(curr_node->type==DIRECTORY_TYPE)
 	{
-		//Directory
+		// DIRECTORY
+		fd->file_ptr = curr_node;
+		fd->file_perm = flags;
+		fd->curr = 2;
+		fd->file_type = DIRECTORY_TYPE;
+		for(i=0;i<MAX_FD_PER_PROC;i++)
+		{
+			if(curr_task->fd[i]==NULL)
+			{
+				curr_task->fd[i]=fd;
+				curr_task->kstack[KSTACK_SIZE-RAX] = i;
+				return;
+			}
+		}
 	}
 	else
 	{
 		//file
 		fd->file_ptr = curr_node;
 		fd->file_perm = flags;
+		fd->file_type = FILE_TYPE;
 		fd->curr = curr_node->start;
 		for(i=0;i<MAX_FD_PER_PROC;i++)
 		{
@@ -373,6 +441,7 @@ void handle_syscall() {
 	}
 	else {
 		switch(curr_task->kstack[KSTACK_SIZE-RAX]) {
+		case 19 : sys_getdents(); break;
 		case 12 : alarm();break;
 		case 11 : sleep(); break;
 		case 10 : waitpid();break;

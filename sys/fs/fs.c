@@ -92,5 +92,6 @@ void* init_tarfs()
 		header = (HEADER* )((char *)header + file_size);
 
 	}while(header<(HEADER*)&_binary_tarfs_end);
+	//while(1);
 	return root_node;
 }
