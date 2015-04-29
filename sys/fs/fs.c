@@ -104,6 +104,7 @@ void init_pipe()
 	root_pipe ->isUsed = FALSE;
 	root_pipe ->read_pos = 0;
 	root_pipe ->write_pos = 0;
+	root_pipe ->size = PIPE_SIZE;
 	pipe_dev_t* curr_pipe = root_pipe;
 	int i;
 	pipe_dev_t* aux_pipe;
