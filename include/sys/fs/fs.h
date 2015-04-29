@@ -29,6 +29,9 @@ enum
 	FILE_TYPE,
 	DIRECTORY_TYPE,
 	PIPE_TYPE,
+	STDIN_TYPE,
+	STDOUT_TYPE,
+	STDERR_TYPE
 }file_type;
 
 typedef struct pipe_dev

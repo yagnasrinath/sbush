@@ -14,17 +14,17 @@
 int main(int argc, char* argv[], char* envp[]) {
 
 	//for(int i=0; i < 15; i++ ) {
-	//char a[500];
-	//read(0,a,50);
+	char a[500];
+	read(0,a,50);
 	//strncpy(a,"hi",2);
 	//int pid = fork();
 	//strncpy(a,"hi",2);
 	//printf("passed line is  %d \n",pid);
-	void* dirp =opendir("/bin");
-	struct dirent *dp;
-	while ((dp = readdir(dirp)) != NULL) {
-		printf(" name is %s \n", dp->d_name);
-	}
+	//void* dirp =opendir("/bin");
+	//struct dirent *dp;
+	//while ((dp = readdir(dirp)) != NULL) {
+		printf(" entered stuff is %s \n", a);
+	//}
 
 	//}
 

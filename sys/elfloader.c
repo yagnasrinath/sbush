@@ -8,11 +8,13 @@
 #include <sys/elf_loader.h>
 #include <sys/system.h>
 #include <sys/fs/tarfs.h>
+#include <sys/fs/fs.h>
 #include <sys/sbunix.h>
 #include <sys/ProcessManagement/process_helper.h>
 #include <sys/ProcessManagement/process_scheduler.h>
 #include <sys/ProcessManagement/process.h>
 #include <sys/MemoryManagement/virtual_page_allocator.h>
+#include <sys/MemoryManagement/kmalloc.h>
 #define ELFMAG0         0x7f
 #define ELFMAG1         'E'
 #define ELFMAG2         'L'
@@ -130,7 +132,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		// need to change to demand paging
 		_set_cr3(new_task->virtual_addr_space->pml4_t);
 		ker_mmap(start_addr, size, page_perm|PAGE_PRESENT);
-//		kprintf("kern_mmap returned succesfully \n");
+		//		kprintf("kern_mmap returned succesfully \n");
 		kmemcpy((void*) start_addr, (void*) elf_header + programHeader->p_offset, programHeader->p_filesz);
 		// .bss section
 		if(programHeader->p_filesz != size) {
@@ -174,6 +176,15 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
 	//copy_arg_to_stack(new_task,filename, argv);
 	new_task->state = READY;
+	file_des_t * file_d      = (file_des_t * )kmalloc(sizeof(file_des_t));
+	file_d->file_type = STDIN_TYPE;
+	new_task->fd[0] = file_d;
+	file_d      = (file_des_t * )kmalloc(sizeof(file_des_t));
+	file_d->file_type = STDOUT_TYPE;
+	new_task->fd[1] = file_d;
+	file_d      = (file_des_t * )kmalloc(sizeof(file_des_t));
+	file_d->file_type = STDERR_TYPE;
+	new_task->fd[2] = file_d;
 	schedule_process(new_task,new_task->virtual_addr_space->stack_start, elf_header->e_entry );
 	//print_present_pages();
 }

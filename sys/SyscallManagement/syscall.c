@@ -248,15 +248,26 @@ void waitpid(){
 void  sys_read()
 {
 	task_struct * curr_task = get_curr_task();
-	uint64_t fd_type, addr, length;
-	fd_type = (uint64_t)curr_task->kstack[KSTACK_SIZE-RDI];
+	uint64_t fd, addr, length;
+	fd = (uint64_t)curr_task->kstack[KSTACK_SIZE-RDI];
 	addr = curr_task->kstack[KSTACK_SIZE-RSI];
 	kprintf("addr passed is %p \n",addr);
-	length = curr_task->kstack[KSTACK_SIZE-RDX];;
-	if (fd_type == STDIN) {
-		length = gets(addr,length);
+	length = curr_task->kstack[KSTACK_SIZE-RDX];
+	if(fd < 0 || fd > MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
 	}
-	curr_task->kstack[KSTACK_SIZE-RAX] = length;
+	else if (curr_task->fd[fd] == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	if (curr_task->fd[fd] ->file_type == STDIN_TYPE) {
+		length = gets(addr,length);
+		curr_task->kstack[KSTACK_SIZE-RAX] = length;
+		return;
+	}
+
+
 }
 
 
