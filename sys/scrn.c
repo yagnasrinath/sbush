@@ -10,8 +10,15 @@
 #define MAX_COLUMN 80
 static unsigned short *basememptr;
 static int colorattr = 0X0F;
+static uint64_t base_video_addr;
 
 static int csr_column = 0, csr_row = 0;
+
+uint64_t get_current_addr() {
+	return base_video_addr + csr_row*MAX_COLUMN + csr_column;
+
+}
+
 
 static void move_csr() {
 	unsigned current_pos  = csr_row*MAX_COLUMN + csr_column;
@@ -79,9 +86,9 @@ void putch(unsigned char c) {
 	// tab space
 	else if(c == 0X09) {
 		// move the bit position by 8 and remove last 3 bits
-		csr_column = (csr_column + 8) | ~(8-1);
+		//csr_column = (csr_column + 8) | ~(8-1);
+		csr_column = (csr_column + 8);
 	}
-
 	// carriage return
 	else if (c == 0X0D) {
 		csr_column = 0;
@@ -122,6 +129,7 @@ void init_video() {
 
 void update_video(uint64_t addr) {
 	basememptr = (unsigned short *)addr;
+	base_video_addr = addr;
 	cls();
 }
 

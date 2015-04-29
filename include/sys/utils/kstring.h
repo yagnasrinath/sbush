@@ -10,7 +10,7 @@
 
 #include <sys/defs.h>
 #include <sys/sbunix.h>
-void *kmemcpy(void *dest, const void *src, int count);
+void *kmemcpy(void *dest, void *src, uint64_t count);
 void *kmemset(void *dest, char val, size_t count);
 char *kstrcpy ( char *__restrict dest, const char *__restrict src) ;
 char *kstrncpy (char *__restrict dest, const char *__restrict src, const size_t n);

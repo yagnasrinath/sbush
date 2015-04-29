@@ -11,6 +11,7 @@
 #include<sys/ProcessManagement/process_helper.h>
 int mymain(uint32_t* modulep, void* physbase, void* physfree);
 extern task_struct * get_elf_task(char *filename, char *argv[]);
+void init_keyboard();
 extern task_struct *init_task_struct;
 void start(uint32_t* modulep, void* physbase, void* physfree) {
 
@@ -60,6 +61,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	__asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
 	initialize_proc_scheduler();
 	initialize_free_list();
+	init_keyboard();
 	//volatile int a=1;
 	//while(a==1);
 
@@ -67,6 +69,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	//create_idle_proc() ;
 	//create_idle_proc2() ;
 	init_task_struct = create_init_proc();
+
 	//create_idle_proc3();
 
 	task_struct* empty_task = get_elf_task("bin/empty", NULL);

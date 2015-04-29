@@ -11,8 +11,8 @@
 #include<sys/ProcessManagement/process.h>
 #include<sys/ProcessManagement/process_helper.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
-
-void print_present_pages();
+#define STDIN 0
+uint64_t gets(uint64_t addr, uint64_t length);
 uint64_t get_pt_vir_addr(uint64_t);
 struct timespec{
 	signed int tv_sec;
@@ -138,7 +138,7 @@ void sys_brk() {
 		panic("SYs_break : NO HEAP VMA");
 	}
 	if(addr ==0) {
-		curr_task->kstack[KSTACK_SIZE-RAX] = curr_vma->vm_area_end-1;
+		curr_task->kstack[KSTACK_SIZE-RAX] = curr_vma->vm_area_end-0X8;
 	}
 	else if ( addr >= max_possile_addr) {
 		panic("addr  is greater that max possible addr");
@@ -149,7 +149,7 @@ void sys_brk() {
 		if(addr%PAGE_SIZE != 0) {
 			addr = PAGE_ALIGN(addr) + PAGE_SIZE;
 		}
-		curr_vma ->vm_area_end = addr+1;
+		curr_vma ->vm_area_end = addr+0X8;
 		//curr_task->kstack[KSTACK_SIZE-10] = curr_vma ->vm_area_end;
 	}
 	//kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
@@ -241,6 +241,23 @@ void waitpid(){
 }
 
 
+void  sys_read()
+{
+	task_struct * curr_task = get_curr_task();
+	uint64_t fd_type, addr, length;
+	fd_type = (uint64_t)curr_task->kstack[KSTACK_SIZE-RDI];
+	addr = curr_task->kstack[KSTACK_SIZE-RSI];
+	kprintf("addr passed is %p \n",addr);
+	length = curr_task->kstack[KSTACK_SIZE-RDX];;
+	if (fd_type == STDIN) {
+		length = gets(addr,length);
+	}
+	curr_task->kstack[KSTACK_SIZE-RAX] = length;
+}
+
+
+
+
 void print_mem_map (task_struct* curr_task) {
 	kprintf("\n##########\n");
 
@@ -299,6 +316,7 @@ void handle_syscall() {
 		case 5 : sys_brk(); break;
 		case 4 : exit();break;
 		case 1 : sys_write();break;
+		case 0 : sys_read();break;
 		default : break;
 		}
 	}

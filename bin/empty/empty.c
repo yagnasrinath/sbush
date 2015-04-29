@@ -12,13 +12,14 @@
 
 
 int main(int argc, char* argv[], char* envp[]) {
-	for(int i=0; i < 5; i++ ) {
+	//for(int i=0; i < 15; i++ ) {
 		char* a = (char *)malloc(423);
-		strncpy(a,"hi",2);
-		fork();
-		strncpy(a,"hi",2);
-		printf("%s",a);
-	}
+		read(0,a,50);
+		//strncpy(a,"hi",2);
+		//fork();
+		//strncpy(a,"hi",2);
+		printf("passed line is %s \n",a);
+	//}
 
 
 

@@ -6,7 +6,7 @@
  */
 #include "../../include/sys/utils/kstring.h"
 
-void *kmemcpy(void *dest, const void *source, int count){
+void *kmemcpy(void *dest, void *source, uint64_t count){
 	char *des = (char *) dest;
 	const char* src = (char *)source;
 
@@ -16,6 +16,19 @@ void *kmemcpy(void *dest, const void *source, int count){
 
 	return dest;
 }
+
+
+/*void *kmemcpy(void *destination, void *source, uint64_t num)
+{
+    uint8_t *dest = (uint8_t *)destination;
+    uint8_t *src = (uint8_t *)source;
+
+    while(num--) {
+        *dest++ = *src++;
+    }
+
+    return destination;
+}*/
 
 void *kmemset(void *dest, char val, size_t count) {
 	char *dst = (char *) dest;

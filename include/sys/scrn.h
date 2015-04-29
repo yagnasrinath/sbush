@@ -16,6 +16,6 @@ void init_video();
 void update_video(uint64_t addr);
 void putchat(int put_row , int put_column,unsigned char c );
 void putsat(int put_row , int put_column, char* s );
-
+uint64_t get_current_addr();
 
 #endif /* SBUSH_INCLUDE_SYS_SCRN_H_ */
