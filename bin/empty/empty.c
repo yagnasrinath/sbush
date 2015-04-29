@@ -15,7 +15,15 @@ int main(int argc, char* argv[], char* envp[]) {
 
 	//for(int i=0; i < 15; i++ ) {
 	char a[500];
-	read(0,a,50);
+	int fd = open("/bin/ls",3);
+	printf(" fd is %d \n", fd);
+
+	read(fd,a,1);
+	printf(" entered stuff is %s \n", a);
+	if(fork() ==0) {
+		int ret = read(fd,a,3);
+			printf(" entered stuff is %s %d,\n", a,ret);
+	}
 	//strncpy(a,"hi",2);
 	//int pid = fork();
 	//strncpy(a,"hi",2);
@@ -23,7 +31,7 @@ int main(int argc, char* argv[], char* envp[]) {
 	//void* dirp =opendir("/bin");
 	//struct dirent *dp;
 	//while ((dp = readdir(dirp)) != NULL) {
-		printf(" entered stuff is %s \n", a);
+
 	//}
 
 	//}

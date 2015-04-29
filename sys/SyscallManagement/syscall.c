@@ -266,6 +266,21 @@ void  sys_read()
 		curr_task->kstack[KSTACK_SIZE-RAX] = length;
 		return;
 	}
+	else if (curr_task->fd[fd]->file_perm == O_WRONLY) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else  if(curr_task->fd[fd]->file_type == FILE_TYPE) {
+		uint64_t  curr_pos = curr_task->fd[fd]->curr;
+		uint64_t end = curr_task->fd[fd]->file_ptr->end;
+		if((end - curr_pos ) < length) {
+			length = end - curr_pos;
+		}
+		kmemcpy((void*)addr,(void*)curr_task->fd[fd]->curr,length);
+		curr_task->fd[fd]->curr += length;
+		curr_task->kstack[KSTACK_SIZE-RAX] = length;
+		return;
+	}
 
 
 }

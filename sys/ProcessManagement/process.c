@@ -14,15 +14,44 @@
 #include<sys/MemoryManagement/virtual_page_allocator.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/MemoryManagement/phy_alloc.h>
+#include<sys/MemoryManagement/kmalloc.h>
 #include<sys/utils/kstring.h>
 extern void print_present_pages();
+
+
+void copyfiledes(file_des_t* child_file_d, file_des_t* parent_file_d) {
+	child_file_d->file_ptr = parent_file_d->file_ptr;
+	child_file_d->file_perm = parent_file_d->file_perm;
+	child_file_d->file_type = parent_file_d->file_type;
+	child_file_d->curr = parent_file_d->curr;
+	child_file_d->pipenode = parent_file_d->pipenode;
+	if(parent_file_d->file_type == PIPE_TYPE) {
+		if(parent_file_d->file_perm & O_RDONLY) {
+			child_file_d->pipenode->readEndRefCount++;
+		}
+		else  if(parent_file_d->file_perm & O_WRONLY){
+			child_file_d->pipenode->writeEndRefCount++;
+		}
+	}
+}
+
 
 task_struct* copy_task_struct(task_struct* parent_task_struct){
 
 	if(parent_task_struct == NULL){
 		panic("process.c: Parent Struct NULL\n");
 	}
+
+
 	task_struct* child_task_struct = create_new_task(TRUE);
+
+	for (int i = 0; i < MAX_FD_PER_PROC; ++i) {
+		if (parent_task_struct->fd[i] != NULL) {
+			file_des_t* file_d = (file_des_t *)kmalloc(sizeof(file_des_t));
+			copyfiledes( file_d,  parent_task_struct->fd[i]);
+			child_task_struct->fd[i] = file_d;
+		}
+	}
 	uint64_t child_pml4 = child_task_struct->virtual_addr_space->pml4_t;
 	uint64_t parent_pml4 = parent_task_struct->virtual_addr_space->pml4_t;
 	//kmemcpy(child_task_struct->virtual_addr_space, parent_task_struct->virtual_addr_space, sizeof(mem_struct));
