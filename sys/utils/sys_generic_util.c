@@ -6,11 +6,11 @@
  */
 
 #include <sys/sys_generic_util.h>
+#include <sys/sbunix.h>
 
 
-
-int32_t oct_to_dec(int n) {
-	int dec = 0, i = 0, curpos;
+uint64_t oct_to_dec(uint64_t n) {
+	uint64_t dec = 0, i = 0, curpos;
 	for(;n != 0;n/=10,++i) {
 		curpos = n % 10;
 		dec += curpos * pow(8, i);
@@ -18,22 +18,20 @@ int32_t oct_to_dec(int n) {
 	return dec;
 }
 
-int32_t pow(int base, int power)
+uint64_t pow(uint64_t x, uint64_t y)
 {
-	if(power == 0){
-		return 1;
-	}
-	power = power/2;
-	int result =0;
-	if(power%2 == 1) {
-		result = pow(base,power);
-		result = result*result* base;
-	}
-	else {
-		result = pow(base,power);
-		result =result*result;
-	}
-
-
-	return result;
+	uint64_t temp;
+    if( y == 0)
+       return 1;
+    temp = pow(x, y/2);
+    if (y%2 == 0)
+        return temp*temp;
+    else
+    {
+        if(y > 0)
+            return x*temp*temp;
+        else
+            return (temp*temp)/x;
+    }
 }
+

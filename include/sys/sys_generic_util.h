@@ -11,7 +11,7 @@
 
 #include<sys/defs.h>
 
-int32_t oct_to_dec(int n);
-int32_t pow(int base, int power);
+uint64_t oct_to_dec(uint64_t n);
+uint64_t pow(uint64_t base, uint64_t power);
 
 #endif /* SBUSH_INCLUDE_SYS_SYS_GENERIC_UTIL_H_ */

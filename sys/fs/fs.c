@@ -60,24 +60,36 @@ void* init_tarfs()
 {
 	HEADER *header = (HEADER*) &_binary_tarfs_start;
 	root_node = (file_t*)kmalloc(sizeof(file_t));
+	//kprintf("root node is %p \n", root_node);
 	create_node(root_node,root_node,"/",0,2,DIRECTORY_TYPE);
+	uint64_t file_size =0;
 	do
 	{
-		uint64_t file_size = oct_to_dec(atoi(header->size));
+
 		if(kstrcmp(header->typeflag,"5")==0)
 		{
+			//kprintf("size in string is %s \n", header->size);
+			file_size = oct_to_dec(atoi(header->size));
 			parse(header->name,DIRECTORY_TYPE,0,2);
+			//kprintf("file_size  is %d\n", file_size);
+			//kprintf("parsed first file %s\n", header->name);
+
 		}
 		else
 		{
+			//kprintf("size in string is %s , %d\n", header->size, atoi(header->size));
+			file_size = oct_to_dec(atoi(header->size));
+			//kprintf("file_size  is %d\n", file_size);
 			parse(header->name,FILE_TYPE,(uint64_t)header+512,(uint64_t)header+512+file_size);
+			//kprintf("parsed first file %s\n", header->name);
 		}
 
-		header=header+1;
-		if(file_size>0)
-		{
-			header=header+file_size/513 +1;
+		file_size = file_size + sizeof(HEADER);
+		if(file_size%512) {
+			file_size = ((file_size/512)*512)+512;
 		}
+		//kprintf("file size is %d",file_size);
+		header = (HEADER* )((char *)header + file_size);
 
 	}while(header<(HEADER*)&_binary_tarfs_end);
 	return root_node;
