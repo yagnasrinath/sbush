@@ -113,6 +113,8 @@ void init_pipe()
 		aux_pipe ->isUsed = FALSE;
 		aux_pipe ->read_pos = 0;
 		aux_pipe ->write_pos = 0;
+		aux_pipe ->writeEndRefCount = 0;
+		aux_pipe ->readEndRefCount = 0;
 		curr_pipe->next = aux_pipe;
 		curr_pipe = aux_pipe;
 	}

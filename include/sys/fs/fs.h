@@ -38,6 +38,8 @@ typedef struct pipe_dev
 	uint64_t read_pos;
 	uint64_t size;
 	uint64_t isUsed;
+	uint64_t readEndRefCount;
+	uint64_t writeEndRefCount;
 	struct pipe_dev* next;
 } pipe_dev_t;
 
