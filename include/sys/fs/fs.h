@@ -32,10 +32,12 @@ enum
 
 typedef struct pipe_dev
 {
-	uint64_t* buffer;
+	char buffer[PIPE_SIZE];
 	uint64_t write_pos;
 	uint64_t read_pos;
 	uint64_t size;
+	uint64_t isUsed;
+	struct pipe_dev* next;
 } pipe_dev_t;
 
 typedef struct file
@@ -49,6 +51,7 @@ typedef struct file
 } file_t;
 
 file_t* root_node;
+pipe_dev_t* root_pipe;
 
 
 typedef struct file_descriptor

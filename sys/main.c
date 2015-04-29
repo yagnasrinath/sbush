@@ -13,6 +13,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree);
 extern task_struct * get_elf_task(char *filename, char *argv[]);
 void init_keyboard();
 extern void* init_tarfs();
+extern void init_pipe();
 extern task_struct *init_task_struct;
 void start(uint32_t* modulep, void* physbase, void* physfree) {
 
@@ -65,6 +66,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 
 	init_keyboard();
 	init_tarfs();
+	init_pipe();
 
 	//volatile int a=1;
 	//while(a==1);
@@ -76,7 +78,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 
 	//create_idle_proc3();
 
-	task_struct* empty_task = get_elf_task("bin/ls", NULL);
+	task_struct* empty_task = get_elf_task("bin/empty", NULL);
 	 //get_elf_task("bin/empty", NULL);
 	empty_task->parent = init_task_struct;
 	empty_task->ppid = init_task_struct->pid;

@@ -95,3 +95,26 @@ void* init_tarfs()
 	//while(1);
 	return root_node;
 }
+
+
+void init_pipe()
+{
+
+	root_pipe = (pipe_dev_t*)kmalloc(sizeof(pipe_dev_t));
+	root_pipe ->isUsed = FALSE;
+	root_pipe ->read_pos = 0;
+	root_pipe ->write_pos = 0;
+	pipe_dev_t* curr_pipe = root_pipe;
+	int i;
+	pipe_dev_t* aux_pipe;
+	for(i=0; i<9; i++) {
+		aux_pipe = (pipe_dev_t*)kmalloc(sizeof(pipe_dev_t));
+		aux_pipe ->isUsed = FALSE;
+		aux_pipe ->read_pos = 0;
+		aux_pipe ->write_pos = 0;
+		curr_pipe->next = aux_pipe;
+		curr_pipe = aux_pipe;
+	}
+	curr_pipe->next = NULL;
+}
+
