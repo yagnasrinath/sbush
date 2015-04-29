@@ -12,6 +12,7 @@
 int mymain(uint32_t* modulep, void* physbase, void* physfree);
 extern task_struct * get_elf_task(char *filename, char *argv[]);
 void init_keyboard();
+extern void* init_tarfs();
 extern task_struct *init_task_struct;
 void start(uint32_t* modulep, void* physbase, void* physfree) {
 
@@ -59,9 +60,13 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 
 	__asm__ __volatile__("movq %0, %%rbp" : :"a"(&stack[0]));
 	__asm__ __volatile__("movq %0, %%rsp" : :"a"(&stack[INITIAL_STACK_SIZE]));
+
 	initialize_proc_scheduler();
 	initialize_free_list();
+
 	init_keyboard();
+	init_tarfs();
+
 	//volatile int a=1;
 	//while(a==1);
 

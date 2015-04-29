@@ -18,4 +18,6 @@ unsigned short *kmemsetw(unsigned short *dest, unsigned short val, int count);
 int kstrlen(const char *str);
 int kstrcmp (const char *s1, const char *s2) ;
 int32_t atoi(char *p);
+char * kstrtok(char *s, const char *delim);
+
 #endif /* SBUSH_INCLUDE_SYS_UTILS_KSTRING_H_ */
