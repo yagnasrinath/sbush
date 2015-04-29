@@ -41,9 +41,11 @@ file_t* root_node;
 
 typedef struct file_descriptor
 {
-	file_t* filenode;
+	file_t* file_ptr;
 	uint64_t file_type;
+	uint64_t curr;
 	pipe_dev_t* pipenode;
+	uint64_t file_perm;
 } file_des_t;
 
 #endif /* INCLUDE_SYS_FS_FS_H_ */

@@ -11,7 +11,11 @@
 #include<sys/ProcessManagement/process.h>
 #include<sys/ProcessManagement/process_helper.h>
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
+#include<sys/MemoryManagement/kmalloc.h>
+#include<sys/fs/fs.h>
+
 #define STDIN 0
+
 uint64_t gets(uint64_t addr, uint64_t length);
 uint64_t get_pt_vir_addr(uint64_t);
 struct timespec{
@@ -278,6 +282,68 @@ void print_mem_map (task_struct* curr_task) {
 	kprintf("\n##########\n");
 }
 
+void sys_open()
+{
+	task_struct* curr_task = get_curr_task();
+	char* path = (char*)curr_task->kstack[KSTACK_SIZE-RDI];
+	uint64_t flags = (uint64_t)curr_task->kstack[KSTACK_SIZE-RSI];
+	file_des_t* fd = (file_des_t*)kmalloc(sizeof(file_des_t));
+
+	file_t* aux_node=NULL;
+	file_t* curr_node=root_node;
+	char* path_copy = (char*)kmalloc(sizeof(char)*kstrlen(path));
+	kstrcpy(path_copy,path);
+	while(1);
+	char* temp = kstrtok(path,"/");
+	int i=0;
+	if(temp == NULL)
+	{
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	while(temp!=NULL)
+	{
+		aux_node=curr_node;
+		for(i=2;i<curr_node->end;i++)
+		{
+			if(kstrcmp(temp,curr_node->fchild[i]->file_name)==0)
+			{
+				curr_node=(file_t*)curr_node->fchild[i];
+				break;
+			}
+		}
+		if(i==aux_node->end)
+		{
+			curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+			return;
+		}
+		temp = kstrtok(NULL,"/");
+	}
+
+	if(curr_node->type==DIRECTORY_TYPE)
+	{
+		//Directory
+	}
+	else
+	{
+		//file
+		fd->file_ptr = curr_node;
+		fd->file_perm = flags;
+		fd->curr = curr_node->start;
+		for(i=0;i<MAX_FD_PER_PROC;i++)
+		{
+			if(curr_task->fd[i]==NULL)
+			{
+				curr_task->fd[i]=fd;
+				curr_task->kstack[KSTACK_SIZE-RAX] = i;
+				return;
+			}
+		}
+	}
+	curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+	return;
+}
+
 void exit(){
 
 
@@ -315,6 +381,7 @@ void handle_syscall() {
 		case 6 : fork(); break;
 		case 5 : sys_brk(); break;
 		case 4 : exit();break;
+		case 2 : sys_open();break;
 		case 1 : sys_write();break;
 		case 0 : sys_read();break;
 		default : break;

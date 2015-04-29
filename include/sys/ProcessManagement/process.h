@@ -10,6 +10,7 @@
 // An Header File that holds all the data structures needed for the Process.
 
 #include <sys/defs.h>
+#include <sys/fs/fs.h>
 
 enum TASK_STATE {
 	READY,
@@ -61,7 +62,7 @@ struct task_structure{
 	task_struct* children_head;
 	task_struct* next_sibling;
 	int wait_pid;
-	uint64_t *fd[MAX_FD_PER_PROC];
+	file_des_t *fd[MAX_FD_PER_PROC];
 	uint64_t  num_of_children;
 	task_struct *next;
 	task_struct *end;

@@ -7,3 +7,6 @@ tags
 *.iso
 newfs.506
 kernel
+.cproject
+.settings/language.settings.xml
+

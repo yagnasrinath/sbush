@@ -12,14 +12,17 @@
 
 
 int main(int argc, char* argv[], char* envp[]) {
-	for(int i=0; i < 15; i++ ) {
+
+	//for(int i=0; i < 15; i++ ) {
 		//char a[500];
 		//read(0,a,50);
 		//strncpy(a,"hi",2);
-		int pid = fork();
+		//int pid = fork();
 		//strncpy(a,"hi",2);
-		printf("passed line is  %d \n",pid);
-	}
+		//printf("passed line is  %d \n",pid);
+		int fd=open("/bin/ls/ls.c",0);
+		printf("fildescriptor %d\n",fd);
+	//}
 
 
 
