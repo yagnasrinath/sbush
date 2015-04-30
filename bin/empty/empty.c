@@ -15,14 +15,18 @@ int main(int argc, char* argv[], char* envp[]) {
 
 	//for(int i=0; i < 15; i++ ) {
 	char a[500];
-	int fd = open("/bin/ls",3);
-	printf(" fd is %d \n", fd);
-
-	read(fd,a,1);
+	a[0] = 'a';
+	int p[2];
+	int fd = pipe(p);
+	printf(" fd, pipe1,pipe2 is %d,%d,%d \n", fd,p[0],p[1]);
+	printf(" fd, pipe1,pipe2 is %d \n", p[1]);
+	int ret = write(p[1],a,1);
+	printf(" ret  is %d \n", ret);
 	printf(" entered stuff is %s \n", a);
 	if(fork() ==0) {
-		int ret = read(fd,a,3);
-			printf(" entered stuff is %s %d,\n", a,ret);
+		printf(" before reading \n");
+		int ret = read(p[0],a,1);
+		printf(" entered stuff is %s %d,\n", a,ret);
 	}
 	//strncpy(a,"hi",2);
 	//int pid = fork();

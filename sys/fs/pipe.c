@@ -8,7 +8,21 @@
 #include<sys/sbunix.h>
 pipe_dev_t* root_pipe;
 
-int open_pipe(file_des_t * fd1, file_des_t * fd2) {
+
+
+uint64_t is_pipe_available() {
+	pipe_dev_t* aux_pipe = root_pipe;
+	while(aux_pipe != NULL) {
+		if(!aux_pipe->isUsed) {
+			return TRUE;
+		}
+		aux_pipe = aux_pipe->next;
+	}
+	return FALSE;
+}
+
+
+uint64_t open_pipe(file_des_t * fd1, file_des_t * fd2) {
 
 	pipe_dev_t* aux_pipe = root_pipe;
 	while(aux_pipe != NULL) {
@@ -16,9 +30,9 @@ int open_pipe(file_des_t * fd1, file_des_t * fd2) {
 			fd1->pipenode = aux_pipe;
 			fd1->file_perm = O_RDONLY;
 			fd1->file_type = PIPE_TYPE;
-			fd1->pipenode = aux_pipe;
-			fd1->file_perm = O_WRONLY;
-			fd1->file_type = PIPE_TYPE;
+			fd2->pipenode = aux_pipe;
+			fd2->file_perm = O_WRONLY;
+			fd2->file_type = PIPE_TYPE;
 			aux_pipe->isUsed = TRUE;
 			aux_pipe->readEndRefCount = 1;
 			aux_pipe->writeEndRefCount = 1;
@@ -88,13 +102,14 @@ static inline void pipe_increment_write_by(pipe_dev_t * pipe, size_t amount) {
 
 
 uint64_t read_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
+
 	if(node->file_type != PIPE_TYPE) {
 		panic("not a pipe !!!" );
 	}
 	if(node->pipenode == NULL) {
 		panic("READ PIPE : PIPE DEVICE IS NULL!!!" );
 	}
-	if(node->file_perm & O_RDONLY) {
+	if(!(node->file_perm  == O_RDONLY)) {
 		return -1;
 	}
 
@@ -121,18 +136,17 @@ uint64_t write_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
 	if(node->pipenode == NULL) {
 		panic("READ PIPE : PIPE DEVICE IS NULL!!!" );
 	}
-	if(node->file_perm & O_WRONLY) {
+	if(!(node->file_perm  == O_WRONLY)) {
 		return -1;
 	}
-
 	pipe_dev_t* pipe = node->pipenode;
 
 	uint64_t written = 0;
 	__asm__ __volatile__ ("sti");
 	while (pipe_available(pipe) > 0 && written < size && !(pipe->readEndRefCount ==0)) {
-				pipe->buffer[pipe->write_pos] = buffer[written];
-				pipe_increment_write(pipe);
-				written++;
+		pipe->buffer[pipe->write_pos] = buffer[written];
+		pipe_increment_write(pipe);
+		written++;
 	}
 	__asm__ __volatile__ ("cli");
 	return written;
@@ -140,7 +154,7 @@ uint64_t write_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
 
 
 
-int close_pipe(file_des_t * fd1) {
+uint64_t close_pipe(file_des_t * fd1) {
 
 	pipe_dev_t* aux_pipe = fd1->pipenode;
 	if(aux_pipe  == NULL) {

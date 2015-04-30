@@ -13,7 +13,7 @@
 #include<sys/MemoryManagement/MemoryManagementUtil.h>
 #include<sys/MemoryManagement/kmalloc.h>
 #include<sys/fs/fs.h>
-
+#include<sys/fs/pipe.h>
 #define STDIN 0
 
 uint64_t gets(uint64_t addr, uint64_t length);
@@ -115,12 +115,30 @@ void sys_write(){
 	task_struct * curr_task = get_curr_task();
 	uint64_t fd = curr_task->kstack[KSTACK_SIZE-RDI];
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RSI];
-	//uint64_t len = curr_task->kstack[KSTACK_SIZE-13];
-	//kprintf("File Descriptor is %d\n",fd);
-	if(fd == 1 || fd == 2){
-		kprintf("%s",addr);
+	uint64_t length = curr_task->kstack[KSTACK_SIZE-RDX];
+	if(fd < 0 || fd > MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
 	}
-	//kprintf("Printing is done\n");
+	else if (curr_task->fd[fd] == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else if (curr_task->fd[fd]->file_type == STDOUT_TYPE ||curr_task->fd[fd]->file_type == STDERR_TYPE ) {
+		kprintf("%s",addr);
+		curr_task->kstack[KSTACK_SIZE-RAX] = length ;
+		return;
+	}
+	else if (curr_task->fd[fd]->file_type == PIPE_TYPE) {
+		length = write_pipe(curr_task->fd[fd] ,length,(uint64_t*)addr);
+		curr_task->kstack[KSTACK_SIZE-RAX] = length ;
+		return;
+	}
+	else {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1 ;
+		return;
+	}
+
 }
 
 
@@ -247,13 +265,15 @@ void waitpid(){
 
 void  sys_read()
 {
+
+
 	task_struct * curr_task = get_curr_task();
 	uint64_t fd, addr, length;
 	fd = (uint64_t)curr_task->kstack[KSTACK_SIZE-RDI];
 	addr = curr_task->kstack[KSTACK_SIZE-RSI];
-	kprintf("addr passed is %p \n",addr);
+	//kprintf("addr passed is %p \n",addr);
 	length = curr_task->kstack[KSTACK_SIZE-RDX];
-	if(fd < 0 || fd > MAX_FD_PER_PROC) {
+	if(fd < 0 || fd >= MAX_FD_PER_PROC) {
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
 		return;
 	}
@@ -261,7 +281,7 @@ void  sys_read()
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
 		return;
 	}
-	if (curr_task->fd[fd] ->file_type == STDIN_TYPE) {
+	else if (curr_task->fd[fd] ->file_type == STDIN_TYPE) {
 		length = gets(addr,length);
 		curr_task->kstack[KSTACK_SIZE-RAX] = length;
 		return;
@@ -271,6 +291,7 @@ void  sys_read()
 		return;
 	}
 	else  if(curr_task->fd[fd]->file_type == FILE_TYPE) {
+
 		uint64_t  curr_pos = curr_task->fd[fd]->curr;
 		uint64_t end = curr_task->fd[fd]->file_ptr->end;
 		if((end - curr_pos ) < length) {
@@ -281,6 +302,18 @@ void  sys_read()
 		curr_task->kstack[KSTACK_SIZE-RAX] = length;
 		return;
 	}
+
+	else  if(curr_task->fd[fd]->file_type == PIPE_TYPE) {
+
+		uint64_t ret = read_pipe(curr_task->fd[fd],length,(uint64_t*)addr);
+		curr_task->kstack[KSTACK_SIZE-RAX] = ret;
+		return;
+	}
+	else {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+
 
 
 }
@@ -458,6 +491,47 @@ void exit(){
 	__asm__ __volatile__("int $32;");
 }
 
+
+
+void sys_pipe() {
+	task_struct* curr_task = get_curr_task();
+	int* fdptr = (int*)curr_task->kstack[KSTACK_SIZE-RDI];
+	if(fdptr  == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	if(!is_pipe_available()) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	fdptr[0] = 0;
+	fdptr[1] = 0;
+	for(int i=0 ; i < MAX_FD_PER_PROC; i++) {
+		//kprintf("%d",i);
+		if(curr_task->fd[i] == NULL) {
+			if(!fdptr[0]) {
+				fdptr[0] =i;
+			}
+			else {
+				fdptr[1] = i;
+				break;
+			}
+		}
+	}
+
+	if(!fdptr[0] || !fdptr[1]) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	curr_task->fd[fdptr[0]] = (file_des_t*)kmalloc(sizeof(file_des_t));
+	curr_task->fd[fdptr[1]] = (file_des_t*)kmalloc(sizeof(file_des_t));
+	//kprintf("fd[0] and fd[1] are %d, %d \n",fdptr[0],fdptr[1]);
+
+	curr_task->kstack[KSTACK_SIZE-RAX] = open_pipe(curr_task->fd[fdptr[0]], curr_task->fd[fdptr[1]] ) ;
+	return;
+
+}
+
 void handle_syscall() {
 	PUSHA;
 	task_struct* curr_task = get_curr_task();
@@ -468,6 +542,7 @@ void handle_syscall() {
 	else {
 		switch(curr_task->kstack[KSTACK_SIZE-RAX]) {
 		case 19 : sys_getdents(); break;
+		case 16 : sys_pipe(); break;
 		case 12 : alarm();break;
 		case 11 : sleep(); break;
 		case 10 : waitpid();break;
