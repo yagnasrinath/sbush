@@ -101,7 +101,7 @@ static inline void pipe_increment_write_by(pipe_dev_t * pipe, size_t amount) {
 }
 
 
-uint64_t read_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
+uint64_t read_pipe(file_des_t  * node, uint64_t size, char *buffer) {
 
 	if(node->file_type != PIPE_TYPE) {
 		panic("not a pipe !!!" );
@@ -129,7 +129,7 @@ uint64_t read_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
 
 
 
-uint64_t write_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
+uint64_t write_pipe(file_des_t  * node, uint64_t size, char *buffer) {
 	if(node->file_type != PIPE_TYPE) {
 		panic("not a pipe !!!" );
 	}
@@ -140,15 +140,17 @@ uint64_t write_pipe(file_des_t  * node, uint64_t size, uint64_t *buffer) {
 		return -1;
 	}
 	pipe_dev_t* pipe = node->pipenode;
-
 	uint64_t written = 0;
 	__asm__ __volatile__ ("sti");
 	while (pipe_available(pipe) > 0 && written < size && !(pipe->readEndRefCount ==0)) {
+		__asm__ __volatile__ ("cli");
 		pipe->buffer[pipe->write_pos] = buffer[written];
 		pipe_increment_write(pipe);
 		written++;
+		__asm__ __volatile__ ("sti");
 	}
 	__asm__ __volatile__ ("cli");
+
 	return written;
 }
 

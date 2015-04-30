@@ -14,19 +14,19 @@
 int main(int argc, char* argv[], char* envp[]) {
 
 	//for(int i=0; i < 15; i++ ) {
-	char a[500];
-	a[0] = 'a';
+	char* a = "this is a test for pipe";
+	char b[500];
 	int p[2];
 	int fd = pipe(p);
 	printf(" fd, pipe1,pipe2 is %d,%d,%d \n", fd,p[0],p[1]);
 	printf(" fd, pipe1,pipe2 is %d \n", p[1]);
-	int ret = write(p[1],a,1);
+	int ret = write(p[1],a,20);
 	printf(" ret  is %d \n", ret);
 	printf(" entered stuff is %s \n", a);
 	if(fork() ==0) {
 		printf(" before reading \n");
-		int ret = read(p[0],a,1);
-		printf(" entered stuff is %s %d,\n", a,ret);
+		int ret = read(p[0],b,22);
+		printf(" entered stuff is %s, %d\n", b,ret);
 	}
 	//strncpy(a,"hi",2);
 	//int pid = fork();

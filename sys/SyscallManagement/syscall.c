@@ -130,7 +130,7 @@ void sys_write(){
 		return;
 	}
 	else if (curr_task->fd[fd]->file_type == PIPE_TYPE) {
-		length = write_pipe(curr_task->fd[fd] ,length,(uint64_t*)addr);
+		length = write_pipe(curr_task->fd[fd] ,length,(char*)addr);
 		curr_task->kstack[KSTACK_SIZE-RAX] = length ;
 		return;
 	}
@@ -305,7 +305,7 @@ void  sys_read()
 
 	else  if(curr_task->fd[fd]->file_type == PIPE_TYPE) {
 
-		uint64_t ret = read_pipe(curr_task->fd[fd],length,(uint64_t*)addr);
+		uint64_t ret = read_pipe(curr_task->fd[fd],length,(char*)addr);
 		curr_task->kstack[KSTACK_SIZE-RAX] = ret;
 		return;
 	}
