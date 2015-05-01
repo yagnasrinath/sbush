@@ -162,10 +162,10 @@ uint64_t close_pipe(file_des_t * fd1) {
 	if(aux_pipe  == NULL) {
 		panic("panic something wrong NO pipe!!!");
 	}
-	if(fd1->file_perm & O_WRONLY) {
+	if(fd1->file_perm == O_WRONLY) {
 		aux_pipe->writeEndRefCount--;
 	}
-	else if (fd1->file_perm & O_RDONLY) {
+	else if (fd1->file_perm == O_RDONLY) {
 		aux_pipe->readEndRefCount--;
 	}
 	if(aux_pipe->writeEndRefCount == 0 && aux_pipe->readEndRefCount == 0) {

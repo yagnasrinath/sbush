@@ -141,6 +141,59 @@ void sys_write(){
 
 }
 
+void  sys_lseek()
+{
+	/*task_struct * curr_task = get_curr_task();
+	uint64_t fd = curr_task->kstack[KSTACK_SIZE-RDI];
+	uint64_t offset = curr_task->kstack[KSTACK_SIZE-RSI];
+	uint64_t whence = curr_task->kstack[KSTACK_SIZE-RDX];
+	uint64_t start, end;
+
+	if(fd < 0 || fd > MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else if (curr_task->fd[fd] == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+
+	else if (curr_task->fd[fd]->file_type == FILE_TYPE)  {
+		start = curr_task->fd[fd]->curr;
+		if(whence == SEEK_SET) {
+			if (offset < 0)
+				offset = 0;
+			CURRENT_TASK->fd[fd]->curr = CURRENT_TASK->fd[fd]->file_ptr->start + offset;
+		} else if (whence == SEEK_CUR) {
+			if(curr_task->fd[fd]->curr + offset > end) {
+
+				CURRENT_TASK->fd[fd]->curr = end;
+			} else {
+
+				((FD *)(CURRENT_TASK->file_descp[fd_type]))->curr += offset;
+			}
+		} else if (whence == SEEK_END) {
+
+		}
+		else {
+
+		}
+	}
+	else if (curr_task->fd[fd]->file_type == PIPE_TYPE) {
+		length = write_pipe(curr_task->fd[fd] ,length,(char*)addr);
+		curr_task->kstack[KSTACK_SIZE-RAX] = length ;
+		return;
+	}
+	else {
+
+
+	}
+*/
+
+}
+
+
+
 
 
 void sys_brk() {
@@ -487,6 +540,15 @@ void exit(){
 	kprintf("vma list freed\n");
 	free_pagetables();
 	//print_present_pages();
+	for(int fd = 0;  fd < MAX_FD_PER_PROC; fd++) {
+		if (curr_task->fd[fd] != NULL){
+			if(curr_task->fd[fd]->file_type  == PIPE_TYPE ) {
+				close_pipe(curr_task->fd[fd]);
+
+			}
+
+		}
+	}
 
 	__asm__ __volatile__("int $32;");
 }
@@ -532,6 +594,121 @@ void sys_pipe() {
 
 }
 
+void dup () {
+	task_struct* curr_task = get_curr_task();
+	uint64_t fd  = curr_task->kstack[KSTACK_SIZE-RDI];
+	if(fd < 0 || fd >= MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else if (curr_task->fd[fd] == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+
+	for(int i=0 ; i < MAX_FD_PER_PROC; i++) {
+		if(curr_task->fd[i] == NULL) {
+			curr_task->fd[i] = curr_task->fd[fd];
+			if(curr_task->fd[i]->file_type  == PIPE_TYPE ) {
+				if(curr_task->fd[i]->file_perm == O_WRONLY) {
+					curr_task->fd[i]->pipenode->writeEndRefCount++;
+				}
+				else {
+					curr_task->fd[i]->pipenode->readEndRefCount++;
+				}
+			}
+			curr_task->kstack[KSTACK_SIZE-RAX] = i;
+			return;
+		}
+
+	}
+	curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+	return;
+}
+
+
+
+void dup2() {
+
+	task_struct* curr_task = get_curr_task();
+	uint64_t oldfd  = curr_task->kstack[KSTACK_SIZE-RDI];
+	uint64_t newfd  = curr_task->kstack[KSTACK_SIZE-RSI];
+	if(oldfd < 0 || oldfd >= MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else if(newfd < 0 || newfd >= MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else if (curr_task->fd[oldfd] == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+
+	if(curr_task->fd[newfd] != NULL) {
+		if(curr_task->fd[newfd]->file_type  == PIPE_TYPE ) {
+			close_pipe(curr_task->fd[newfd]);
+
+		}
+	}
+	curr_task->fd[newfd]  = curr_task->fd[oldfd];
+	if(curr_task->fd[newfd]->file_type  == PIPE_TYPE) {
+		if(curr_task->fd[newfd]->file_perm == O_WRONLY) {
+			curr_task->fd[newfd]->pipenode->writeEndRefCount++;
+		}
+		else {
+			curr_task->fd[newfd]->pipenode->readEndRefCount++;
+		}
+	}
+	curr_task->kstack[KSTACK_SIZE-RAX] = 0;
+	return;
+}
+
+void SYS_lseek() {
+
+
+}
+
+
+void sys_getcwd() {
+	char * buf;
+	uint64_t size;
+	task_struct* curr_task = get_curr_task();
+	buf  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
+	kprintf("hi \n");
+	size=  curr_task->kstack[KSTACK_SIZE-RSI];
+	if (!buf) {
+		return ;
+	}
+	kmemcpy(buf, "/bin", size);
+	curr_task->kstack[KSTACK_SIZE-RAX] = 0;
+}
+
+
+
+
+void SYS_close() {
+
+	task_struct* curr_task = get_curr_task();
+	uint64_t fd  = curr_task->kstack[KSTACK_SIZE-RDI];
+	if(fd < 0 || fd >= MAX_FD_PER_PROC) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	else if (curr_task->fd[fd] == NULL) {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
+	if(curr_task->fd[fd]->file_type  == PIPE_TYPE ) {
+		close_pipe(curr_task->fd[fd]);
+
+	}
+	curr_task->fd[fd] = NULL;
+
+}
+
+
 void handle_syscall() {
 	PUSHA;
 	task_struct* curr_task = get_curr_task();
@@ -542,7 +719,11 @@ void handle_syscall() {
 	else {
 		switch(curr_task->kstack[KSTACK_SIZE-RAX]) {
 		case 19 : sys_getdents(); break;
+		case 18 : dup2(); break;
+		case 17 : dup(); break;
 		case 16 : sys_pipe(); break;
+		case 15 : SYS_lseek(); break;
+		case 13 : sys_getcwd(); break;
 		case 12 : alarm();break;
 		case 11 : sleep(); break;
 		case 10 : waitpid();break;
@@ -551,6 +732,7 @@ void handle_syscall() {
 		case 6 : fork(); break;
 		case 5 : sys_brk(); break;
 		case 4 : exit();break;
+		case 3 : SYS_close(); break;
 		case 2 : sys_open();break;
 		case 1 : sys_write();break;
 		case 0 : sys_read();break;

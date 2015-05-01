@@ -56,6 +56,7 @@ struct task_structure{
 	enum TASK_STATE state;
 	uint64_t rsp;
 	char task_name[TASK_NAME_LENGTH];
+	char CWD[MAX_FULL_PATH_LEN];
 	int sleep_for;
 	BOOL is_user_proc;
 	task_struct* parent;

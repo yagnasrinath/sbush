@@ -14,8 +14,11 @@
 int main(int argc, char* argv[], char* envp[]) {
 
 	//for(int i=0; i < 15; i++ ) {
-	char* a = "this is a test for pipe";
+	char a[500];
 	char b[500];
+	strcpy(b, "this is a test for stack");
+	strcpy(a, "this is a test for stack");
+	printf(" entered stuff is %s\n", b);
 	int p[2];
 	int fd = pipe(p);
 	printf(" fd, pipe1,pipe2 is %d,%d,%d \n", fd,p[0],p[1]);

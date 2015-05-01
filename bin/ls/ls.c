@@ -7,6 +7,7 @@ int main(int argc, char* argv[], char* envp[]) {
     void* dir; 
     if(argc == 1){
         getcwd(buf,255);
+
         dir = opendir(buf);
         if(!dir){
             printf("Opening Directory failed\n");

@@ -23,6 +23,8 @@
 extern void print_present_pages();
 extern void _set_cr3(uint64_t cr3);
 static char args[MAX_ARGS][MAX_USR_ARG_LEN];
+static char envs[MAX_ENVP][MAX_USR_ENVP_LEN];
+
 static BOOL is_file_elf(Elf64_Ehdr* elf_loader) {
 	if(elf_loader->e_ident[0] !=ELFMAG0 ) {
 		return FALSE;
@@ -40,45 +42,47 @@ static BOOL is_file_elf(Elf64_Ehdr* elf_loader) {
 }
 
 
-void copy_arg_to_stack(task_struct *task,char* filename, char* inp_args[]) {
-	int argc = 0;
-	kstrncpy(args[argc],filename, MAX_USR_ARG_LEN-1);
-	args[argc][MAX_USR_ARG_LEN-1]= '\0';
-	argc++;
-	int curr_arg = 0;
-	if(inp_args) {
-		while(inp_args[curr_arg]) {
-			kstrncpy(args[argc], inp_args[curr_arg], MAX_USR_ARG_LEN-1);
-			args[argc][MAX_USR_ARG_LEN-1]= '\0';
-			curr_arg++;
-			argc++;
-		}
-	}
+static void copy_arg_to_stack(task_struct *task, int argc, int envc)
+{
+	uint64_t *user_stack, *argv[10], *env[10];
+	int len, i;
 	uint64_t present_pml4 = read_cr3();
 	_set_cr3(task->virtual_addr_space->pml4_t);
-	uint64_t *user_stack = (uint64_t*)task->virtual_addr_space->stack_start;
-	uint64_t *argv[10];
-	int i = argc-1;
-	while(i>=0 ) {
-		int len = kstrlen(args[i]) + 1;
+	user_stack = (uint64_t*) task->virtual_addr_space->stack_start;
+	for (i = envc-1; i >= 0; i--) {
+		len = kstrlen(envs[i]) + 1;
 		user_stack = (uint64_t*)((void*)user_stack - len);
-		kmemcpy(user_stack,args[i], len);
-		argv[i] = user_stack;
-		i--;
+		kmemcpy((char*)user_stack, envs[i], len);
+		env[i] = user_stack;
 	}
-	i = argc-1;
-	while(i>=0 ) {
+
+	for (i = argc-1; i >= 0; i--) {
+		len = kstrlen(args[i]) + 1;
+		user_stack = (uint64_t*)((void*)user_stack - len);
+		kmemcpy((char*)user_stack, args[i], len);
+		argv[i] = user_stack;
+	}
+	// Store the argument pointers
+	*user_stack  = 0;
+	user_stack--;
+	for (i = envc-1; i >= 0; i--) {
 		user_stack--;
-		*user_stack = (uint64_t)argv[i] ;
-		i--;
+		*user_stack = (uint64_t)env[i];
+	}
+	*user_stack  = 0;
+	user_stack--;
+	for (i = argc-1; i >= 0; i--) {
+		user_stack--;
+		*user_stack = (uint64_t)argv[i];
 	}
 	user_stack--;
 	*user_stack = (uint64_t)argc;
-	task->virtual_addr_space->stack_start= (uint64_t)user_stack;
+	task->virtual_addr_space->stack_start = (uint64_t)user_stack;
+
 	_set_cr3(present_pml4);
 }
 
-void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char* argv[]) {
+void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char* argv[], char* envp[]) {
 
 	uint64_t present_pml4 = read_cr3();
 	//kprintf("pml4t of new process is %p \n",present_pml4);
@@ -174,7 +178,23 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	new_task->virtual_addr_space->stack_start = user_stack_top -0x8;
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
-	//copy_arg_to_stack(new_task,filename, argv);
+	int argc = 0;
+	kstrcpy(args[argc++], filename);
+	if (argv) {
+		while (argv[argc-1]) {
+			kstrcpy(args[argc], argv[argc-1]);
+			argc++;
+		}
+	}
+	int envc =0;
+	if (envp) {
+		while (envp[envc]) {
+			kstrcpy(envs[envc], envp[envc]);
+			envc++;
+		}
+	}
+
+	copy_arg_to_stack(new_task, argc, envc);
 	new_task->state = READY;
 	file_des_t * file_d      = (file_des_t * )kmalloc(sizeof(file_des_t));
 	file_d->file_type = STDIN_TYPE;
@@ -191,7 +211,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 
 
 
-task_struct * get_elf_task(char *filename, char *argv[]) {
+task_struct * get_elf_task(char *filename, char *argv[], char* env[]) {
 
 	char* data = get_file_data(filename);
 	if(data  == NULL) {
@@ -209,6 +229,6 @@ task_struct * get_elf_task(char *filename, char *argv[]) {
 	if(new_task  == NULL) {
 		panic("elfoader.c : get_elf_task : create_new_task returned NULL. Probably out of resources");
 	}
-	load_elf(new_task, filename,elf_header, argv);
+	load_elf(new_task, filename,elf_header, argv, env);
 	return new_task;
 }

@@ -17,6 +17,7 @@ typedef unsigned char uint8_t;
 #define KSTACK_SIZE 512   // since it is an array of uint64_t 8*12
 #define USR_STK_SIZE 0x10000 // 64KB *
 #define TASK_NAME_LENGTH 50
+#define MAX_FULL_PATH_LEN 100
 #define  MAX_FD_PER_PROC 12
 #define PAGE_ALIGN(ADDR) ((ADDR) >> 12 << 12)
 #define KERNEL_RW_FLAG 2UL  // 10
@@ -30,6 +31,8 @@ typedef unsigned char uint8_t;
 #define USR_STK_TOP  0xF0000000000UL
 #define MAX_USR_ARG_LEN 100
 #define MAX_ARGS 10
+#define MAX_ENVP 10
+#define MAX_USR_ENVP_LEN 100
 
 typedef int BOOL;
 

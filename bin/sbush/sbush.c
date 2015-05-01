@@ -299,6 +299,7 @@ void execute_job(struct job* j,char***envp_ptr)
 int main(int argc, char* argv[], char* envp[])
 {
     initprompt();
+
     initializeenv(envp);
     char*** new_envp_ptr = getenv();
     char * line;
@@ -322,7 +323,7 @@ int main(int argc, char* argv[], char* envp[])
     }
     while(1)
     {
-        line = get_line(); 
+        line = get_line();
         if(!strlen(line))
         {
             free(line);

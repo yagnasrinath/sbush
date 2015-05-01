@@ -78,7 +78,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 
 	//create_idle_proc3();
 
-	task_struct* empty_task = get_elf_task("bin/empty", NULL);
+	task_struct* empty_task = get_elf_task("bin/sbush", NULL);
 	 //get_elf_task("bin/empty", NULL);
 	empty_task->parent = init_task_struct;
 	empty_task->ppid = init_task_struct->pid;
