@@ -42,28 +42,30 @@ static BOOL is_file_elf(Elf64_Ehdr* elf_loader) {
 }
 
 
-static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInitProc,char* file_name)
+static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInitProc)
 {
 	uint64_t *user_stack, *argv[10], *env[10];
 	int len, i;
 	uint64_t present_pml4 = read_cr3();
 	_set_cr3(task->virtual_addr_space->pml4_t);
 	user_stack = (uint64_t*) task->virtual_addr_space->stack_start;
+	//kprintf("user stack start is %p \n",user_stack );
 	for (i = envc-1; i >= 0; i--) {
 		len = kstrlen(envs[i]) + 1;
-		user_stack = (uint64_t*)((void*)user_stack - len);
+		user_stack = (uint64_t*)((uint64_t)user_stack - len);
 		kmemcpy((char*)user_stack, envs[i], len);
 		env[i] = user_stack;
 	}
+	//kprintf("env[i] end is %p \n",user_stack );
 	if(isInitProc) {
 		kprintf("process is init process \n");
 		len = kstrlen("PATH=/bin") + 1;
-		user_stack = (uint64_t*)((void*)user_stack - len);
+		user_stack = (uint64_t*)((uint64_t)user_stack - len);
 		kmemcpy((char*)user_stack, "PATH=/bin", len);
-		env[i] = user_stack;
-		envc++;
+		env[0] = user_stack;
+		envc = 1;
 	}
-
+	//kprintf("env[i] end in case of init is %p \n",user_stack );
 
 	for (i = argc-1; i >= 0; i--) {
 		len = kstrlen(args[i]) + 1;
@@ -71,31 +73,31 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 		kmemcpy((char*)user_stack, args[i], len);
 		argv[i] = user_stack;
 	}
-	//srinath
-	kmemcpy((char*)user_stack, file_name, kstrlen(file_name));
-	uint64_t file_name_ptr = (uint64_t)user_stack;
-	//srinath
-
+	//kprintf("argv[i] end in is %p \n",user_stack );
 	// Store the argument pointers
-	*user_stack  = 0;
 	user_stack--;
+	*user_stack  = 0;
+
 	for (i = envc-1; i >= 0; i--) {
 		user_stack--;
 		*user_stack = (uint64_t)env[i];
 	}
-	*user_stack  = 0;
+	//kprintf("beggining of env is %s \n",user_stack);
 	user_stack--;
+	*user_stack  = 0;
+
+	//kprintf("argv[i] is %p \n", argv[0]);
 	for (i = argc-1; i >= 0; i--) {
 		user_stack--;
 		*user_stack = (uint64_t)argv[i];
 	}
+	//kprintf("beggining of argv is %p  %p\n",user_stack, *user_stack);
 	user_stack--;
-	//srinath
-	*user_stack = file_name_ptr;
-	user_stack--;
-	//srinath
 
 	*user_stack = (uint64_t)argc;
+	//kprintf("beggining of argc is %p \n",user_stack);
+	//user_stack--;
+	//while(1);
 	task->virtual_addr_space->stack_start = (uint64_t)user_stack;
 
 	_set_cr3(present_pml4);
@@ -205,6 +207,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 			argc++;
 		}
 	}
+
 	int envc =0;
 	if (envp) {
 		while (envp[envc]) {
@@ -213,7 +216,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		}
 	}
 
-	copy_arg_to_stack(new_task, argc, envc,isInitProc,filename);
+	copy_arg_to_stack(new_task, argc, envc,isInitProc);
 	new_task->state = READY;
 	file_des_t * file_d      = (file_des_t * )kmalloc(sizeof(file_des_t));
 	file_d->file_type = STDIN_TYPE;

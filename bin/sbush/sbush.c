@@ -209,11 +209,20 @@ void execute_command(struct command*c, char***envp_ptr)
 		if(paths != NULL) {
 			while( *paths)
 			{
-				if(c->argv[0])
-					free(c->argv[0]);
+				printf("paths are %s \n", *paths);
+				printf("c-> argv[0] is %p \n",c->argv[0]);
+				printf("paths are %s \n", *paths);
+//				if(c->argv[0])
+//					free(c->argv[0]);
+				printf("paths are %s \n", *paths);
 				char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
+				printf("paths are %s \n", *paths);
+				printf("cmdpath are %p \n", cmdpath);
+				printf("cmdpaths are %s \n", cmdpath);
+				printf("c are %s \n", c->executable);
 				setabsolutepath(cmdpath,c,*paths);
 				c->argv[0]=cmdpath;
+				printf("cmdpath is %s \n", cmdpath);
 				execve(cmdpath,c->argv,*envp_ptr);
 				if (errno != ENOENT && errno != EACCES)
 				{
@@ -302,7 +311,6 @@ void execute_job(struct job* j,char***envp_ptr)
 int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
-
 	initializeenv(envp);
 	char*** new_envp_ptr = getenv();
 	char * line;

@@ -12,6 +12,7 @@ void _start(void) {
 	argc = *(uint64_t*)(((uint64_t)stack_breaker)+sizeof(uint64_t));
 	argv = (char**)(((uint64_t)stack_breaker)+2*sizeof(uint64_t));
 	envp =(char**)(((uint64_t)stack_breaker)+3*sizeof(uint64_t)+sizeof(uint64_t)*argc);
+	//while(1);
 	int res = main(argc, argv, envp);
 	exit(res);
 }

@@ -4,6 +4,6 @@
 #define JOB_MAX_LENGTH  2440
 #define ARG_MAX_LENGTH  256
 #define MAX_COMMAND_ARGS 256
-#define MAX_PATH_LENGTH 10240
+#define MAX_PATH_LENGTH  256
 
 #endif

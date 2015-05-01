@@ -161,6 +161,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 		if(curr_vma == NULL) {
 			print_regiters(regs);
 			// should exit process and throw segmentation fault
+			kprintf("page_fault_handler cr2 %p \n",lcr2);
 			panic("Process accessed unassigned memory \n");
 		}
 	}

@@ -42,11 +42,6 @@ void initializeenv(char **inputEnv) {
 
 
 	int i =0;
-	printf("envp[i] is %d \n",inputEnv[i]);
-	while(inputEnv[i]) {
-		printf("%s",inputEnv[i]);
-		i++;
-	}
 	i=0;
 	envList* head = 0;
 	envList* tail = 0;
