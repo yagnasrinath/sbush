@@ -59,9 +59,9 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 	//kprintf("env[i] end is %p \n",user_stack );
 	if(isInitProc) {
 		kprintf("process is init process \n");
-		len = kstrlen("PATH=/bin") + 1;
+		len = kstrlen("PATH=bin") + 1;
 		user_stack = (uint64_t*)((uint64_t)user_stack - len);
-		kmemcpy((char*)user_stack, "PATH=/bin", len);
+		kmemcpy((char*)user_stack, "PATH=bin", len);
 		env[0] = user_stack;
 		envc = 1;
 	}

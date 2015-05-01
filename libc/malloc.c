@@ -209,7 +209,7 @@ void free(void* mem)
 			else {
 				base = NULL;
 			}
-			brk(cur);
+			//	brk(cur);
 		}
 	}
 }

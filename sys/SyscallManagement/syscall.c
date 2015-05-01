@@ -221,9 +221,9 @@ void sys_brk() {
 	}
 	else {
 		curr_task->kstack[KSTACK_SIZE-RAX] = addr;
-		if(addr%PAGE_SIZE != 0) {
+		/*if(addr%PAGE_SIZE != 0) {
 			addr = PAGE_ALIGN(addr) + PAGE_SIZE;
-		}
+		}*/
 		curr_vma ->vm_area_end = addr+0X8;
 		//curr_task->kstack[KSTACK_SIZE-10] = curr_vma ->vm_area_end;
 	}
@@ -404,24 +404,24 @@ void sys_getdents()
 	kmemset(curr_dirent, '\0', sizeof(curr_dirent));
 	if(fd < 0 || fd > MAX_FD_PER_PROC ) {
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
-		kprintf("reached here 1\n");
+		//kprintf("reached here 1\n");
 		return;
 	}
 	file_des_t* curr_file_desp =  curr_task->fd[fd];
 	if(curr_file_desp == NULL) {
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
-		kprintf("reached here 2 \n");
+		//kprintf("reached here 2 \n");
 		return;
 	}
 	if(curr_file_desp->file_type != DIRECTORY_TYPE) {
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
-		kprintf("reached here 3 \n");
+		//kprintf("reached here 3 \n");
 		return;
 	}
 	if( curr_file_desp->curr >= curr_file_desp->file_ptr->end ) {
 
 		curr_task->kstack[KSTACK_SIZE-RAX] = 0;
-		kprintf("reached here 4 \n");
+		//kprintf("reached here 4 \n");
 		return;
 	}
 
@@ -735,6 +735,7 @@ void sys_execvpe()
 		__asm__ __volatile__("int $32");
 	}
 	curr_task->kstack[KSTACK_SIZE-RAX] = -2;
+	kprintf("sys_excecve returned \n");
 	return;
 }
 void sys_getcwd() {
