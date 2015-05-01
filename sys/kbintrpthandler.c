@@ -94,6 +94,7 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 		uint64_t val = get_asci_for_sc(b,is_shift_pressed);
 		if (flag == 1) {
 			if (val == '\n') {
+				buf[counter++] = '\n';
 				buf[counter++] = '\0';
 				putch(val);
 				flag = 0;
