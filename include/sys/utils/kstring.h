@@ -19,5 +19,5 @@ int kstrlen(const char *str);
 int kstrcmp (const char *s1, const char *s2) ;
 int32_t atoi(char *p);
 char * kstrtok(char *s, const char *delim);
-
+char *kstrcat (char *__restrict dest, const char *__restrict src);
 #endif /* SBUSH_INCLUDE_SYS_UTILS_KSTRING_H_ */

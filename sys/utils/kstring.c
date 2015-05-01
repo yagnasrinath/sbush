@@ -18,6 +18,19 @@ void *kmemcpy(void *dest, void *source, uint64_t count){
 }
 
 
+char *kstrcat (char *__restrict dest, const char *__restrict src) {
+    char *orgdest = dest;
+    while(*dest){
+        dest++;
+    }
+    while(*src){
+        *dest++ =*src++;
+    }
+    *dest='\0';
+    return orgdest;
+}
+
+
 /*void *kmemcpy(void *destination, void *source, uint64_t num)
 {
     uint8_t *dest = (uint8_t *)destination;

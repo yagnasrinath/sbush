@@ -14,6 +14,7 @@
 #include<sys/MemoryManagement/kmalloc.h>
 #include<sys/fs/fs.h>
 #include<sys/fs/pipe.h>
+#include<sys/elf_loader.h>
 #define STDIN 0
 
 uint64_t gets(uint64_t addr, uint64_t length);
@@ -143,11 +144,11 @@ void sys_write(){
 
 void  sys_lseek()
 {
-	/*task_struct * curr_task = get_curr_task();
+	task_struct * curr_task = get_curr_task();
 	uint64_t fd = curr_task->kstack[KSTACK_SIZE-RDI];
 	uint64_t offset = curr_task->kstack[KSTACK_SIZE-RSI];
 	uint64_t whence = curr_task->kstack[KSTACK_SIZE-RDX];
-	uint64_t start, end;
+	uint64_t end;
 
 	if(fd < 0 || fd > MAX_FD_PER_PROC) {
 		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
@@ -159,37 +160,33 @@ void  sys_lseek()
 	}
 
 	else if (curr_task->fd[fd]->file_type == FILE_TYPE)  {
-		start = curr_task->fd[fd]->curr;
+		end=curr_task->fd[fd]->file_ptr->end;
 		if(whence == SEEK_SET) {
-			if (offset < 0)
+			if (offset < 0) {
 				offset = 0;
-			CURRENT_TASK->fd[fd]->curr = CURRENT_TASK->fd[fd]->file_ptr->start + offset;
+			}
+			curr_task->fd[fd]->curr = curr_task->fd[fd]->file_ptr->start + offset;
+			curr_task->kstack[KSTACK_SIZE-RAX] = curr_task->fd[fd]->curr;
 		} else if (whence == SEEK_CUR) {
 			if(curr_task->fd[fd]->curr + offset > end) {
-
-				CURRENT_TASK->fd[fd]->curr = end;
+				curr_task->fd[fd]->curr = end;
 			} else {
-
-				((FD *)(CURRENT_TASK->file_descp[fd_type]))->curr += offset;
+				curr_task->fd[fd]->curr += offset;
 			}
+			curr_task->kstack[KSTACK_SIZE-RAX] = curr_task->fd[fd]->curr;
 		} else if (whence == SEEK_END) {
-
+			curr_task->fd[fd]->curr = end;
+			curr_task->kstack[KSTACK_SIZE-RAX] = curr_task->fd[fd]->curr;
 		}
 		else {
-
+			curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+			return;
 		}
 	}
-	else if (curr_task->fd[fd]->file_type == PIPE_TYPE) {
-		length = write_pipe(curr_task->fd[fd] ,length,(char*)addr);
-		curr_task->kstack[KSTACK_SIZE-RAX] = length ;
+	else {
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
 		return;
 	}
-	else {
-
-
-	}
-*/
-
 }
 
 
@@ -445,7 +442,13 @@ void sys_open()
 
 	char* path_copy = (char*)kmalloc(sizeof(char)*kstrlen(path));
 	kstrcpy(path_copy,path);
-	char* temp = kstrtok(path,"/");
+	//prepending path if absolute path is not given
+	if(path[0]!='/')
+	{
+		kstrcpy(path_copy,curr_task->CWD);
+		kstrcat(path_copy,path);
+	}
+	char* temp = kstrtok(path_copy,"/");
 	int i=0;
 	if(temp == NULL)
 	{
@@ -665,24 +668,81 @@ void dup2() {
 	return;
 }
 
-void SYS_lseek() {
-
-
+void sys_chdir()
+{
+	char * path;
+	task_struct* curr_task = get_curr_task();
+	path  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
+	kmemcpy(curr_task->CWD,path, kstrlen(path));
+	curr_task->kstack[KSTACK_SIZE-RAX] = 0;
+	return;
 }
 
+void replace_task(task_struct* old_task, task_struct* curr_task){
+	task_struct* parent_task = old_task->parent;
+	task_struct* sib = parent_task->children_head;
+	task_struct* last_sib = NULL;
 
+	while(sib!=NULL)
+	{
+		if(sib==old_task)
+		{
+			break;
+		}
+		last_sib = sib;
+		sib=sib->next;
+	}
+	if(sib==NULL)
+	{
+		panic("child is not present in parent's children list");
+	}
+	if(last_sib!=NULL)
+	{
+		last_sib->next_sibling = curr_task;
+		curr_task->next_sibling = sib->next_sibling;
+	}
+	else
+	{
+		curr_task->next_sibling = sib->next_sibling;
+		parent_task->children_head=curr_task;
+	}
+}
+
+void sys_execvpe()
+{
+	task_struct* curr_task = get_curr_task();
+	char* file_name  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
+	char** argv = (char **)curr_task->kstack[KSTACK_SIZE-RSI];
+	char** envp = (char **)curr_task->kstack[KSTACK_SIZE-RDX];
+	task_struct* new_task = get_elf_task(file_name,argv,envp);
+	if(new_task!=NULL)
+	{
+		decrement_pid();
+		new_task->pid = curr_task->pid;
+		new_task->ppid = curr_task->ppid;
+		new_task->parent = curr_task->parent;
+		kmemcpy(new_task->fd,curr_task->fd,MAX_FD_PER_PROC*8);
+		replace_task(curr_task, new_task);
+		free_process_vma_list(curr_task->virtual_addr_space->vmaList);
+		//free_page_tables()
+		curr_task->state=EXIT;
+		__asm__ __volatile__("int $32");
+	}
+	curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+	return;
+}
 void sys_getcwd() {
 	char * buf;
 	uint64_t size;
 	task_struct* curr_task = get_curr_task();
 	buf  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
-	kprintf("hi \n");
 	size=  curr_task->kstack[KSTACK_SIZE-RSI];
 	if (!buf) {
 		return ;
 	}
-	kmemcpy(buf, "/bin", size);
+	kmemcpy(buf, curr_task->CWD, size);
 	curr_task->kstack[KSTACK_SIZE-RAX] = 0;
+	return;
 }
 
 
@@ -722,11 +782,13 @@ void handle_syscall() {
 		case 18 : dup2(); break;
 		case 17 : dup(); break;
 		case 16 : sys_pipe(); break;
-		case 15 : SYS_lseek(); break;
+		case 15 : sys_lseek(); break;
+		case 14 : sys_chdir(); break;
 		case 13 : sys_getcwd(); break;
 		case 12 : alarm();break;
 		case 11 : sleep(); break;
 		case 10 : waitpid();break;
+		case 9  : sys_execvpe();break;
 		case 8  : getppid(); break;
 		case 7  : getpid(); break;
 		case 6 : fork(); break;

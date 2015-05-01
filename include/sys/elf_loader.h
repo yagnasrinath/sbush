@@ -10,6 +10,8 @@
 #ifndef SBUSH_INCLUDE_SYS_ELF_LOADER_H_
 #define SBUSH_INCLUDE_SYS_ELF_LOADER_H_
 
+#include<sys/ProcessManagement/process.h>
+
 #define EI_NIDENT 16
 typedef  uint64_t Elf64_Off;
 typedef  uint64_t Elf64_Addr;
@@ -55,6 +57,6 @@ typedef struct {
 	uint16_t      e_shnum;
 	uint16_t      e_shstrndx;
 } Elf64_Ehdr;
-
+task_struct * get_elf_task(char *filename, char *argv[], char* env[]);
 
 #endif /* SBUSH_INCLUDE_SYS_ELF_LOADER_H_ */
