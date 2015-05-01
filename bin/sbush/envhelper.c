@@ -36,9 +36,18 @@ void parsecurrenv(envList* currentEnv, char* inputEnv) {
 void initializeenv(char **inputEnv) {
 
 	if(inputEnv == 0) {
+		printf("envp is null \n");
 		return ;
 	}
+
+
 	int i =0;
+	printf("envp[i] is %d \n",inputEnv[i]);
+	while(inputEnv[i]) {
+		printf("%s",inputEnv[i]);
+		i++;
+	}
+	i=0;
 	envList* head = 0;
 	envList* tail = 0;
 	while(inputEnv[i]) {

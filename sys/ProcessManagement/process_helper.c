@@ -147,6 +147,37 @@ void detach_children(task_struct* parent_task_struct){
 	parent_task_struct->children_head = NULL;
 }
 
+
+void remove_child(task_struct* child_task){
+	task_struct* parent_task = child_task->parent;
+	task_struct* sib = parent_task->children_head;
+	task_struct* last_sib = NULL;
+
+	while(sib!=NULL)
+	{
+		if(sib==child_task)
+		{
+			break;
+		}
+		last_sib = sib;
+		sib=sib->next_sibling;
+	}
+	if(sib==NULL)
+	{
+		panic("child is not present in parent's children list");
+	}
+	if(last_sib!=NULL)
+	{
+		last_sib->next_sibling = sib->next_sibling;
+	}
+	else
+	{
+		parent_task->children_head= sib->next_sibling;
+	}
+	sib->next_sibling = NULL;
+}
+
+
 void detach_from_parent(task_struct* child_task_struct){
 	task_struct* parent_task_struct = child_task_struct->parent;
 	//kprintf("address of parent task struct is %p", parent_task_struct);
@@ -154,6 +185,8 @@ void detach_from_parent(task_struct* child_task_struct){
 		if(parent_task_struct->state == WAIT ) {
 			if(parent_task_struct->wait_pid == child_task_struct->pid || parent_task_struct->wait_pid == -1){
 				parent_task_struct->state = READY;
+				//kprintf("parent marked ready %d\n", parent_task_struct->wait_pid);
+				remove_child(child_task_struct);
 				child_task_struct->state = EXIT;
 			}
 			else{

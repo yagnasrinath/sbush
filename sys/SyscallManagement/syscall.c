@@ -102,6 +102,7 @@ enum registers {
 //15
 
 void fork()  {
+	kprintf("sys_fork called \n");
 	task_struct * curr_task = get_curr_task();
 	task_struct * child_task = copy_task_struct(curr_task);
 	kmemset(child_task->kstack, 0 , PAGE_SIZE);
@@ -109,10 +110,12 @@ void fork()  {
 	//kprintf("pml4t of parent is %p \n",curr_task->virtual_addr_space->pml4_t );
 	schedule_process(child_task, curr_task->kstack[KSTACK_SIZE-STK_TOP], curr_task->kstack[KSTACK_SIZE-ENTRY]);
 	curr_task->kstack[KSTACK_SIZE-RAX] = child_task->pid;
+	kprintf("sys_fork returned \n");
 }
 
 
 void sys_write(){
+	 // kprintf("sys write called \n");
 	task_struct * curr_task = get_curr_task();
 	uint64_t fd = curr_task->kstack[KSTACK_SIZE-RDI];
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RSI];
@@ -196,7 +199,7 @@ void  sys_lseek()
 void sys_brk() {
 	task_struct * curr_task = get_curr_task();
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RDI];
-	kprintf("passed addr is %p \n", addr);
+	//kprintf("passed addr is %p \n", addr);
 	uint64_t max_possile_addr = USR_STK_TOP - USR_STK_SIZE;
 	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 	vma_struct* curr_vma = curr_vmaList;
@@ -276,6 +279,7 @@ void waitpid(){
 		while(child_head != NULL){
 			if(child_head->state == ZOMBIE){
 				child_head->state  = EXIT;
+				remove_child(child_head);
 				curr_task->kstack[KSTACK_SIZE-RAX] = child_head->pid;
 				return;
 			}
@@ -439,6 +443,11 @@ void sys_open()
 	file_t* aux_node=NULL;
 	file_t* curr_node=root_node;
 
+	if(path == NULL)
+	{
+		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+		return;
+	}
 
 	char* path_copy = (char*)kmalloc(sizeof(char)*kstrlen(path));
 	kstrcpy(path_copy,path);
@@ -450,11 +459,7 @@ void sys_open()
 	}
 	char* temp = kstrtok(path_copy,"/");
 	int i=0;
-	if(temp == NULL)
-	{
-		curr_task->kstack[KSTACK_SIZE-RAX] = -1;
-		return;
-	}
+
 	int k=0;
 	while(temp!=NULL)
 	{
@@ -678,7 +683,7 @@ void sys_chdir()
 	return;
 }
 
-void replace_task(task_struct* old_task, task_struct* curr_task){
+void replace_task(task_struct* old_task, task_struct* new_task){
 	task_struct* parent_task = old_task->parent;
 	task_struct* sib = parent_task->children_head;
 	task_struct* last_sib = NULL;
@@ -690,7 +695,7 @@ void replace_task(task_struct* old_task, task_struct* curr_task){
 			break;
 		}
 		last_sib = sib;
-		sib=sib->next;
+		sib=sib->next_sibling;
 	}
 	if(sib==NULL)
 	{
@@ -698,23 +703,24 @@ void replace_task(task_struct* old_task, task_struct* curr_task){
 	}
 	if(last_sib!=NULL)
 	{
-		last_sib->next_sibling = curr_task;
-		curr_task->next_sibling = sib->next_sibling;
+		last_sib->next_sibling = new_task;
+		new_task->next_sibling = sib->next_sibling;
 	}
 	else
 	{
-		curr_task->next_sibling = sib->next_sibling;
-		parent_task->children_head=curr_task;
+		new_task->next_sibling = sib->next_sibling;
+		parent_task->children_head=new_task;
 	}
 }
 
 void sys_execvpe()
 {
+	kprintf("sys_excecve called \n");
 	task_struct* curr_task = get_curr_task();
 	char* file_name  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
 	char** argv = (char **)curr_task->kstack[KSTACK_SIZE-RSI];
 	char** envp = (char **)curr_task->kstack[KSTACK_SIZE-RDX];
-	task_struct* new_task = get_elf_task(file_name,argv,envp);
+	task_struct* new_task = get_elf_task(file_name,argv,envp,FALSE);
 	if(new_task!=NULL)
 	{
 		decrement_pid();
@@ -728,7 +734,7 @@ void sys_execvpe()
 		curr_task->state=EXIT;
 		__asm__ __volatile__("int $32");
 	}
-	curr_task->kstack[KSTACK_SIZE-RAX] = -1;
+	curr_task->kstack[KSTACK_SIZE-RAX] = -2;
 	return;
 }
 void sys_getcwd() {
@@ -741,6 +747,7 @@ void sys_getcwd() {
 		return ;
 	}
 	kmemcpy(buf, curr_task->CWD, size);
+	//kstrcpy(buf,"/bin");
 	curr_task->kstack[KSTACK_SIZE-RAX] = 0;
 	return;
 }

@@ -10,7 +10,7 @@
 #include<sys/ProcessManagement/process_scheduler.h>
 #include<sys/ProcessManagement/process_helper.h>
 int mymain(uint32_t* modulep, void* physbase, void* physfree);
-extern task_struct * get_elf_task(char *filename, char *argv[]);
+extern task_struct * get_elf_task(char *filename, char *argv[], char *envp[], BOOL isinitproc);
 void init_keyboard();
 extern void* init_tarfs();
 extern void init_pipe();
@@ -77,8 +77,8 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	init_task_struct = create_init_proc();
 
 	//create_idle_proc3();
-
-	task_struct* empty_task = get_elf_task("bin/sbush", NULL);
+	task_struct* empty_task = get_elf_task("bin/sbush", NULL, NULL,TRUE);
+	kstrcpy(empty_task->CWD,"/");
 	 //get_elf_task("bin/empty", NULL);
 	empty_task->parent = init_task_struct;
 	empty_task->ppid = init_task_struct->pid;

@@ -57,6 +57,6 @@ typedef struct {
 	uint16_t      e_shnum;
 	uint16_t      e_shstrndx;
 } Elf64_Ehdr;
-task_struct * get_elf_task(char *filename, char *argv[], char* env[]);
+task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isInitProc);
 
 #endif /* SBUSH_INCLUDE_SYS_ELF_LOADER_H_ */
