@@ -133,7 +133,7 @@ void detach_children(task_struct* parent_task_struct){
 	task_struct* children = parent_task_struct->children_head;
 	task_struct* children_head = children;
 	task_struct* children_tail = NULL;
-	print_children(parent_task_struct);
+	//print_children(parent_task_struct);
 	while(children != NULL){
 		children->ppid = init_task_struct->pid;
 		children->parent = init_task_struct;
@@ -200,7 +200,7 @@ void detach_from_parent(task_struct* child_task_struct){
 	else {
 		panic("NO PARENT \n");
 	}
-	kprintf("detached from parent\n");
+	//kprintf("detached from parent\n");
 }
 
 void free_task_struct(task_struct* to_free){

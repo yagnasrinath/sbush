@@ -539,7 +539,7 @@ void exit(){
 
 
 	task_struct* curr_task = get_curr_task();
-	kprintf("in the sys exit handler %d\n",curr_task->pid);
+	//kprintf("in the sys exit handler %d\n",curr_task->pid);
 	/*if(curr_task->pid == 2) {
 		//panic("");
 	}*/
@@ -548,7 +548,7 @@ void exit(){
 	detach_from_parent(curr_task);
 	//print_mem_map(curr_task);
 	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
-	kprintf("vma list freed\n");
+	//kprintf("vma list freed\n");
 	free_pagetables();
 	//print_present_pages();
 	for(int fd = 0;  fd < MAX_FD_PER_PROC; fd++) {

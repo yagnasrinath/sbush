@@ -187,7 +187,7 @@ void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
 	dec_phy_page_ref_count(page_num);
 	if(get_phy_page_ref_count(page_num) ==0) {
 		if(zeroPage) {
-			kprintf("zeroing page \n");
+			//kprintf("zeroing page \n");
 			uint64_t vir_addr = get_temp_virtual_address(page_addr);
 			kmemset((uint64_t *)vir_addr, 0,PAGE_SIZE);
 			free_temp_virtual_address(vir_addr);
