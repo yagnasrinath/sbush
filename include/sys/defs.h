@@ -38,7 +38,7 @@ typedef int BOOL;
 
 #define MAX_FILE_NAME_LEN 50
 #define MAXCHILD 12
-#define PIPE_SIZE 4032
+#define PIPE_SIZE 4024
 struct dirent {
     char d_name[MAX_FILE_NAME_LEN];
 };

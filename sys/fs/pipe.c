@@ -164,11 +164,14 @@ uint64_t close_pipe(file_des_t * fd1) {
 	}
 	if(fd1->file_perm == O_WRONLY) {
 		aux_pipe->writeEndRefCount--;
+		//kprintf("write ref count on closing is %d %d \n ", aux_pipe->writeEndRefCount, aux_pipe->id);
 	}
 	else if (fd1->file_perm == O_RDONLY) {
 		aux_pipe->readEndRefCount--;
+		//kprintf("read ref count on closing is %d %d \n ", aux_pipe->readEndRefCount, aux_pipe->id);
 	}
 	if(aux_pipe->writeEndRefCount == 0 && aux_pipe->readEndRefCount == 0) {
+		kprintf("pipe marked free \n");
 		aux_pipe->isUsed = FALSE;
 	}
 	return TRUE;

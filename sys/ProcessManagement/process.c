@@ -26,10 +26,10 @@ void copyfiledes(file_des_t* child_file_d, file_des_t* parent_file_d) {
 	child_file_d->curr = parent_file_d->curr;
 	child_file_d->pipenode = parent_file_d->pipenode;
 	if(parent_file_d->file_type == PIPE_TYPE) {
-		if(parent_file_d->file_perm & O_RDONLY) {
+		if(parent_file_d->file_perm  == O_RDONLY) {
 			child_file_d->pipenode->readEndRefCount++;
 		}
-		else  if(parent_file_d->file_perm & O_WRONLY){
+		else  if(parent_file_d->file_perm  == O_WRONLY){
 			child_file_d->pipenode->writeEndRefCount++;
 		}
 	}

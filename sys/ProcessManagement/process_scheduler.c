@@ -179,8 +179,11 @@ static void init_proc(){
 	//	kprintf("##########################################################################");
 		task_struct* curr_task = get_curr_task();
 		task_struct* children = curr_task->children_head;
+		//int i=0;
 		while(children != NULL){
+			//kprintf("%d", i++);
 			if(children->state == ZOMBIE){
+
 				children->state = EXIT;
 			}
 			children = children->next_sibling;

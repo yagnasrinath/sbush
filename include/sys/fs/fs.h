@@ -40,6 +40,7 @@ enum
 typedef struct pipe_dev
 {
 	char buffer[PIPE_SIZE];
+	uint64_t  id;
 	uint64_t write_pos;
 	uint64_t read_pos;
 	uint64_t size;
