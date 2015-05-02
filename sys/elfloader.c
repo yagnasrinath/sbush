@@ -189,7 +189,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 		max_addr = (max_addr/PAGE_SIZE)*PAGE_SIZE + PAGE_SIZE;
 	}
 	heap_start_vaddr= max_addr;
-	vma_struct* new_usr_heap_vma =  create_new_vma(0,heap_start_vaddr,heap_start_vaddr,HEAP,READ_WRITE);
+	vma_struct* new_usr_heap_vma =  create_new_vma(0,heap_start_vaddr,heap_start_vaddr+0X8,HEAP,READ_WRITE);
 	curr_vma->next = new_usr_heap_vma ;
 
 

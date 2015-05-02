@@ -13,7 +13,7 @@
 
 int main(int argc, char* argv[], char* envp[]) {
 
-	//for(int i=0; i < 15; i++ ) {
+	/*//for(int i=0; i < 15; i++ ) {
 	char a[500];
 	char b[500];
 	strcpy(b, "this is a test for stack");
@@ -30,7 +30,7 @@ int main(int argc, char* argv[], char* envp[]) {
 		printf(" before reading \n");
 		int ret = read(p[0],b,22);
 		printf(" entered stuff is %s, %d\n", b,ret);
-	}
+	}*/
 	//strncpy(a,"hi",2);
 	//int pid = fork();
 	//strncpy(a,"hi",2);
@@ -71,6 +71,16 @@ int main(int argc, char* argv[], char* envp[]) {
 	//
 	//		//printf("In parent process %d\n",b);
 	//	}
+	int* b[10];
+	for(int i=0 ; i<1; i+=2) {
+		b[i] = (int*)malloc(sizeof(int));
+		b[i+1] = (int*)malloc(sizeof(char)*17);
+	}
+	for(int i=0 ; i<1; i+=2) {
+			free(b[i]);
+			free(b[i+1]);
+		}
+	while(1);
 
 	return 0;
 }

@@ -81,12 +81,12 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 					break;
 				}
 				uint64_t new_phy_page = allocate_phy_page();
-				map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, USER_RW_FLAG| PAGE_PRESENT);
+				map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, USER_RW_FLAG| PAGE_PRESENT, TRUE);
 				kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)curr_pos_in_stack, PAGE_SIZE);
 				uint64_t *pte_entry_kern_vir_addr = (uint64_t *)get_pt_vir_addr(curr_kern_vaddr);
 				*pte_entry_kern_vir_addr = 0;
 				set_cr3(child_pml4);
-				map_vir_to_phyaddr(curr_pos_in_stack, new_phy_page, USER_RW_FLAG|PAGE_PRESENT);
+				map_vir_to_phyaddr(curr_pos_in_stack, new_phy_page, USER_RW_FLAG|PAGE_PRESENT, FALSE);
 				set_cr3(parent_pml4);
 				curr_pos_in_stack -= PAGE_SIZE;
 			}
@@ -113,7 +113,7 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 					uint64_t child_pte_entry = (*parent_pte_entry) & UNSET_FLAGS;
 					uint64_t child_pte_flags = (*parent_pte_entry) & FLAGS;
 					set_cr3(child_pml4);
-					map_vir_to_phyaddr(vma_start,child_pte_entry,child_pte_flags);
+					map_vir_to_phyaddr(vma_start,child_pte_entry,child_pte_flags, FALSE);
 
 					set_cr3(parent_pml4);
 					uint64_t page_num = (*parent_pte_entry)/PAGE_SIZE;

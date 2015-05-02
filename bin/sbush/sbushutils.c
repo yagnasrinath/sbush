@@ -94,14 +94,17 @@ char** strtokenize(char* string, char character) {
             char* currstring = (char*)(malloc(strlen(string)+1));
             memset(currstring,'\0',strlen(string)+1);
             strcpy(currstring,string);
+            //printf("curr string : %p\n",currstring);
             output[index] = currstring;
+            //printf("next string : %p\n",output[0]);
+           // printf("next string : %p\n",output[1]);
             return output;
         }
         char* currstring = (char*)(malloc(j+1));
         memset(currstring,'\0',j+1);
         strncpy(currstring,string,j);
         currstring[j] ='\0';
-        //printf("%s\n",currstring);
+        printf("curr string : %p\n",currstring);
         string+=(j+1);
         output[index] =currstring;
         index++;

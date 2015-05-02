@@ -93,6 +93,18 @@ uint64_t get_pt_vir_addr(uint64_t vir_addr){
 	return pt_pos;
 }
 
+uint64_t get_page_beg(uint64_t vir_addr){
+	//self referencing virtual address for pt
+	//uint64_t pt_vir_addr = 0xFFFF0000000000UL;
+	uint64_t pg_offset = vir_addr >> 12 << 12;
+	//Entry pointing to the given virtual address in pt
+	// shifiting 3 bits sicne each entry is  8 bytes
+
+	return pg_offset;
+}
+
+
+
 
 
 BOOL is_page_present_for_virtual_addr(uint64_t viraddr) {
@@ -125,7 +137,7 @@ BOOL is_page_present_for_virtual_addr(uint64_t viraddr) {
 }
 
 
-void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
+void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags, BOOL zeroFlag){
 	uint64_t *pml4_entry, *pdp_entry, *pd_entry, *pt_entry;
 
 	pml4_entry = (uint64_t *)get_pml4_vir_addr(viraddr);
@@ -169,6 +181,10 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags){
 	}
 	//kprintf("flags are %d\n", flags);
 	*pt_entry = phyaddr | flags;
+	if(zeroFlag) {
+		uint64_t* pg_beg = (uint64_t *)get_page_beg(viraddr);
+		kmemset(pg_beg,'\0', PAGE_SIZE);
+	}
 	//kmemset(pt_entry, '\0',PAGE_SIZE);
 	//kprintf("phyaddr->%p\n",phyaddr);
 
@@ -178,7 +194,7 @@ uint64_t get_new_pml4_t() {
 	uint64_t phy_page = allocate_phy_page();
 	uint64_t vaddr = get_present_virtual_address();
 	set_present_virtual_address(get_present_virtual_address() + PAGE_SIZE);
-	map_vir_to_phyaddr(vaddr,phy_page, PAGE_PRESENT|USER_RW_FLAG);
+	map_vir_to_phyaddr(vaddr,phy_page, PAGE_PRESENT|USER_RW_FLAG,TRUE);
 	uint64_t *vir_addr = (uint64_t *)vaddr;
 	//self referencing
 	vir_addr[510] = phy_page|PAGE_PRESENT|USER_RW_FLAG;

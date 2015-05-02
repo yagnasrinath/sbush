@@ -202,9 +202,11 @@ void make_job(struct job* cmd_list,char * cmdline)
 void execute_command(struct command*c, char***envp_ptr)
 {
 	//printf("executable is  %s\n", c->executable);
+
 	int indexofslash =  getfirstindex(c->executable,'/');
 	if(indexofslash != -1)
 	{
+
 		execve(c->executable,c->argv,*envp_ptr);
 		write(2,strerror(errno),strlen(strerror(errno)));
 		write(2,"\n",strlen("\n"));
@@ -220,21 +222,29 @@ void execute_command(struct command*c, char***envp_ptr)
 		if(paths != NULL) {
 			while( *paths)
 			{
+				printf("enter again  %p\n",*paths);
 				/*printf("paths are %s \n", *paths);*/
 				printf("c-> argv[0] is %p \n",c->argv[0]);
 				printf("paths are %s \n", *paths);
 				/*printf("paths are %s \n", *paths);*/
 				//char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
 				char cmdpath [MAX_PATH_LENGTH];
-				printf("path is %s \n", path);
+				printf("path1 is %p \n", *paths);
 				//printf("cmdpaths are %s \n", cmdpath);
 
 				setabsolutepath(cmdpath,c,*paths);
+				printf("path2 is %p \n", *paths);
+				printf("c->argv[0] is %p \n",c->argv[0]);
+				printf("c->argv is %p \n",c->argv);
 				printf("cmdpath is %s \n", cmdpath);
-				/*if(c->argv[0])
-					free(c->argv[0]);*/
+				if(c->argv[0])
+					free(c->argv[0]);
+				printf("c->argv is %p \n",c->argv);
 				c->argv[0]=cmdpath;
-				printf("cmdpath is %s \n", cmdpath);
+				/*printf("path3 is %p \n", *paths);
+				printf("cmdpath is %s \n", cmdpath);*/
+				printf("path address before ++ is %p\n", paths);
+				printf("envp is %p", *envp_ptr[0]);
 				execve(cmdpath,c->argv,*envp_ptr);
 				if (errno != ENOENT && errno != EACCES)
 				{
@@ -244,7 +254,9 @@ void execute_command(struct command*c, char***envp_ptr)
 					write(2,"\n",strlen("\n"));
 					return;
 				}
+				printf("path address before ++ is %p\n", *paths);
 				paths++;
+				printf("path address after ++ is %p\n", *paths);
 			}
 		}
 		char * msg="command not found";
@@ -276,12 +288,13 @@ void execute_job(struct job* j,char***envp_ptr)
 			switch(pid = fork())
 			{
 			case (-1):
-                    				;
+                    						;
 			char * msg="fork failed";
 			write(2,msg,strlen(msg));
 			exit(EXIT_FAILURE);
 			break;
 			case 0:
+
 				if(old[1]!=-1)
 				{
 					close(old[1]);
@@ -323,6 +336,15 @@ void execute_job(struct job* j,char***envp_ptr)
 int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
+	printf("argv[0] is %p\n", argv[0]);
+	printf("argv[0] is %s\n", argv[0]);
+	printf("argv[1] is %p\n", argv[1]);
+		//printf("argv[1] is %s\n", argv[1]);
+	printf("envp[0] is %p\n", envp[0]);
+	printf("envp[0] is %s\n", envp[0]);
+	printf("envp[1] is %p\n", envp[1]);
+	//	printf("envp[1] is %s\n", envp[1]);
+
 	initializeenv(envp);
 	char*** new_envp_ptr = getenv();
 	char * line;
@@ -350,7 +372,6 @@ int main(int argc, char* argv[], char* envp[])
 		if(!strlen(line))
 		{
 			free(line);
-
 			continue;
 		}
 		make_job(&cmd_list,line);

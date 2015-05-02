@@ -27,7 +27,7 @@ uint64_t get_present_virtual_address() {
 // get a temporary pages for things like memseting a physical page
 uint64_t get_temp_virtual_address(uint64_t phy_addr) {
 	uint64_t curr_vir_addr = get_present_virtual_address();
-	map_vir_to_phyaddr(curr_vir_addr,phy_addr, (USER_RW_FLAG|PAGE_PRESENT));
+	map_vir_to_phyaddr(curr_vir_addr,phy_addr, (USER_RW_FLAG|PAGE_PRESENT), TRUE);
 	return curr_vir_addr;
 }
 
@@ -46,7 +46,7 @@ uint64_t* vir_allocate_pages(int num_pages, uint64_t permissions) {
 		uint64_t phy_addr = allocate_phy_page();
 		uint64_t virtual_addr = get_present_virtual_address();
 		set_present_virtual_address(virtual_addr+PAGE_SIZE);
-		map_vir_to_phyaddr(virtual_addr,phy_addr,permissions);
+		map_vir_to_phyaddr(virtual_addr,phy_addr,permissions,TRUE);
 	}
 	return (uint64_t*) start_addr;
 }

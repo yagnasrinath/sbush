@@ -197,8 +197,11 @@ void  sys_lseek()
 
 
 void sys_brk() {
+
 	task_struct * curr_task = get_curr_task();
+	kprintf("passed addr is %p \n", curr_task->kstack[KSTACK_SIZE-RDI]);
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RDI];
+
 	//kprintf("passed addr is %p \n", addr);
 	uint64_t max_possile_addr = USR_STK_TOP - USR_STK_SIZE;
 	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
@@ -220,14 +223,14 @@ void sys_brk() {
 		curr_task->kstack[KSTACK_SIZE-RAX]  = -1;
 	}
 	else {
-		curr_task->kstack[KSTACK_SIZE-RAX] = addr;
+		curr_task->kstack[KSTACK_SIZE-RAX] = curr_vma->vm_area_end-0X8;
 		/*if(addr%PAGE_SIZE != 0) {
 			addr = PAGE_ALIGN(addr) + PAGE_SIZE;
 		}*/
 		curr_vma ->vm_area_end = addr+0X8;
 		//curr_task->kstack[KSTACK_SIZE-10] = curr_vma ->vm_area_end;
 	}
-	//kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
+	kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
 }
 
 
@@ -720,6 +723,8 @@ void sys_execvpe()
 	char* file_name  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
 	char** argv = (char **)curr_task->kstack[KSTACK_SIZE-RSI];
 	char** envp = (char **)curr_task->kstack[KSTACK_SIZE-RDX];
+	kprintf("envp passed to the syscall is %p",envp[0]);
+
 	task_struct* new_task = get_elf_task(file_name,argv,envp,FALSE);
 	if(new_task!=NULL)
 	{
