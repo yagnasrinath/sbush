@@ -44,8 +44,8 @@ void dec_phy_page_ref_count(uint64_t pageNum) {
 	//kprintf("dec_phy_page_ref_count \n");
 	if(ref_count[pageNum] == 0) {
 
-	//	kprintf("something wrong ref count is already zero %d", pageNum);
-		//panic("");
+		kprintf("something wrong ref count is already zero %d", pageNum);
+		panic("");
 		return;
 	}
 	ref_count[pageNum] = ref_count[pageNum]-1;
@@ -181,7 +181,7 @@ void free_phy_page(uint64_t page_addr,BOOL zeroPage) {
 	uint64_t page_num = page_addr/PAGE_SIZE;
 	//kprintf("free phy page called  address, pagenum , refcount is %p, %d, %d\n", page_addr, page_num, ref_count[page_num]);
 	if(page_num == 0){
-		//panic("page number is zero \n");
+		panic("page number is zero \n");
 		return;
 	}
 	dec_phy_page_ref_count(page_num);
