@@ -199,7 +199,7 @@ void  sys_lseek()
 void sys_brk() {
 
 	task_struct * curr_task = get_curr_task();
-	kprintf("passed addr is %p \n", curr_task->kstack[KSTACK_SIZE-RDI]);
+	//kprintf("passed addr is %p \n", curr_task->kstack[KSTACK_SIZE-RDI]);
 	uint64_t addr = curr_task->kstack[KSTACK_SIZE-RDI];
 
 	//kprintf("passed addr is %p \n", addr);
@@ -230,7 +230,7 @@ void sys_brk() {
 		curr_vma ->vm_area_end = addr+0X8;
 		//curr_task->kstack[KSTACK_SIZE-10] = curr_vma ->vm_area_end;
 	}
-	kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
+	//kprintf("return addr is %p \n", curr_task->kstack[KSTACK_SIZE-RAX]);
 }
 
 

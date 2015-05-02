@@ -217,7 +217,9 @@ void free(void* mem)
 				cur->prev->next = NULL;
 			}
 			else {
-				printf("freeing base \n");
+				printf(" freeing base %p\n", base);
+				//printmalloc();
+				//while(1);
 				base = NULL;
 			}
 			brk(cur);

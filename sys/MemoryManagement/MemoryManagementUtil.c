@@ -175,7 +175,7 @@ void map_vir_to_phyaddr(uint64_t viraddr, uint64_t phyaddr, uint64_t flags, BOOL
 	pt_entry = (uint64_t *)get_pt_vir_addr(viraddr);
 	if(IS_PAGE_PRESENT(*pt_entry)){
 
-		//kprintf("%d", *pt_entry);
+		kprintf(" page present for %p \n", viraddr);
 		//panic("page mapped where it should not be ");
 		free_phy_page(*pt_entry, TRUE);
 	}
