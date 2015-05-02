@@ -213,10 +213,13 @@ void execute_command(struct command*c, char***envp_ptr)
 				printf("c-> argv[0] is %p \n",c->argv[0]);
 				printf("paths are %s \n", *paths);
 				/*printf("paths are %s \n", *paths);*/
-				char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
+				//char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
+				char cmdpath [MAX_PATH_LENGTH];
 				printf("path is %s \n", path);
-				printf("cmdpaths are %s \n", cmdpath);
+				//printf("cmdpaths are %s \n", cmdpath);
+
 				setabsolutepath(cmdpath,c,*paths);
+				printf("cmdpath is %s \n", cmdpath);
 				/*if(c->argv[0])
 					free(c->argv[0]);*/
 				c->argv[0]=cmdpath;
