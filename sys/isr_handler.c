@@ -71,7 +71,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
 	//kprintf("\n page_fault_handler cr3 %p \n",lcr3);
-	kprintf("page_fault_handler cr2 %p \n",lcr2);
+	//kprintf("page_fault_handler cr2 %p \n",lcr2);
 	//kprintf("page_fault_handler rsp %p \n",lrsp);
 	//kprintf("page fault  handler errno %d \n",regs.error);
 	task_struct* curr_task = get_curr_task();
@@ -83,7 +83,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 
 	}
 	if(regs.error & 0x1) { // PAGE PRESENT
-		kprintf("page present \n");
+		//kprintf("page present \n");
 		if(curr_vmaList  == NULL) {
 			kprintf("Page present : Process name %s\n",curr_task->task_name);
 			panic("No vma list for the process");
@@ -110,17 +110,17 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						panic("");
 					}
 					else {
-						kprintf("ref count is %d \n", curr_ref_count);
-						kprintf("Page aligned fault address is %p \n",PAGE_ALIGN(fault_addr));
+						//kprintf("ref count is %d \n", curr_ref_count);
+						//kprintf("Page aligned fault address is %p \n",PAGE_ALIGN(fault_addr));
 						uint64_t new_phy_page = allocate_phy_page();
 						uint64_t curr_kern_vaddr = get_present_virtual_address();
 						map_vir_to_phyaddr(curr_kern_vaddr, new_phy_page, (USER_RW_FLAG| PAGE_PRESENT),FALSE);
-						kprintf("addr is %s",curr_kern_vaddr);
+						//kprintf("addr is %s",curr_kern_vaddr);
 						kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
-						kprintf("addr is %s",curr_kern_vaddr);
+						//kprintf("addr is %s",curr_kern_vaddr);
 						map_vir_to_phyaddr(PAGE_ALIGN(fault_addr), new_phy_page, (USER_RW_FLAG|PAGE_PRESENT),FALSE);
 						curr_ref_count = get_phy_page_ref_count((*pte_entry)/PAGE_SIZE);
-						kprintf("updated ref count is %d \n", curr_ref_count);
+						//kprintf("updated ref count is %d \n", curr_ref_count);
 						uint64_t *pte_entry_kern_vir_addr = (uint64_t *)get_pt_vir_addr(curr_kern_vaddr);
 						*pte_entry_kern_vir_addr = 0;
 						//ker_mmap(fault_addr, PAGE_SIZE, PAGE_PRESENT | USER_RW_FLAG);

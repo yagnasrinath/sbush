@@ -91,8 +91,8 @@ void split_blk(blockptr cur,size_t req_size)
 void *malloc(size_t size)
 {
 	//printmalloc();
-	printf("base is %p \n", base);
-	printf("size is %d \n", size);
+	//printf("base is %p \n", base);
+	//printf("size is %d \n", size);
 	void* mem = NULL;
 	size = ALIGN_SIZE(size);
 	blockptr new,last;
@@ -189,9 +189,9 @@ blockptr get_valid_blk(void*mem)
 void free(void* mem)
 {
 	//printmalloc();
-	printf("mem for free is %p \n", mem);
+	//printf("mem for free is %p \n", mem);
 	blockptr cur = (blockptr)get_valid_blk(mem);
-	printf("cur is %p \n", cur);
+	//printf("cur is %p \n", cur);
 	if(cur==NULL)
 	{
 		//set errno
@@ -203,17 +203,17 @@ void free(void* mem)
 		cur->free=1;
 		if(cur->prev!=NULL && cur->prev->free==1)
 		{
-			printf("prev is free %p \n",cur->prev);
+			//printf("prev is free %p \n",cur->prev);
 			merge_blks(cur->prev);
 			cur = cur->prev;
 		}
 		if(cur->next != NULL) {
-			printf("next is null \n");
+			//printf("next is null \n");
 			merge_blks(cur);
 		}
 		else {
 			if(cur->prev != NULL) {
-				printf("next is null and prev is not null \n");
+				//printf("next is null and prev is not null \n");
 				cur->prev->next = NULL;
 			}
 			else {
@@ -226,7 +226,7 @@ void free(void* mem)
 		}
 	}
 	//printmalloc();
-	printf("returned from free \n");
+	//printf("returned from free \n");
 }
 
 void printmalloc(){

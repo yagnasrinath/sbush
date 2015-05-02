@@ -233,18 +233,18 @@ void execute_command(struct command*c, char***envp_ptr)
 				//printf("cmdpaths are %s \n", cmdpath);
 
 				setabsolutepath(cmdpath,c,*paths);
-				printf("path2 is %p \n", *paths);
-				printf("c->argv[0] is %p \n",c->argv[0]);
-				printf("c->argv is %p \n",c->argv);
-				printf("cmdpath is %s \n", cmdpath);
+				//printf("path2 is %p \n", *paths);
+				//printf("c->argv[0] is %p \n",c->argv[0]);
+				//printf("c->argv is %p \n",c->argv);
+				//printf("cmdpath is %s \n", cmdpath);
 				if(c->argv[0])
 					free(c->argv[0]);
-				printf("c->argv is %p \n",c->argv);
+				//printf("c->argv is %p \n",c->argv);
 				c->argv[0]=cmdpath;
 				/*printf("path3 is %p \n", *paths);
 				printf("cmdpath is %s \n", cmdpath);*/
-				printf("path address before ++ is %p\n", paths);
-				printf("envp is %p", *envp_ptr[0]);
+				//printf("path address before ++ is %p\n", paths);
+				//printf("envp is %p", *envp_ptr[0]);
 				execve(cmdpath,c->argv,*envp_ptr);
 				if (errno != ENOENT && errno != EACCES)
 				{
@@ -254,9 +254,9 @@ void execute_command(struct command*c, char***envp_ptr)
 					write(2,"\n",strlen("\n"));
 					return;
 				}
-				printf("path address before ++ is %p\n", *paths);
+				//printf("path address before ++ is %p\n", *paths);
 				paths++;
-				printf("path address after ++ is %p\n", *paths);
+				//printf("path address after ++ is %p\n", *paths);
 			}
 		}
 		char * msg="command not found";
