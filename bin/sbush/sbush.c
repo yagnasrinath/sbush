@@ -66,21 +66,32 @@ char* get_line()
 		write(1,getprompt(),strlen(getprompt()));
 		write(1," ",strlen(" "));
 	}
-	char c[1]={'\0'};
+	char c[1024]={'\0'};
 	int index = 0;
-	while(read(fd,c,1))
+	int no_read_chars=0;
+	while((no_read_chars=read(fd,c,1024))>0)
 	{
-		if(c[0]=='\n')
+		//if(c[0]=='\n')
+		//{
+		//	buf[index]='\0';
+		//	//printf("%s\n",buf);
+		//	break;
+		//}
+		//else
+		//{
+		//	buf[index]=c[0];
+		//}
+		//index++
+		if(no_read_chars<1024)
 		{
-			buf[index]='\0';
-			//printf("%s\n",buf);
+			strncpy(buf+index,c,no_read_chars);
 			break;
 		}
 		else
 		{
-			buf[index]=c[0];
+			strncpy(buf+index,c,no_read_chars);
+			index+=no_read_chars;
 		}
-		index++;
 	}
 	if((index == 0)&&(isfileinput))
 	{
