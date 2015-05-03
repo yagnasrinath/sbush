@@ -73,6 +73,15 @@ void print_char_pressed(char c) {
 	 */
 }
 
+BOOL valid_ascii(int val)
+{
+	if(val==0||val==1||(val>=54&&val<=56)||(val>=58&&val<=73))
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
 
 void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 	uint8_t b = inportb(0x60);
@@ -105,8 +114,11 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 					counter--;
 				}
 			} else {
-				buf[counter] = val;
-				counter += 1;
+				if(valid_ascii(val))
+				{
+					buf[counter] = val;
+					counter += 1;
+				}
 				putch(val);
 				if(counter == num_char_to_read) {
 					flag = 0;
