@@ -20,5 +20,7 @@
 #define SYS_dup        17
 #define SYS_dup2       18
 #define SYS_getdents   19
+#define SYS_ps         20
+#define SYS_kill       21
 
 #endif

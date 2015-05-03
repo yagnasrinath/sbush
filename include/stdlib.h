@@ -49,5 +49,6 @@ int getdirentries(int fd, struct dirent* direntry , int size );
 void *opendir(const char *name);
 struct dirent *readdir(void *dir);
 int closedir(void *dir);
-
+void ps();
+int kill(int,int);
 #endif

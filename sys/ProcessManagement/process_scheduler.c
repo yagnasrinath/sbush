@@ -26,6 +26,11 @@ task_struct*  get_curr_task() {
 	return curr_proc;
 }
 
+task_struct* get_task_list()
+{
+	return task_list;
+}
+
 void awake_sleeping_proc() {
 	task_struct *curr=task_list;
 	while(curr != NULL) {
@@ -204,12 +209,14 @@ task_struct*  create_init_proc() {
 
 
 
-void create_idle_proc2() {
-	idle_process = create_new_task(FALSE);
+task_struct* create_idle_proc2() {
+	task_struct* idle_process = create_new_task(FALSE);
 	idle_process->state = READY;
 	kstrcpy(idle_process->task_name, "IDLE PROCESS 2");
 	//kprintf("new process kernel stack is %p",(uint64_t)&idle_process->kstack[KSTACK_SIZE-1]);
 	schedule_process(idle_process,(uint64_t)&idle_process->kstack[KSTACK_SIZE-1],(uint64_t)idle_proc2 );
+
+	return idle_process;
 }
 
 void create_idle_proc3() {

@@ -6,8 +6,8 @@
  */
 
 #include "knowncommandexecutor.h"
-static char* knowncommands[] = {"cd", "set" ,"setenv","echo"};
-int knowncommandslength = 4;
+static char* knowncommands[] = {"cd", "set" ,"setenv","echo","ps","kill","sleep","exit"};
+int knowncommandslength = 8;
 static char prompt[128];
 int isdirexist(char *newDirName){
 	void *Exists;
@@ -65,6 +65,45 @@ int isknowncommand(char *command) {
 }
 
 void executeknowncommand(char *command, char** args) {
+
+	if(!strcmp(command,"sleep"))
+	    {
+			if(args[1]==NULL)
+			{
+				printf("Usage: sleep <no of seconds>\n");
+				return;
+			}
+			sleep(atoi(args[1]));
+	        return;
+	    }
+	if(!strcmp(command,"ps"))
+	    {
+
+	        ps();
+	        return;
+	    }
+
+	if(!strcmp(command,"exit"))
+	    {
+
+	        exit(0);
+	        return;
+	    }
+	if(!strcmp(command,"kill"))
+	    {
+
+			int sig_no=0;
+			sig_no = atoi(args[1]);
+			if(sig_no!= -9)
+			{
+				printf("Usage: kill -9 <pid>\n");
+				return;
+			}
+	        kill(sig_no,atoi(args[2]));
+	        return;
+	    }
+
+
 
     if(!strcmp(command,"cd")) 
     {

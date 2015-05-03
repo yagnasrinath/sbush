@@ -294,6 +294,9 @@ vma_struct* create_new_vma(uint64_t file_desc, uint64_t vma_start, uint64_t vma_
 }
 
 
-
+int get_curr_pid()
+{
+	return curr_pid;
+}
 
 

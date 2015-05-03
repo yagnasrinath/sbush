@@ -14,7 +14,7 @@ task_struct * get_next_ready_proc() ;
 void free_exit_process();
 task_struct*  get_curr_task() ;
 void create_idle_proc() ;
-void create_idle_proc2() ;
+task_struct* create_idle_proc2() ;
 void create_idle_proc3() ;
 task_struct*  create_init_proc();
 void awake_sleeping_proc() ;

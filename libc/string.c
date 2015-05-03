@@ -174,6 +174,28 @@ char *strstr(char *haystack, char *needle)
     }
     return 0;
 }
+
+int32_t atoi(char *p)
+{
+	int sign =1;
+	if (p[0] == '-' || p[0] == '+') {
+		if(p[0] == '-' )
+			sign = -1;
+		p++;
+	}
+	int i=0, output = 0;
+	while (p[i]!= '\0') {
+		if (p[i] >= 48 && p[i] <= 57) {
+			output = 10*output+p[i]-'0';
+			i++;
+		} else {
+			return 0;
+		}
+
+	}
+	return output*sign;
+}
+
 extern const char *sys_errlist[]; 
 const char *strerror(int errnum)
 {

@@ -13,6 +13,7 @@
 #include<sys/MemoryManagement/virtual_page_allocator.h>
 #include<sys/SyscallManagement/syscall.h>
 
+
 static void print_regiters(struct isr_nrm_regs regs) {
 	kprintf("r15:%p",regs.r15);
 	kprintf(";r14:%p",regs.r14);
@@ -169,10 +170,12 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 			curr_vma = curr_vma->next;
 		}
 		if(curr_vma == NULL) {
-			//print_regiters(regs);
+			print_regiters(regs);
 			// should exit process and throw segmentation fault
 			kprintf("page_fault_handler cr2 %p \n",lcr2);
 			panic("Process accessed unassigned memory \n");
+			kprintf("Segmentation fault (core dumped)\n");
+			exit();
 		}
 	}
 

@@ -73,8 +73,12 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 
 	//INITSCHEDULING = FALSE;
 	//create_idle_proc() ;
-	//create_idle_proc2() ;
 	init_task_struct = create_init_proc();
+	//task_struct* t = create_idle_proc2() ;
+
+	//t->parent = init_task_struct;
+	//t->ppid = init_task_struct->pid;
+
 
 	//create_idle_proc3();
 	task_struct* empty_task = get_elf_task("bin/sbush", NULL, NULL,TRUE);
@@ -83,6 +87,7 @@ int mymain(uint32_t* modulep, void* physbase, void* physfree) {
 	empty_task->parent = init_task_struct;
 	empty_task->ppid = init_task_struct->pid;
 	init_task_struct->children_head = empty_task;
+	//init_task_struct->children_head->next_sibling = t;
 	// empty_task = get_elf_task("bin/tempty", NULL);
 	 //empty_task->parent = init_task_struct;
 	 	//empty_task->ppid = init_task_struct->pid;

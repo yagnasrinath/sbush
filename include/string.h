@@ -17,5 +17,8 @@ extern size_t strlen (const char *__s);
 void *memset(void* input,int c,size_t size);
 char *strstr(char *haystack, char *needle);
 const char *strerror(int errnum);
+
+int32_t atoi(char *p);
+
 #endif /* string.h  */
 

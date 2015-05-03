@@ -19,4 +19,6 @@ void detach_children(task_struct* parent_task_struct);
 void detach_from_parent(task_struct* child_task_struct);
 void free_process_vma_list(vma_struct* curr_list);
 void decrement_pid();
+int get_curr_pid();
+task_struct* get_task_list();
 #endif /* SBUSH_INCLUDE_SYS_PROCESSMANAGEMENT_PROCESS_HELPER_H_ */

@@ -10,5 +10,5 @@
 
 #include<sys/idt.h>
 
-
+void exit();
 #endif /* INCLUDE_SYS_SYSCALLMANAGEMENT_SYSCALL_H_ */
