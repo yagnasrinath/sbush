@@ -222,14 +222,14 @@ void execute_command(struct command*c, char***envp_ptr)
 		if(paths != NULL) {
 			while( *paths)
 			{
-				printf("enter again  %p\n",*paths);
+				//printf("enter again  %p\n",*paths);
 				/*printf("paths are %s \n", *paths);*/
-				printf("c-> argv[0] is %p \n",c->argv[0]);
-				printf("paths are %s \n", *paths);
+				//printf("c-> argv[0] is %p \n",c->argv[0]);
+				//printf("paths are %s \n", *paths);
 				/*printf("paths are %s \n", *paths);*/
 				//char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
 				char cmdpath [MAX_PATH_LENGTH];
-				printf("path1 is %p \n", *paths);
+				//printf("path1 is %p \n", *paths);
 				//printf("cmdpaths are %s \n", cmdpath);
 
 				setabsolutepath(cmdpath,c,*paths);
@@ -336,13 +336,13 @@ void execute_job(struct job* j,char***envp_ptr)
 int main(int argc, char* argv[], char* envp[])
 {
 	initprompt();
-	printf("argv[0] is %p\n", argv[0]);
+	/*printf("argv[0] is %p\n", argv[0]);
 	printf("argv[0] is %s\n", argv[0]);
 	printf("argv[1] is %p\n", argv[1]);
 		//printf("argv[1] is %s\n", argv[1]);
 	printf("envp[0] is %p\n", envp[0]);
 	printf("envp[0] is %s\n", envp[0]);
-	printf("envp[1] is %p\n", envp[1]);
+	printf("envp[1] is %p\n", envp[1]);*/
 	//	printf("envp[1] is %s\n", envp[1]);
 
 	initializeenv(envp);

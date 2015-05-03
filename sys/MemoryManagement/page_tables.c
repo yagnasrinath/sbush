@@ -61,12 +61,12 @@ void init_page_tables(void* _physbase,void* _physfree,void*_kernmem)
     kprintf("pd:%p\n",pd);
     kprintf("pt:%p\n",pt);
     cls();
-    memset_phy_pages();
-    kprintf("worked - physical pages done!!\n");
+   // kprintf("worked - physical pages done!!\n");
     // saves the kernel cr3
     set_kernel_cr3(pml4);
     _set_cr3(pml4);
     set_present_virtual_address(kernmem + index*PAGE_SIZE +PAGE_SIZE);
+    //memset_phy_pages();
     //saves the kernel mapping to save it to the process
     set_kernel_pml4_entry(pdp | USER_RW_FLAG|PAGE_PRESENT);
     initKmalloc();

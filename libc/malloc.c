@@ -188,8 +188,8 @@ blockptr get_valid_blk(void*mem)
 
 void free(void* mem)
 {
-	//printmalloc();
-	//printf("mem for free is %p \n", mem);
+	/*//printmalloc();
+	printf("mem for free is %p \n", mem);
 	blockptr cur = (blockptr)get_valid_blk(mem);
 	//printf("cur is %p \n", cur);
 	if(cur==NULL)
@@ -226,7 +226,7 @@ void free(void* mem)
 		}
 	}
 	//printmalloc();
-	//printf("returned from free \n");
+	//printf("returned from free \n");*/
 }
 
 void printmalloc(){

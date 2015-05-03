@@ -15,6 +15,7 @@
 #include <sys/ProcessManagement/process.h>
 #include <sys/MemoryManagement/virtual_page_allocator.h>
 #include <sys/MemoryManagement/kmalloc.h>
+#include <sys/MemoryManagement/MemoryManagementUtil.h>
 #define ELFMAG0         0x7f
 #define ELFMAG1         'E'
 #define ELFMAG2         'L'
@@ -245,9 +246,11 @@ task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isIni
 
 		return NULL;
 	}
-
+	//uint64_t present_pml4 = read_cr3();
 	task_struct* new_task = create_new_task(TRUE);
-
+	/*_set_cr3(new_task->virtual_addr_space->pml4_t);
+	free_pagetables();
+	_set_cr3(present_pml4);*/
 	if(new_task  == NULL) {
 		panic("elfoader.c : get_elf_task : create_new_task returned NULL. Probably out of resources");
 	}

@@ -171,7 +171,7 @@ uint64_t close_pipe(file_des_t * fd1) {
 		//kprintf("read ref count on closing is %d %d \n ", aux_pipe->readEndRefCount, aux_pipe->id);
 	}
 	if(aux_pipe->writeEndRefCount == 0 && aux_pipe->readEndRefCount == 0) {
-		kprintf("pipe marked free \n");
+		//kprintf("pipe marked free \n");
 		aux_pipe->isUsed = FALSE;
 	}
 	return TRUE;

@@ -102,7 +102,7 @@ enum registers {
 //15
 
 void fork()  {
-	kprintf("sys_fork called \n");
+	//kprintf("sys_fork called \n");
 	task_struct * curr_task = get_curr_task();
 	task_struct * child_task = copy_task_struct(curr_task);
 	kmemset(child_task->kstack, 0 , PAGE_SIZE);
@@ -110,7 +110,7 @@ void fork()  {
 	//kprintf("pml4t of parent is %p \n",curr_task->virtual_addr_space->pml4_t );
 	schedule_process(child_task, curr_task->kstack[KSTACK_SIZE-STK_TOP], curr_task->kstack[KSTACK_SIZE-ENTRY]);
 	curr_task->kstack[KSTACK_SIZE-RAX] = child_task->pid;
-	kprintf("sys_fork returned \n");
+	//kprintf("sys_fork returned \n");
 }
 
 
@@ -718,12 +718,12 @@ void replace_task(task_struct* old_task, task_struct* new_task){
 
 void sys_execvpe()
 {
-	kprintf("sys_excecve called \n");
+	//kprintf("sys_excecve called \n");
 	task_struct* curr_task = get_curr_task();
 	char* file_name  = (char *)curr_task->kstack[KSTACK_SIZE-RDI];
 	char** argv = (char **)curr_task->kstack[KSTACK_SIZE-RSI];
 	char** envp = (char **)curr_task->kstack[KSTACK_SIZE-RDX];
-	kprintf("envp passed to the syscall is %p",envp[0]);
+	//kprintf("envp passed to the syscall is %p",envp[0]);
 
 	task_struct* new_task = get_elf_task(file_name,argv,envp,FALSE);
 	if(new_task!=NULL)
@@ -735,12 +735,13 @@ void sys_execvpe()
 		kmemcpy(new_task->fd,curr_task->fd,MAX_FD_PER_PROC*8);
 		replace_task(curr_task, new_task);
 		free_process_vma_list(curr_task->virtual_addr_space->vmaList);
-		//free_page_tables()
+		free_pagetables();
 		curr_task->state=EXIT;
+		//exit();
 		__asm__ __volatile__("int $32");
 	}
 	curr_task->kstack[KSTACK_SIZE-RAX] = -2;
-	kprintf("sys_excecve returned \n");
+	//kprintf("sys_excecve returned \n");
 	return;
 }
 void sys_getcwd() {
