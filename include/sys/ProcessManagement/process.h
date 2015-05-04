@@ -67,7 +67,7 @@ struct task_structure{
 	uint64_t  num_of_children;
 	task_struct *next;
 	task_struct *end;
-}__attribute__((packed));
+};
 
 struct mem_structure{
 	vma_struct *vmaList;
