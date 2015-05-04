@@ -365,7 +365,7 @@ void sys_getdents() {
 	task_struct* curr_task = get_curr_task();
 	uint64_t fd = curr_task->kstack[KSTACK_SIZE - RDI];
 	struct dirent* curr_dirent = (struct dirent*) curr_task->kstack[KSTACK_SIZE
-			- RSI];
+																	- RSI];
 	kmemset(curr_dirent, '\0', sizeof(curr_dirent));
 	if (fd < 0 || fd > MAX_FD_PER_PROC) {
 		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
@@ -414,12 +414,13 @@ void sys_open() {
 	}
 
 	char* path_copy = (char*) kmalloc(sizeof(char) * kstrlen(path));
-	kstrcpy(path_copy, path);
+	//kstrcpy(path_copy, path);
 	//prepending path if absolute path is not given
 	if (path[0] != '/') {
 		kstrcpy(path_copy, curr_task->CWD);
-		kstrcat(path_copy, path);
+
 	}
+	kstrcat(path_copy, path);
 	char* temp = kstrtok(path_copy, "/");
 	int i = 0;
 
@@ -617,10 +618,63 @@ void dup2() {
 
 void sys_chdir() {
 	char * path;
+	file_t* aux_node = NULL;
+	file_t* curr_node = root_node;
+
 	task_struct* curr_task = get_curr_task();
 	path = (char *) curr_task->kstack[KSTACK_SIZE - RDI];
-	kmemcpy(curr_task->CWD, path, kstrlen(path));
-	curr_task->kstack[KSTACK_SIZE - RAX] = 0;
+	char* path_copy = (char*) kmalloc(sizeof(char) * kstrlen(path));
+	if(path == NULL) {
+		kmemcpy(curr_task->CWD, "/", kstrlen("/"));
+	}
+	else  {
+
+		if (path[0] != '/') {
+			kstrcpy(path_copy, curr_task->CWD);
+
+		}
+		kstrcat(path_copy, path);
+		char* temp = kstrtok(path_copy, "/");
+		int i = 0;
+
+		int k = 0;
+		while (temp != NULL) {
+
+			aux_node = curr_node;
+
+			if (curr_node->type == FILE_TYPE) {
+				curr_task->kstack[KSTACK_SIZE - RAX] = -2;
+				return;
+			}
+
+			for (i = 2; i < curr_node->end; i++) {
+
+				if (kstrcmp(temp, curr_node->fchild[i]->file_name) == 0) {
+
+					curr_node = (file_t*) curr_node->fchild[i];
+
+					break;
+				}
+			}
+
+			if (i == aux_node->end) {
+				curr_task->kstack[KSTACK_SIZE - RAX] = -2;
+				return;
+			}
+
+			temp = kstrtok(NULL, "/");
+			k++;
+
+		}
+	}
+	if (curr_node->type == DIRECTORY_TYPE) {
+		kmemcpy(curr_task->CWD, path_copy, kstrlen(path_copy));
+		curr_task->kstack[KSTACK_SIZE - RAX] = 0;
+	}
+	kprintf("chdir called path is %s \n", path_copy);
+
+
+	kprintf("chdir called returned \n");
 	return;
 }
 
@@ -662,6 +716,7 @@ void sys_execvpe() {
 		new_task->pid = curr_task->pid;
 		new_task->ppid = curr_task->ppid;
 		new_task->parent = curr_task->parent;
+		kstrcpy(new_task->CWD, curr_task->CWD);
 		kmemcpy(new_task->fd, curr_task->fd, MAX_FD_PER_PROC * 8);
 		replace_task(curr_task, new_task);
 		free_process_vma_list(curr_task->virtual_addr_space->vmaList);
@@ -675,14 +730,17 @@ void sys_execvpe() {
 	return;
 }
 void sys_getcwd() {
+	kprintf("get cwd called \n");
 	char * buf;
 	uint64_t size;
 	task_struct* curr_task = get_curr_task();
 	buf = (char *) curr_task->kstack[KSTACK_SIZE - RDI];
 	size = curr_task->kstack[KSTACK_SIZE - RSI];
 	if (!buf) {
+		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 		return;
 	}
+	kprintf("curr_task->CWD  is %s \n ", curr_task->CWD);
 	kmemcpy(buf, curr_task->CWD, size);
 	//kstrcpy(buf,"/bin");
 	curr_task->kstack[KSTACK_SIZE - RAX] = 0;
@@ -769,8 +827,8 @@ void sys_kill() {
 		} else {
 			//__asm__ __volatile__("int $32;");
 
-			 curr_task->kstack[KSTACK_SIZE-RAX] = 0;
-			 return;
+			curr_task->kstack[KSTACK_SIZE-RAX] = 0;
+			return;
 		}
 		//kprintf("killed process\n");
 	}

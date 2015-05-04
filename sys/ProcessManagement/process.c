@@ -128,6 +128,7 @@ task_struct* copy_task_struct(task_struct* parent_task_struct){
 	}
 	kstrcpy(child_task_struct->task_name, parent_task_struct->task_name);
 	child_task_struct->ppid = parent_task_struct->pid;
+	kstrcpy(child_task_struct->CWD, parent_task_struct->CWD);
 	child_task_struct->next = NULL;
 	child_task_struct->parent = parent_task_struct;
 	if(parent_task_struct->children_head == NULL){

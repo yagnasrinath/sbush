@@ -122,7 +122,9 @@ void setvalue(char* key, char *val) {
             head->next=0;
         }
     }
+
 	buildenv();
+
 }
 
 void buildenv() {
@@ -131,6 +133,7 @@ void buildenv() {
 		freeenv(env);
 	}
 	env = (char **)malloc(sizeof(char *)*(envSize+1));
+
 	int i=0;
 	while(head !=0) {
 		int len = strlen(head->key) + strlen(head->value) + 2;
@@ -143,6 +146,7 @@ void buildenv() {
 		head = head->next;
 		i++;
 	}
+
 	env [i]= 0;
 
 }

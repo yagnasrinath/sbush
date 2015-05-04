@@ -113,6 +113,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						//kprintf("ref count is %d \n", curr_ref_count);
 						//kprintf("Page aligned fault address is %p \n",PAGE_ALIGN(fault_addr));
 						volatile uint64_t new_phy_page = allocate_phy_page();
+						// allocate_phy_page();
 						//	kprintf("new phy page is  %p \n", new_phy_page);
 						volatile uint64_t tvaddr = get_temp_virtual_address(new_phy_page);
 						//kprintf("val is %d",((uint64_t *)tvaddr)[10]);

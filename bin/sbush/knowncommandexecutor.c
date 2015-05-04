@@ -50,7 +50,9 @@ void changedir(char *dirpath){
             //write(2,"\n",strlen("\n"));
         }
         getcwd(path,4096);
+
         setvalue("PWD",path);
+
 	}
 }
 

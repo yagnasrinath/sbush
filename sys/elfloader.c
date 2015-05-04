@@ -65,6 +65,12 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 		kmemcpy((char*)user_stack, "PATH=bin", len);
 		env[0] = user_stack;
 		envc = 1;
+		len = kstrlen("HOME=/") + 1;
+		user_stack = (uint64_t*)((uint64_t)user_stack - len);
+		kmemcpy((char*)user_stack, "HOME=/", len);
+		env[1] = user_stack;
+		envc = 2;
+
 	}
 	//kprintf("env[i] end in case of init is %p \n",user_stack );
 
@@ -104,7 +110,7 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 	_set_cr3(present_pml4);
 }
 
-void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char* argv[], char* envp[], BOOL isInitProc) {
+void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, int argc, int envc, BOOL isInitProc) {
 
 	uint64_t present_pml4 = read_cr3();
 	//kprintf("pml4t of new process is %p \n",present_pml4);
@@ -200,22 +206,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, char
 	new_task->virtual_addr_space->stack_start = user_stack_top -0x8;
 	new_task->virtual_addr_space->brk_start = heap_start_vaddr;
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
-	int argc = 0;
-	kstrcpy(args[argc++], filename);
-	if (argv) {
-		while (argv[argc-1]) {
-			kstrcpy(args[argc], argv[argc-1]);
-			argc++;
-		}
-	}
 
-	int envc =0;
-	if (envp) {
-		while (envp[envc]) {
-			kstrcpy(envs[envc], envp[envc]);
-			envc++;
-		}
-	}
 
 	copy_arg_to_stack(new_task, argc, envc,isInitProc);
 	new_task->state = READY;
@@ -247,13 +238,31 @@ task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isIni
 		return NULL;
 	}
 	//uint64_t present_pml4 = read_cr3();
-	task_struct* new_task = create_new_task(TRUE);
+
 	/*_set_cr3(new_task->virtual_addr_space->pml4_t);
 	free_pagetables();
 	_set_cr3(present_pml4);*/
+
+	int argc = 0;
+	kstrcpy(args[argc++], filename);
+	if (argv) {
+		while (argv[argc]) {
+			kstrcpy(args[argc], argv[argc]);
+			argc++;
+		}
+	}
+
+	int envc =0;
+	if (env) {
+		while (env[envc]) {
+			kstrcpy(envs[envc], env[envc]);
+			envc++;
+		}
+	}
+	task_struct* new_task = create_new_task(TRUE);
 	if(new_task  == NULL) {
 		panic("elfoader.c : get_elf_task : create_new_task returned NULL. Probably out of resources");
 	}
-	load_elf(new_task, filename,elf_header, argv, env,isInitProc);
+	load_elf(new_task, filename,elf_header, argc,envc, isInitProc);
 	return new_task;
 }
