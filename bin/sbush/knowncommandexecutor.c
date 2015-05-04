@@ -85,7 +85,7 @@ void executeknowncommand(char *command, char** args) {
 
 	if(!strcmp(command,"exit"))
 	    {
-
+			printf("\n");
 	        exit(0);
 	        return;
 	    }

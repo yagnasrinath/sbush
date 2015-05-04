@@ -117,13 +117,15 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						volatile uint64_t tvaddr = get_temp_virtual_address(new_phy_page);
 						//kprintf("val is %d",((uint64_t *)tvaddr)[10]);
 						 kmemcpy((void*)tvaddr, (void*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
+						 free_phy_page(*pte_entry, TRUE);
 						 *pte_entry = new_phy_page | (USER_RW_FLAG|PAGE_PRESENT);
+						 kprintf("* pte entry is %p \n",*pte_entry);
 						 free_temp_virtual_address(tvaddr);
 						//kprintf("val is %d",((uint64_t *)tvaddr)[10]);
 						/*kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
 						kprintf("val is %d",((uint64_t *)curr_kern_vaddr)[10]);
 						volatile uint64_t *pte_entry_fault_addr = (uint64_t *)get_pt_vir_addr(PAGE_ALIGN(fault_addr));*/
-						//dec_phy_page_ref_count((*pte_entry)/PAGE_SIZE);
+
 						/**pte_entry_fault_addr  = 0;
 						map_vir_to_phyaddr(PAGE_ALIGN(fault_addr), new_phy_page, (USER_RW_FLAG|PAGE_PRESENT),FALSE);
 						curr_ref_count = get_phy_page_ref_count((*pte_entry)/PAGE_SIZE);*/
