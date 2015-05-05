@@ -59,7 +59,7 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 	}
 	//kprintf("env[i] end is %p \n",user_stack );
 	if(isInitProc) {
-		kprintf("process is init process \n");
+		//kprintf("process is init process \n");
 		len = kstrlen("PATH=bin") + 1;
 		user_stack = (uint64_t*)((uint64_t)user_stack - len);
 		kmemcpy((char*)user_stack, "PATH=bin", len);
@@ -229,7 +229,7 @@ task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isIni
 
 	char* data = get_file_data(filename);
 	if(data  == NULL) {
-		kprintf("data is null \n");
+		//kprintf("data is null \n");
 		return NULL;
 	}
 	Elf64_Ehdr* elf_header = (Elf64_Ehdr*)data;

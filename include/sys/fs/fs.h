@@ -53,6 +53,7 @@ typedef struct pipe_dev
 typedef struct file
 {
 	char file_name[MAX_FILE_NAME_LEN];
+	char file_path[MAX_PATH_LEN];
 	uint64_t start;
 	uint64_t end;
 	uint64_t curr;

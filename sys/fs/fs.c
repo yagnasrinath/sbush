@@ -12,7 +12,7 @@
 #include<sys/utils/kstring.h>
 #include <sys/sys_generic_util.h>
 
-void create_node(file_t * node,file_t* parent,char* name,uint64_t start,uint64_t end,uint64_t type)
+void create_node(file_t * node,file_t* parent,char* name,uint64_t start,uint64_t end,uint64_t type,char* path)
 {
 	node->start=start;
 	node->end=end;
@@ -21,6 +21,8 @@ void create_node(file_t * node,file_t* parent,char* name,uint64_t start,uint64_t
 	node->fchild[1]=parent;
 	node->type=type;
 	kstrcpy(node->file_name,name);
+	kstrcpy(node->file_path,"/");
+	kstrncpy(node->file_path+1,path,kstrlen(path)-1);
 }
 
 void parse(char* inp_path,uint64_t file_type,uint64_t start,uint64_t end)
@@ -47,7 +49,7 @@ void parse(char* inp_path,uint64_t file_type,uint64_t start,uint64_t end)
 		{
 			//void* ptr=(void*);
 			temp_node = (file_t*)kmalloc(sizeof(file_t));
-			create_node(temp_node,curr_node,temp,start,end,file_type);
+			create_node(temp_node,curr_node,temp,start,end,file_type,inp_path);
 			curr_node->fchild[curr_node->end]=temp_node;
 			curr_node->end+=1;
 			curr_node=temp_node;
@@ -61,7 +63,7 @@ void* init_tarfs()
 	HEADER *header = (HEADER*) &_binary_tarfs_start;
 	root_node = (file_t*)kmalloc(sizeof(file_t));
 	//kprintf("root node is %p \n", root_node);
-	create_node(root_node,root_node,"/",0,2,DIRECTORY_TYPE);
+	create_node(root_node,root_node,"/",0,2,DIRECTORY_TYPE, "/");
 	uint64_t file_size =0;
 	do
 	{

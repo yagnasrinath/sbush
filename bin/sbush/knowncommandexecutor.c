@@ -45,7 +45,7 @@ void changedir(char *dirpath){
             //printf("Change DIR Successful \n");
         }
         else {
-            printf("%s\n",strerror(errno));
+            //printf("%s\n",strerror(errno));
             //write(2,strerror(errno),strlen(strerror(errno)));
             //write(2,"\n",strlen("\n"));
         }

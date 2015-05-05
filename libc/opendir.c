@@ -16,6 +16,7 @@ void *opendir(const char *path)
 		return dir;
 	}
 	dir->fd = open(path,0);
+	//printf("fd returned %d\n",dir->fd);
 	if(dir->fd < 0)
 	{
 		free(dir);

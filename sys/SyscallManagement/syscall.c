@@ -400,11 +400,12 @@ void sys_getdents() {
 }
 
 void sys_open() {
+
 	task_struct* curr_task = get_curr_task();
 	char* path = (char*) curr_task->kstack[KSTACK_SIZE - RDI];
 	uint64_t flags = (uint64_t) curr_task->kstack[KSTACK_SIZE - RSI];
 	file_des_t* fd = (file_des_t*) kmalloc(sizeof(file_des_t));
-
+	//kprintf("path is %s \n",path);
 	file_t* aux_node = NULL;
 	file_t* curr_node = root_node;
 
@@ -414,11 +415,12 @@ void sys_open() {
 	}
 
 	char* path_copy = (char*) kmalloc(sizeof(char) * kstrlen(path));
-	//kstrcpy(path_copy, path);
 	//prepending path if absolute path is not given
 	if (path[0] != '/') {
 		kstrcpy(path_copy, curr_task->CWD);
-
+		if(kstrcmp(path_copy, "/")) {
+			kstrcat(path_copy,"/");
+		}
 	}
 	kstrcat(path_copy, path);
 	char* temp = kstrtok(path_copy, "/");
@@ -433,21 +435,30 @@ void sys_open() {
 			curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 			return;
 		}
+		if (kstrcmp(temp, ".") == 0) {
+			curr_node = curr_node->fchild[0];
 
-		for (i = 2; i < curr_node->end; i++) {
+		} else if (kstrcmp(temp,"..") == 0) {
+			curr_node = curr_node->fchild[1];
 
-			if (kstrcmp(temp, curr_node->fchild[i]->file_name) == 0) {
+		}
+		else {
+			for (i = 2; i < curr_node->end; i++) {
 
-				curr_node = (file_t*) curr_node->fchild[i];
+				if (kstrcmp(temp, curr_node->fchild[i]->file_name) == 0) {
 
-				break;
+					curr_node = (file_t*) curr_node->fchild[i];
+
+					break;
+				}
 			}
+			if (i == aux_node->end) {
+				curr_task->kstack[KSTACK_SIZE - RAX] = -2;
+				return;
+			}
+
 		}
 
-		if (i == aux_node->end) {
-			curr_task->kstack[KSTACK_SIZE - RAX] = -1;
-			return;
-		}
 
 		temp = kstrtok(NULL, "/");
 		k++;
@@ -617,36 +628,46 @@ void dup2() {
 }
 
 void sys_chdir() {
-	char * path;
+	task_struct* curr_task = get_curr_task();
+	char* path = (char*) curr_task->kstack[KSTACK_SIZE - RDI];
+	//kprintf("path is %s \n",path);
 	file_t* aux_node = NULL;
 	file_t* curr_node = root_node;
 
-	task_struct* curr_task = get_curr_task();
-	path = (char *) curr_task->kstack[KSTACK_SIZE - RDI];
-	char* path_copy = (char*) kmalloc(sizeof(char) * kstrlen(path));
-	if(path == NULL) {
-		kmemcpy(curr_task->CWD, "/", kstrlen("/"));
+	if (path == NULL) {
+		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		return;
 	}
-	else  {
 
-		if (path[0] != '/') {
-			kstrcpy(path_copy, curr_task->CWD);
+	char* path_copy = (char*) kmalloc(sizeof(char) * kstrlen(path));
+	//prepending path if absolute path is not given
+	if (path[0] != '/') {
+		kstrcpy(path_copy, curr_task->CWD);
+		if(kstrcmp(path_copy, "/")) {
+			kstrcat(path_copy,"/");
+		}
+	}
+	kstrcat(path_copy, path);
+	char* temp = kstrtok(path_copy, "/");
+	int i = 0;
+
+	int k = 0;
+	while (temp != NULL) {
+
+		aux_node = curr_node;
+
+		if (curr_node->type == FILE_TYPE) {
+			curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+			return;
+		}
+		if (kstrcmp(temp, ".") == 0) {
+			curr_node = curr_node->fchild[0];
+
+		} else if (kstrcmp(temp,"..") == 0) {
+			curr_node = curr_node->fchild[1];
 
 		}
-		kstrcat(path_copy, path);
-		char* temp = kstrtok(path_copy, "/");
-		int i = 0;
-
-		int k = 0;
-		while (temp != NULL) {
-
-			aux_node = curr_node;
-
-			if (curr_node->type == FILE_TYPE) {
-				curr_task->kstack[KSTACK_SIZE - RAX] = -2;
-				return;
-			}
-
+		else {
 			for (i = 2; i < curr_node->end; i++) {
 
 				if (kstrcmp(temp, curr_node->fchild[i]->file_name) == 0) {
@@ -656,25 +677,21 @@ void sys_chdir() {
 					break;
 				}
 			}
-
 			if (i == aux_node->end) {
 				curr_task->kstack[KSTACK_SIZE - RAX] = -2;
 				return;
 			}
 
-			temp = kstrtok(NULL, "/");
-			k++;
-
 		}
-	}
-	if (curr_node->type == DIRECTORY_TYPE) {
-		kmemcpy(curr_task->CWD, path_copy, kstrlen(path_copy));
-		curr_task->kstack[KSTACK_SIZE - RAX] = 0;
-	}
-	kprintf("chdir called path is %s \n", path_copy);
 
 
-	kprintf("chdir called returned \n");
+		temp = kstrtok(NULL, "/");
+		k++;
+
+	}
+	curr_task->kstack[KSTACK_SIZE - RAX] = 0;
+
+	kstrcpy(curr_task->CWD, curr_node->file_path);
 	return;
 }
 
@@ -730,7 +747,7 @@ void sys_execvpe() {
 	return;
 }
 void sys_getcwd() {
-	kprintf("get cwd called \n");
+	//kprintf("get cwd called \n");
 	char * buf;
 	uint64_t size;
 	task_struct* curr_task = get_curr_task();
@@ -740,7 +757,7 @@ void sys_getcwd() {
 		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 		return;
 	}
-	kprintf("curr_task->CWD  is %s \n ", curr_task->CWD);
+	//kprintf("curr_task->CWD  is %s \n ", curr_task->CWD);
 	kmemcpy(buf, curr_task->CWD, size);
 	//kstrcpy(buf,"/bin");
 	curr_task->kstack[KSTACK_SIZE - RAX] = 0;

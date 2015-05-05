@@ -37,6 +37,7 @@ typedef unsigned char uint8_t;
 typedef int BOOL;
 
 #define MAX_FILE_NAME_LEN 50
+#define MAX_PATH_LEN 256
 #define MAXCHILD 12
 #define PIPE_SIZE 4024
 struct dirent {

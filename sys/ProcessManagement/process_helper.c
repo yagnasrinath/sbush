@@ -247,7 +247,7 @@ task_struct* create_new_task(BOOL is_user_process) {
 		new_task->num_of_children = 0;
 		new_task->parent = NULL;
 		new_task->next_sibling = NULL;
-		 kprintf("* pte entry for kstack is %p \n",*(uint64_t*)get_pt_vir_addr((uint64_t)(new_task->kstack)+4096));
+		// kprintf("* pte entry for kstack is %p \n",*(uint64_t*)get_pt_vir_addr((uint64_t)(new_task->kstack)+4096));
 		kmemset(new_task->kstack, 0 , PAGE_SIZE);
 		kmemset(new_task->fd,0,MAX_FD_PER_PROC*8);
 	}

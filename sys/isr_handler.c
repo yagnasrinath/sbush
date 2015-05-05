@@ -120,7 +120,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 						 kmemcpy((void*)tvaddr, (void*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
 						 free_phy_page(*pte_entry, TRUE);
 						 *pte_entry = new_phy_page | (USER_RW_FLAG|PAGE_PRESENT);
-						 kprintf("* pte entry is %p \n",*pte_entry);
+						 //kprintf("* pte entry is %p \n",*pte_entry);
 						 free_temp_virtual_address(tvaddr);
 						//kprintf("val is %d",((uint64_t *)tvaddr)[10]);
 						/*kmemcpy((uint64_t*)curr_kern_vaddr, (uint64_t*)PAGE_ALIGN(fault_addr), PAGE_SIZE);
