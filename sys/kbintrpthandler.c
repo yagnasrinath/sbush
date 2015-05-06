@@ -80,6 +80,7 @@ BOOL valid_ascii(int val)
 
 void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 	uint8_t b = inportb(0x60);
+
 	if(b == SC_LEFTSHIFT) {
 		special_keys = special_keys | LEFT_SHIFT_PRESS;
 	}
@@ -99,10 +100,11 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 		special_keys = special_keys & CTRL_RELEASE;
 	}
 	else if( b < 0X80){
-		BOOL is_shift_pressed = (special_keys && LEFT_SHIFT_PRESS) ||
-				(special_keys && RIGHT_SHIFT_PRESS);
-		BOOL is_ctrl_pressed = (special_keys && CTRL_PRESS);
-		if(is_ctrl_pressed && (b == SC_C || b == SC_D)){
+		BOOL is_shift_pressed = (special_keys & LEFT_SHIFT_PRESS) ||
+				(special_keys & RIGHT_SHIFT_PRESS);
+		BOOL is_ctrl_pressed = (special_keys & CTRL_PRESS);
+		if(flag == 1 && is_ctrl_pressed && (b == SC_C || b == SC_D)){
+				putch('\n');
 				counter = 0;
 				flag= 0;
 		}
