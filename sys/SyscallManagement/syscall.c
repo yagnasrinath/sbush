@@ -304,17 +304,19 @@ void sys_read() {
 	//kprintf("addr passed is %p \n",addr);
 	length = curr_task->kstack[KSTACK_SIZE - RDX];
 	if (fd < 0 || fd >= MAX_FD_PER_PROC) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		kprintf("fd value is %d",fd);
+		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
 		return;
 	} else if (curr_task->fd[fd] == NULL) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		kprintf("fd value is %d",fd);
+		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
 		return;
 	} else if (curr_task->fd[fd]->file_type == STDIN_TYPE) {
 		length = gets(addr, length);
 		curr_task->kstack[KSTACK_SIZE - RAX] = length;
 		return;
 	} else if (curr_task->fd[fd]->file_perm == O_WRONLY) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = -13;
 		return;
 	} else if (curr_task->fd[fd]->file_type == FILE_TYPE) {
 
@@ -342,7 +344,8 @@ void sys_read() {
 		curr_task->kstack[KSTACK_SIZE - RAX] = ret;
 		return;
 	} else {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
+
 		return;
 	}
 
@@ -500,7 +503,7 @@ void sys_open() {
 			}
 		}
 	}
-	curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+	curr_task->kstack[KSTACK_SIZE - RAX] = -24;
 	return;
 }
 
@@ -610,10 +613,10 @@ void dup2() {
 		curr_task->kstack[KSTACK_SIZE - RAX] = 1;
 		return;
 	} else if (newfd < 0 || newfd >= MAX_FD_PER_PROC) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = 1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 		return;
 	} else if (curr_task->fd[oldfd] == NULL) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = 1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 		return;
 	}
 
