@@ -56,11 +56,11 @@ void gpf_handler(struct isr_nrm_regs regs) {
 	__asm__ __volatile__ ("movq %%cr3, %0;" : "=r"(lcr3));
 	uint64_t lrsp =3;
 	__asm__ __volatile__ ("movq %%rsp, %0;" : "=r"(lrsp));
-	kprintf("protection  handler cr3 %p \n",lcr3);
-	kprintf("protection  handler cr2 %p \n",lcr2);
-	kprintf("protection  handler errno %d \n",regs.error);
-	kprintf("protection_fault_handler rsp %p \n",lrsp);
-	print_regiters(regs);
+	//kprintf("protection  handler cr3 %p \n",lcr3);
+	//kprintf("protection  handler cr2 %p \n",lcr2);
+	//kprintf("protection  handler errno %d \n",regs.error);
+	//kprintf("protection_fault_handler rsp %p \n",lrsp);
+	//print_regiters(regs);
 	panic("Protection fault handler");
 }
 
@@ -78,7 +78,7 @@ void page_fault_handler(struct isr_nrm_regs regs) {
 	vma_struct* curr_vmaList = curr_task->virtual_addr_space->vmaList;
 	uint64_t fault_addr = lcr2;
 	if(lcr2 >= USR_STK_TOP) {
-		print_regiters(regs);
+		//print_regiters(regs);
 		panic("PAGE FAULT IN KERNEL\n");
 
 	}

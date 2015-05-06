@@ -104,7 +104,7 @@ char** strtokenize(char* string, char character) {
         memset(currstring,'\0',j+1);
         strncpy(currstring,string,j);
         currstring[j] ='\0';
-        printf("curr string : %p\n",currstring);
+        //printf("curr string : %p\n",currstring);
         string+=(j+1);
         output[index] =currstring;
         index++;

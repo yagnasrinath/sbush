@@ -23,7 +23,6 @@ uint64_t is_pipe_available() {
 
 
 uint64_t open_pipe(file_des_t * fd1, file_des_t * fd2) {
-
 	pipe_dev_t* aux_pipe = root_pipe;
 	while(aux_pipe != NULL) {
 		if(!aux_pipe->isUsed) {

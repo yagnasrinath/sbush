@@ -6,6 +6,7 @@
 void kprintf(const char *fmt, ...);
 static inline void panic(char * reason) {
 	kprintf("\n FATAL ERROR %s \n",reason);
+	kprintf("PLEASE REBOOT !!");
 	while(1);
 }
 

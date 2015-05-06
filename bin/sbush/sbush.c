@@ -71,17 +71,18 @@ char* get_line()
 	int no_read_chars=0;
 	while((no_read_chars=read(fd,c,1024))>0)
 	{
-		//if(c[0]=='\n')
-		//{
-		//	buf[index]='\0';
-		//	//printf("%s\n",buf);
-		//	break;
-		//}
-		//else
-		//{
-		//	buf[index]=c[0];
-		//}
-		//index++
+
+		/*if(c[0]=='\n')
+		{
+			buf[index]='\0';
+			printf("%s\n",buf);
+			break;
+		}
+			else
+			{
+				buf[index]=c[0];
+			}
+			index++;*/
 		if(no_read_chars<1024)
 		{
 			strncpy(buf+index,c,no_read_chars);
@@ -93,7 +94,7 @@ char* get_line()
 			index+=no_read_chars;
 		}
 	}
-	if((index == 0)&&(isfileinput))
+	if((no_read_chars == 0)&&(isfileinput))
 	{
 		exit(0);
 	}
@@ -133,6 +134,7 @@ void make_job(struct job* cmd_list,char * cmdline)
 		return;
 	}
 	trim(cmdline);
+
 	if((cmdline[0]=='#')&&(isfileinput))
 	{
 		cmd_list->start=0;
@@ -201,7 +203,7 @@ void make_job(struct job* cmd_list,char * cmdline)
 
 void execute_command(struct command*c, char***envp_ptr)
 {
-	//printf("executable is  %s\n", c->executable);
+
 
 	int indexofslash =  getfirstindex(c->executable,'/');
 	if(indexofslash != -1)
@@ -218,46 +220,47 @@ void execute_command(struct command*c, char***envp_ptr)
 		getvalue("PATH",path);
 
 
-		char** paths = strtokenize(path,':');
-		if(paths != NULL) {
-			while( *paths)
-			{
-				//printf("enter again  %p\n",*paths);
-				/*printf("paths are %s \n", *paths);*/
-				//printf("c-> argv[0] is %p \n",c->argv[0]);
-				//printf("paths are %s \n", *paths);
-				/*printf("paths are %s \n", *paths);*/
-				//char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
-				char cmdpath [MAX_PATH_LENGTH];
-				//printf("path1 is %p \n", *paths);
-				//printf("cmdpaths are %s \n", cmdpath);
+		//char** paths = strtokenize(path,':');
 
-				setabsolutepath(cmdpath,c,*paths);
-				//printf("path2 is %p \n", *paths);
-				//printf("c->argv[0] is %p \n",c->argv[0]);
-				//printf("c->argv is %p \n",c->argv);
-				//printf("cmdpath is %s \n", cmdpath);
-				if(c->argv[0])
-					free(c->argv[0]);
-				//printf("c->argv is %p \n",c->argv);
-				c->argv[0]=cmdpath;
-				/*printf("path3 is %p \n", *paths);
-				printf("cmdpath is %s \n", cmdpath);*/
-				//printf("path address before ++ is %p\n", paths);
-				//printf("envp is %p", *envp_ptr[0]);
-				execve(cmdpath,c->argv,*envp_ptr);
-				if (errno != ENOENT && errno != EACCES)
-				{
-					printf("Enter the process 1 \n");
-					write(2,strerror(errno),strlen(strerror(errno)));
-					printf("Enter the process 1 \n");
-					write(2,"\n",strlen("\n"));
-					return;
-				}
-				//printf("path address before ++ is %p\n", *paths);
-				paths++;
-				//printf("path address after ++ is %p\n", *paths);
+		if(path != NULL) {
+			//	while( *paths)
+			//{
+			//printf("enter again  %p\n",*paths);
+			/*printf("paths are %s \n", *paths);*/
+			//printf("c-> argv[0] is %p \n",c->argv[0]);
+			//printf("paths are %s \n", *paths);
+			/*printf("paths are %s \n", *paths);*/
+			//char *cmdpath = (char*)malloc(MAX_PATH_LENGTH);
+			char cmdpath [MAX_PATH_LENGTH];
+
+			//printf("cmdpaths are %s \n", cmdpath);
+
+			setabsolutepath(cmdpath,c,path);
+			//printf("path2 is %p \n", *paths);
+			//printf("c->argv[0] is %p \n",c->argv[0]);
+			//printf("c->argv is %p \n",c->argv);
+			//printf("cmdpath is %s \n", cmdpath);
+			if(c->argv[0])
+				free(c->argv[0]);
+			//printf("c->argv is %p \n",c->argv);
+			c->argv[0]=cmdpath;
+			//printf("path3 is %p \n", *paths);
+			//printf("cmdpath is %p \n", cmdpath);
+			//printf("path address before ++ is %p\n", paths);
+			//printf("envp is %p", *envp_ptr[0]);
+			execve(cmdpath,c->argv,*envp_ptr);
+			if (errno != ENOENT && errno != EACCES)
+			{
+				printf("Enter the process 1 \n");
+				write(2,strerror(errno),strlen(strerror(errno)));
+				printf("Enter the process 1 \n");
+				write(2,"\n",strlen("\n"));
+				return;
 			}
+			//printf("path address before ++ is %p\n", *paths);
+			//paths++;
+			//printf("path address after ++ is %p\n", *paths);
+			//}
 		}
 		char * msg="command not found";
 		write(2,msg,strlen(msg));
@@ -285,10 +288,11 @@ void execute_job(struct job* j,char***envp_ptr)
 				write(2,msg,strlen(msg));
 				exit(EXIT_FAILURE);
 			}
+
 			switch(pid = fork())
 			{
 			case (-1):
-                    						;
+                    								;
 			char * msg="fork failed";
 			write(2,msg,strlen(msg));
 			exit(EXIT_FAILURE);
@@ -362,6 +366,7 @@ int main(int argc, char* argv[], char* envp[])
 	 */
 	if(argc == 2)
 	{
+
 		int fd = open(argv[1],O_RDONLY);
 		isfileinput =1;
 		dup2(fd,0);
@@ -369,6 +374,7 @@ int main(int argc, char* argv[], char* envp[])
 	while(1)
 	{
 		line = get_line();
+
 		if(!strlen(line))
 		{
 			free(line);

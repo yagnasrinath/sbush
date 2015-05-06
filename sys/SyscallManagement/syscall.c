@@ -323,9 +323,16 @@ void sys_read() {
 		if ((end - curr_pos) < length) {
 			length = end - curr_pos;
 		}
-		kmemcpy((void*) addr, (void*) curr_task->fd[fd]->curr, length);
-		curr_task->fd[fd]->curr += length;
-		curr_task->kstack[KSTACK_SIZE - RAX] = length;
+		char * addrpointer = (char *)addr;
+		uint64_t  final_length = 0 ;
+		for(; final_length <length; final_length++ ) {
+			addrpointer[final_length] = *((char *)(curr_task->fd[fd]->curr+final_length));
+			if(addrpointer[final_length] == '\n') {
+				break;
+			}
+		}
+		curr_task->fd[fd]->curr += final_length+1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = final_length;
 		return;
 	}
 
@@ -403,13 +410,14 @@ void sys_open() {
 
 	task_struct* curr_task = get_curr_task();
 	char* path = (char*) curr_task->kstack[KSTACK_SIZE - RDI];
+	curr_task->kstack[KSTACK_SIZE - RDI] = 0;
 	uint64_t flags = (uint64_t) curr_task->kstack[KSTACK_SIZE - RSI];
 	file_des_t* fd = (file_des_t*) kmalloc(sizeof(file_des_t));
 	//kprintf("path is %s \n",path);
 	file_t* aux_node = NULL;
 	file_t* curr_node = root_node;
-
 	if (path == NULL) {
+
 		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 		return;
 	}
@@ -432,7 +440,7 @@ void sys_open() {
 		aux_node = curr_node;
 
 		if (curr_node->type == FILE_TYPE) {
-			curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+			curr_task->kstack[KSTACK_SIZE - RAX] = -2;
 			return;
 		}
 		if (kstrcmp(temp, ".") == 0) {
@@ -599,13 +607,13 @@ void dup2() {
 	uint64_t oldfd = curr_task->kstack[KSTACK_SIZE - RDI];
 	uint64_t newfd = curr_task->kstack[KSTACK_SIZE - RSI];
 	if (oldfd < 0 || oldfd >= MAX_FD_PER_PROC) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = 1;
 		return;
 	} else if (newfd < 0 || newfd >= MAX_FD_PER_PROC) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = 1;
 		return;
 	} else if (curr_task->fd[oldfd] == NULL) {
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = 1;
 		return;
 	}
 
@@ -616,6 +624,7 @@ void dup2() {
 		}
 	}
 	curr_task->fd[newfd] = curr_task->fd[oldfd];
+
 	if (curr_task->fd[newfd]->file_type == PIPE_TYPE) {
 		if (curr_task->fd[newfd]->file_perm == O_WRONLY) {
 			curr_task->fd[newfd]->pipenode->writeEndRefCount++;
@@ -623,6 +632,7 @@ void dup2() {
 			curr_task->fd[newfd]->pipenode->readEndRefCount++;
 		}
 	}
+
 	curr_task->kstack[KSTACK_SIZE - RAX] = 0;
 	return;
 }
@@ -630,11 +640,11 @@ void dup2() {
 void sys_chdir() {
 	task_struct* curr_task = get_curr_task();
 	char* path = (char*) curr_task->kstack[KSTACK_SIZE - RDI];
-	//kprintf("path is %s \n",path);
 	file_t* aux_node = NULL;
 	file_t* curr_node = root_node;
-
+	//kprintf("path is %s \n", path);
 	if (path == NULL) {
+		kprintf("path is null \n");
 		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
 		return;
 	}

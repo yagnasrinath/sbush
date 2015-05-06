@@ -13,9 +13,9 @@
 #include<sys/utils/kstring.h>
 static  volatile uint16_t special_keys =0;
 static  volatile  uint16_t LEFT_SHIFT_PRESS = 1;
-static  volatile  uint16_t LEFT_SHIFT_RELEASE = ~(-1);
+static  volatile  uint16_t LEFT_SHIFT_RELEASE = ~(1);
 static  volatile  uint16_t RIGHT_SHIFT_PRESS = 2;
-static  volatile  uint16_t RIGHT_SHIFT_RELEASE = ~(-2);
+static  volatile  uint16_t RIGHT_SHIFT_RELEASE = ~(2);
 static volatile uint16_t flag =0;
 static volatile uint64_t last_addr;
 static volatile uint64_t counter;
