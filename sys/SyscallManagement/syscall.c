@@ -304,11 +304,10 @@ void sys_read() {
 	//kprintf("addr passed is %p \n",addr);
 	length = curr_task->kstack[KSTACK_SIZE - RDX];
 	if (fd < 0 || fd >= MAX_FD_PER_PROC) {
-		kprintf("fd value is %d",fd);
 		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
 		return;
 	} else if (curr_task->fd[fd] == NULL) {
-		kprintf("fd value is %d",fd);
+
 		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
 		return;
 	} else if (curr_task->fd[fd]->file_type == STDIN_TYPE) {
@@ -421,7 +420,7 @@ void sys_open() {
 	file_t* curr_node = root_node;
 	if (path == NULL) {
 
-		curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+		curr_task->kstack[KSTACK_SIZE - RAX] = -2;
 		return;
 	}
 

@@ -20,7 +20,8 @@ int main(int argc,char** argv,char** envp){
 		while(argc > 0){
 			fd = open(*argv,O_RDONLY);
 			if(fd < 0 ) {
-				strerror(fd);
+				printf("%s \n", strerror(errno));
+				exit(0);
 			}
 			while(1){
 				if((size = read(fd, buf,10240))>0){
