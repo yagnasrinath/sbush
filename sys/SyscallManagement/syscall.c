@@ -708,6 +708,11 @@ void sys_chdir() {
 		k++;
 
 	}
+	if(curr_node->type != DIRECTORY_TYPE) {
+		curr_task->kstack[KSTACK_SIZE - RAX] = -20;
+		return;
+	}
+
 	curr_task->kstack[KSTACK_SIZE - RAX] = 0;
 
 	kstrcpy(curr_task->CWD, curr_node->file_path);
