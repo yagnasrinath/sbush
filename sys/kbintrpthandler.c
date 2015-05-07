@@ -123,7 +123,10 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 						putch(val);
 						counter--;
 					}
-				} else {
+				} else if (val == '\t') {
+
+				}
+				else {
 					if(valid_ascii(val))
 					{
 						buf[counter] = val;

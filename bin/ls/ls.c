@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<errno.h>
+#include<string.h>
 
 int main(int argc, char* argv[], char* envp[]) {
 	/*printf("argv[0] is %p\n", argv[0]);
@@ -17,15 +18,14 @@ int main(int argc, char* argv[], char* envp[]) {
 		getcwd(buf,255);
 		dir = opendir(buf);
 		if(!dir){
-			printf("Opening Directory failed\n");
+			printf("%s \n",strerror(errno));
 			return 0;
 		}
 	}
 	else {
-		printf("current working directory is %s \n", argv[1]);
 		dir = opendir(argv[1]);
 		if(!dir){
-			printf("Opening Directory failed\n");
+			printf("%s \n",strerror(errno));
 			return 0;
 		}
 	}
