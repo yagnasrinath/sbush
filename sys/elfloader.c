@@ -227,11 +227,16 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, int 
 
 task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isInitProc) {
 
+	if(filename[0] == '/') {
+		filename +=1;
+	}
 	char* data = get_file_data(filename);
 	if(data  == NULL) {
 		//kprintf("data is null \n");
 		return NULL;
 	}
+
+
 	Elf64_Ehdr* elf_header = (Elf64_Ehdr*)data;
 	if(!is_file_elf(elf_header)) {
 

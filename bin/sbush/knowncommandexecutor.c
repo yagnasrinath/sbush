@@ -115,7 +115,6 @@ void executeknowncommand(char *command, char** args) {
 			printf("Usage: setenv VARIABLE newpath\n");
 			return;
 		}
-		printf("args[1] and args[2] are %s ,%s \n",args[1], args[2]);
 		char** arg2tokens = strtokenize(args[2],':');
 		int index=0;
 		char *temp = 0;
