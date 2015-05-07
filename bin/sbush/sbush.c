@@ -18,6 +18,38 @@ void setabsolutepath(char*newexec,struct command *newcommand, char *path){
 	strcat(newexec, newcommand->executable);
 }
 
+
+BOOL isBackGroundProcess(char **argv) {
+	if(argv == NULL) {
+		return FALSE;
+	}
+	int i =0;
+	while(argv[i]) {
+		i++;
+	}
+	if(i > 0) {
+		if(!strcmp(argv[i-1] ,"&")){
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+BOOL isValidJobList(struct job*j) {
+	struct command* c = j->start;
+	if(!c) {
+		return TRUE;
+	}
+	while(c->next) {
+		if(isBackGroundProcess(c->argv)) {
+			return FALSE;
+		}
+		c = c->next;
+	}
+	return TRUE;
+}
+
 void print_job(struct job*cmd_list)
 {
 	struct command *cmd;
@@ -274,6 +306,10 @@ void execute_job(struct job* j,char***envp_ptr)
 	struct command* c = j->start;
 	int pid = -1;
 	int childs=0;
+	if(!isValidJobList(j)) {
+		printf("INVALID SYNTAX : commands in the middle cannot be background process \n");
+		return;
+	}
 	while(c)
 	{
 		if(isknowncommand(c->executable))
@@ -292,7 +328,7 @@ void execute_job(struct job* j,char***envp_ptr)
 			switch(pid = fork())
 			{
 			case (-1):
-                    								;
+                    										;
 			char * msg="fork failed";
 			write(2,msg,strlen(msg));
 			exit(EXIT_FAILURE);
@@ -313,7 +349,9 @@ void execute_job(struct job* j,char***envp_ptr)
 				exit(EXIT_FAILURE);
 				break;
 			default:
-				childs++;
+				if(!isBackGroundProcess(c->argv)) {
+					childs++;
+				}
 				if(old[0]!=-1)
 				{
 					close(old[0]);

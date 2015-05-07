@@ -43,7 +43,7 @@ static BOOL is_file_elf(Elf64_Ehdr* elf_loader) {
 }
 
 
-static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInitProc)
+static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInitProc, BOOL isBackGroundProcess)
 {
 	uint64_t *user_stack, *argv[10], *env[10];
 	int len, i;
@@ -73,7 +73,9 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 
 	}
 	//kprintf("env[i] end in case of init is %p \n",user_stack );
-
+	if(isBackGroundProcess){
+		argc = argc-1;
+	}
 	for (i = argc-1; i >= 0; i--) {
 		len = kstrlen(args[i]) + 1;
 		user_stack = (uint64_t*)((void*)user_stack - len);
@@ -110,7 +112,7 @@ static void copy_arg_to_stack(task_struct *task, int argc, int envc, BOOL isInit
 	_set_cr3(present_pml4);
 }
 
-void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, int argc, int envc, BOOL isInitProc) {
+void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, int argc, int envc, BOOL isInitProc, BOOL isBackGroundProcess) {
 
 	uint64_t present_pml4 = read_cr3();
 	//kprintf("pml4t of new process is %p \n",present_pml4);
@@ -208,7 +210,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, int 
 	new_task->virtual_addr_space->brk_end = heap_start_vaddr;
 
 
-	copy_arg_to_stack(new_task, argc, envc,isInitProc);
+	copy_arg_to_stack(new_task, argc, envc,isInitProc, isBackGroundProcess);
 	new_task->state = READY;
 	file_des_t * file_d      = (file_des_t * )kmalloc(sizeof(file_des_t));
 	file_d->file_type = STDIN_TYPE;
@@ -225,7 +227,7 @@ void load_elf(task_struct* new_task, char* filename,Elf64_Ehdr* elf_header, int 
 
 
 
-task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isInitProc) {
+task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isInitProc, BOOL isBackGroundProcess) {
 
 	if(filename[0] == '/') {
 		filename +=1;
@@ -268,6 +270,6 @@ task_struct * get_elf_task(char *filename, char *argv[], char* env[], BOOL isIni
 	if(new_task  == NULL) {
 		panic("elfoader.c : get_elf_task : create_new_task returned NULL. Probably out of resources");
 	}
-	load_elf(new_task, filename,elf_header, argc,envc, isInitProc);
+	load_elf(new_task, filename,elf_header, argc,envc, isInitProc, isBackGroundProcess);
 	return new_task;
 }

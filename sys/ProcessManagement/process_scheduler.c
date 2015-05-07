@@ -9,7 +9,7 @@
 #include<sys/utils/kstring.h>
 #include<sys/ProcessManagement/process.h>
 #include<sys/ProcessManagement/process_helper.h>
-
+extern task_struct *init_task_struct;
 extern void x86_64_isr32();
 static task_struct* task_list;
 static task_struct* curr_proc;

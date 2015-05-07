@@ -258,6 +258,7 @@ task_struct* create_new_task(BOOL is_user_process) {
 		}
 	}
 	new_task->is_user_proc = is_user_process;
+	new_task->isBckProcess = FALSE;
 	curr_pid = curr_pid+1;
 	new_task->pid =curr_pid;
 	new_task->state = READY;

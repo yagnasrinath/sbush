@@ -63,6 +63,7 @@ struct task_structure{
 	task_struct* children_head;
 	task_struct* next_sibling;
 	int wait_pid;
+	uint64_t isBckProcess;
 	file_des_t *fd[MAX_FD_PER_PROC];
 	uint64_t  num_of_children;
 	task_struct *next;

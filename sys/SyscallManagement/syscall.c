@@ -16,7 +16,7 @@
 #include<sys/fs/pipe.h>
 #include<sys/elf_loader.h>
 #define STDIN 0
-
+extern task_struct *init_task_struct;
 uint64_t gets(uint64_t addr, uint64_t length);
 uint64_t get_pt_vir_addr(uint64_t);
 struct timespec {
@@ -136,6 +136,35 @@ void sys_write() {
 	}
 
 }
+
+void exit() {
+
+	task_struct* curr_task = get_curr_task();
+	//kprintf("in the sys exit handler %d\n",curr_task->pid);
+	/*if(curr_task->pid == 2) {
+	 //panic("");
+	 }*/
+	//kprintf("process %d cleared \n",curr_task->pid);
+	detach_children(curr_task);
+	detach_from_parent(curr_task);
+	//print_mem_map(curr_task);
+	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
+	//kprintf("vma list freed\n");
+	free_pagetables();
+	//print_present_pages();
+	for (int fd = 0; fd < MAX_FD_PER_PROC; fd++) {
+		if (curr_task->fd[fd] != NULL) {
+			if (curr_task->fd[fd]->file_type == PIPE_TYPE) {
+				close_pipe(curr_task->fd[fd]);
+
+			}
+
+		}
+	}
+
+	__asm__ __volatile__("int $32;");
+}
+
 
 void sys_lseek() {
 	task_struct * curr_task = get_curr_task();
@@ -311,6 +340,10 @@ void sys_read() {
 		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
 		return;
 	} else if (curr_task->fd[fd]->file_type == STDIN_TYPE) {
+		if(curr_task->isBckProcess) {
+			kprintf("Background process terminated as it tried to read from STDIN ");
+			exit();
+		}
 		length = gets(addr, length);
 		curr_task->kstack[KSTACK_SIZE - RAX] = length;
 		return;
@@ -506,33 +539,7 @@ void sys_open() {
 	return;
 }
 
-void exit() {
 
-	task_struct* curr_task = get_curr_task();
-	//kprintf("in the sys exit handler %d\n",curr_task->pid);
-	/*if(curr_task->pid == 2) {
-	 //panic("");
-	 }*/
-	//kprintf("process %d cleared \n",curr_task->pid);
-	detach_children(curr_task);
-	detach_from_parent(curr_task);
-	//print_mem_map(curr_task);
-	free_process_vma_list(curr_task->virtual_addr_space->vmaList);
-	//kprintf("vma list freed\n");
-	free_pagetables();
-	//print_present_pages();
-	for (int fd = 0; fd < MAX_FD_PER_PROC; fd++) {
-		if (curr_task->fd[fd] != NULL) {
-			if (curr_task->fd[fd]->file_type == PIPE_TYPE) {
-				close_pipe(curr_task->fd[fd]);
-
-			}
-
-		}
-	}
-
-	__asm__ __volatile__("int $32;");
-}
 
 void sys_pipe() {
 	task_struct* curr_task = get_curr_task();
@@ -707,11 +714,10 @@ void sys_chdir() {
 	return;
 }
 
-void replace_task(task_struct* old_task, task_struct* new_task) {
+void replace_task(task_struct* old_task, task_struct* new_task, BOOL isBkProcess) {
 	task_struct* parent_task = old_task->parent;
 	task_struct* sib = parent_task->children_head;
 	task_struct* last_sib = NULL;
-
 	while (sib != NULL) {
 		if (sib == old_task) {
 			break;
@@ -723,23 +729,55 @@ void replace_task(task_struct* old_task, task_struct* new_task) {
 		panic("child is not present in parent's children list");
 	}
 	if (last_sib != NULL) {
-		last_sib->next_sibling = new_task;
-		new_task->next_sibling = sib->next_sibling;
+		if(!isBkProcess) {
+			last_sib->next_sibling = new_task;
+			new_task->next_sibling = sib->next_sibling;
+		}
+		else {
+			last_sib->next_sibling  = sib->next_sibling;
+		}
 	} else {
-		new_task->next_sibling = sib->next_sibling;
-		parent_task->children_head = new_task;
+		if(!isBkProcess) {
+			new_task->next_sibling = sib->next_sibling;
+			parent_task->children_head = new_task;
+		}
+		else {
+			parent_task->children_head = sib->next_sibling;
+		}
 	}
+	if(isBkProcess) {
+		new_task->next_sibling =init_task_struct->children_head;
+		init_task_struct->children_head = init_task_struct;
+	}
+
 }
 
+BOOL isBackGroundProcess(char **argv) {
+	if(argv == NULL) {
+		return FALSE;
+	}
+	int i =0;
+	while(argv[i]) {
+		i++;
+	}
+	if(i > 0) {
+		if(!kstrcmp(argv[i-1] ,"&")){
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+
 void sys_execvpe() {
-	//kprintf("sys_excecve called \n");
 	task_struct* curr_task = get_curr_task();
 	char* file_name = (char *) curr_task->kstack[KSTACK_SIZE - RDI];
 	char** argv = (char **) curr_task->kstack[KSTACK_SIZE - RSI];
 	char** envp = (char **) curr_task->kstack[KSTACK_SIZE - RDX];
 	//kprintf("envp passed to the syscall is %p",envp[0]);
-
-	task_struct* new_task = get_elf_task(file_name, argv, envp, FALSE);
+	BOOL isBkProcess = isBackGroundProcess(argv);
+	task_struct* new_task = get_elf_task(file_name, argv, envp, FALSE, isBkProcess);
 	if (new_task != NULL) {
 		decrement_pid();
 		new_task->pid = curr_task->pid;
@@ -747,7 +785,8 @@ void sys_execvpe() {
 		new_task->parent = curr_task->parent;
 		kstrcpy(new_task->CWD, curr_task->CWD);
 		kmemcpy(new_task->fd, curr_task->fd, MAX_FD_PER_PROC * 8);
-		replace_task(curr_task, new_task);
+		replace_task(curr_task, new_task,isBkProcess);
+		new_task->isBckProcess = isBkProcess;
 		free_process_vma_list(curr_task->virtual_addr_space->vmaList);
 		free_pagetables();
 		curr_task->state = EXIT;
@@ -755,7 +794,6 @@ void sys_execvpe() {
 		__asm__ __volatile__("int $32");
 	}
 	curr_task->kstack[KSTACK_SIZE - RAX] = -2;
-	//kprintf("sys_excecve returned \n");
 	return;
 }
 void sys_getcwd() {
