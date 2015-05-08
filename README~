@@ -12,8 +12,6 @@ Setting PATH
 command : setenv PATH path
 example : setenv PATH /bin
 
-NOTE : We are supporting only one PATH at time. Cann't prepend or append PATH.
-
 List Processes
 
 Command : ps
@@ -63,10 +61,6 @@ Command : cd <path/../.>
 
 example : cd ..
 
-List Directory
-
-Command : ls [DIRECTORY]
-
-example : ls or ls <DIRECTORY>
 
 
+Known Issues : 
