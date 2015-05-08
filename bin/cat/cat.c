@@ -21,6 +21,7 @@ int main(int argc,char** argv,char** envp){
 			fd = open(*argv,O_RDONLY);
 			if(fd < 0 ) {
 				printf("%s ", strerror(errno));
+				write(1, "\n", 1);
 				exit(0);
 			}
 			while(1){
