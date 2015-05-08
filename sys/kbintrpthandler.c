@@ -77,7 +77,15 @@ BOOL valid_ascii(int val)
 	return TRUE;
 }
 
-
+BOOL isSpecialChar(uint8_t val) {
+	switch(val) {
+	case SC_UP:
+	case SC_PGUP :
+	case SC_ALT:
+		return TRUE;
+	}
+	return FALSE;
+}
 void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 	uint8_t b = inportb(0x60);
 
@@ -98,6 +106,9 @@ void  kb_intrpt_handler( struct isr_nrm_regs  stack) {
 	}
 	else if(b == (SC_CTRL | 0x80)){
 		special_keys = special_keys & CTRL_RELEASE;
+	}
+	else if (isSpecialChar(b)) {
+
 	}
 	else if( b < 0X80){
 		BOOL is_shift_pressed = (special_keys & LEFT_SHIFT_PRESS) ||
