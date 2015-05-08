@@ -20,7 +20,7 @@ int main(int argc,char** argv,char** envp){
 		while(argc > 0){
 			fd = open(*argv,O_RDONLY);
 			if(fd < 0 ) {
-				printf("%s \n", strerror(errno));
+				printf("%s ", strerror(errno));
 				exit(0);
 			}
 			while(1){
@@ -31,7 +31,7 @@ int main(int argc,char** argv,char** envp){
 
 				}
 				else if (size < 0) {
-					printf("%s \n",strerror(errno));
+					printf("%s ",strerror(errno));
 					write(1, "\n", 1);
 					exit(0);
 				}
