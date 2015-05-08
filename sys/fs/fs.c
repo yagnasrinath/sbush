@@ -110,7 +110,7 @@ void init_pipe()
 	pipe_dev_t* curr_pipe = root_pipe;
 	int i;
 	pipe_dev_t* aux_pipe;
-	for(i=0; i<9; i++) {
+	for(i=0; i<10; i++) {
 		aux_pipe = (pipe_dev_t*)kmalloc(sizeof(pipe_dev_t));
 		aux_pipe ->id = i;
 		aux_pipe ->isUsed = FALSE;
