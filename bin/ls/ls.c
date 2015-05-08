@@ -29,13 +29,25 @@ int main(int argc, char* argv[], char* envp[]) {
 			return 0;
 		}
 	}
-	while(1){
+	struct dirent* directoryentry = readdir(dir);
+	if(!directoryentry){
+		if(argv[1]) {
+			printf("%s\n", argv[1]);
+			return 0;
+		}
+		else {
+			return 0;
+		}
+
+	}
+	do{
+		printf("%s\t",directoryentry->d_name);
 		struct dirent* directoryentry = readdir(dir);
 		if(!directoryentry){
 			break;
 		}
-		printf("%s\t",directoryentry->d_name);
-	}
+
+	}while(1);
 	printf("\n");
 
 
