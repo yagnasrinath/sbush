@@ -70,7 +70,7 @@ void print_char_pressed(char c) {
 
 BOOL valid_ascii(int val)
 {
-	if(val==0||val==1||(val>=58&&val<=64))
+	if(val==0||val==1)
 	{
 		return FALSE;
 	}
