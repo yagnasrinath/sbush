@@ -406,6 +406,10 @@ int main(int argc, char* argv[], char* envp[])
 	{
 
 		int fd = open(argv[1],O_RDONLY);
+		if(fd < 0) {
+			printf("%s \n",strerror(errno));
+			return 0;
+		}
 		isfileinput =1;
 		dup2(fd,0);
 	}
