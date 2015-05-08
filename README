@@ -12,7 +12,7 @@ Setting PATH
 command : setenv PATH path
 example : setenv PATH /bin
 
-NOTE : We are supporting only one PATH at time. Cann't prepend or append PATH.
+NOTE : We are supporting only one PATH at time. Cann't prepend or append PATH. Will search only in the PATH pointed by the PATH environment variable.
 
 List Processes
 
