@@ -1,24 +1,64 @@
-The provided Makefile:
-  1) builds a kernel
-  2) copies it into rootfs/boot/kernel/kernel
-  3) creates an ISO CD image with the rootfs/ contents
+// Authors
+Yagna Srinath Reddy, Battula(110010304)
+Ravi Chandra, Sadineni(109754581)
+Harshavardhan Chowdary, Ellanti(109596321)
 
-To boot the system in QEMU, run:
-  qemu-system-x86_64 -curses -cdrom $USER.iso -drive id=disk,file=$USER.img,if=none -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0 -net nic -net user,hostfwd=tcp::10080-:80 -net user,hostfwd=tcp::10023-:23 --no-reboot -gdb tcp::9998
+Project Level : Preemptive OS(70 marks)
 
-  Explanation of parameters:
-  -curses         use a text console (omit this to use default SDL/VNC console)
-  -cdrom x.iso    connect a CD-ROM and insert CD with x.iso disk
-  --no-reboot     exit when guest reboots
-  -gdb tcp::9998  listen for "remote" debugging connections on port 9998
+How to execute particular command in our sbush
 
-  connect a hard drive with x.img disk:
-  -drive id=disk,file=$USER.img,if=none -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0
-  connect a NIC and forward local port 10080 into port 80 and local port 10023 to port 23
-  -net nic -net user,hostfwd=tcp::10080-:80 -net user,hostfwd=tcp::10023-:23
+Setting PATH 
 
-When using the -curses mode, switch to the qemu> console with ESC-2.
+command : setenv PATH path
+example : setenv PATH /bin
 
-To connect a remote debugger to the running qemu VM:
-  gdb ./kernel
-  target remote localhost:9998
+List Processes
+
+Command : ps
+
+Kill Processes
+
+kill -9 <PID>
+
+Backgroud Processes
+
+Command : command &
+
+example : ls &
+
+Present Working Directory
+
+Command : pwd
+
+Echo command 
+
+Command : echo $PATH
+
+cat command
+
+Command : cat <Binary/FileName/NULL>
+
+
+Pipe command
+
+How to : <command1> | <command2> | <command3> | <command4>
+
+Sleep command
+
+Command : sleep <seconds>
+
+example : sleep 4
+
+Exit command
+
+Command : exit
+
+Exits the shell
+
+Change Directory
+
+Command : cd <path/../.>
+
+example : cd ..
+
+
