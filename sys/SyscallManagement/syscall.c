@@ -375,7 +375,12 @@ void sys_read() {
 		uint64_t ret = read_pipe(curr_task->fd[fd], length, (char*) addr);
 		curr_task->kstack[KSTACK_SIZE - RAX] = ret;
 		return;
-	} else {
+	}else if (curr_task->fd[fd]->file_type == DIRECTORY_TYPE) {
+		curr_task->kstack[KSTACK_SIZE - RAX] = -21;
+		return;
+	}
+
+	else {
 		curr_task->kstack[KSTACK_SIZE - RAX] = -9;
 
 		return;
