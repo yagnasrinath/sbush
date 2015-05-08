@@ -899,7 +899,7 @@ void sys_kill() {
 		}
 		if (aux_task == NULL) {
 			//kprintf("process not found\n");
-			curr_task->kstack[KSTACK_SIZE - RAX] = -1;
+			curr_task->kstack[KSTACK_SIZE - RAX] = -3;
 			return;
 		} else {
 			//__asm__ __volatile__("int $32;");

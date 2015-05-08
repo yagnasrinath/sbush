@@ -96,7 +96,9 @@ void executeknowncommand(char *command, char** args) {
 			printf("Usage: kill -9 <pid>\n");
 			return;
 		}
-		kill(sig_no,atoi(args[2]));
+		if(kill(sig_no,atoi(args[2])) < 0) {
+			printf("%s \n",strerror(errno));
+		}
 		return;
 	}
 
